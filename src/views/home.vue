@@ -5,13 +5,13 @@
     >
       <div class="text-2xl font-bold">ChatGPT</div>
       <div class="ml-4 text-sm text-gray-500">
-        基于 OpenAI 的 ChatGPT 自然语言模型人工智能对话
+        基於 OpenAI 的 ChatGPT 自然語言模型人工智能對話
       </div>
       <div
         class="ml-auto px-3 py-2 text-sm cursor-pointer hover:bg-white rounded-md"
         @click="clickConfig()"
       >
-        设置
+        設置
       </div>
     </div>
 
@@ -37,18 +37,18 @@
 
     <div class="sticky bottom-0 w-full p-6 pb-8 bg-gray-100">
       <div class="-mt-2 mb-2 text-sm text-gray-500" v-if="isConfig">
-        请输入 API Key：
+        請輸入 API Key：
       </div>
       <div class="flex">
         <input
           class="input"
           :type="isConfig ? 'password' : 'text'"
-          :placeholder="isConfig ? 'sk-xxxxxxxxxx' : '请输入'"
+          :placeholder="isConfig ? 'sk-xxxxxxxxxx' : '請輸入'"
           v-model="messageContent"
           @keydown.enter="isTalking || sendOrSave()"
         />
         <button class="btn" :disabled="isTalking" @click="sendOrSave()">
-          {{ isConfig ? "保存" : "发送" }}
+          {{ isConfig ? "保存" : "發送" }}
         </button>
       </div>
     </div>
@@ -74,19 +74,19 @@ const roleAlias = { user: "ME", assistant: "ChatGPT", system: "System" };
 const messageList = ref<ChatMessage[]>([
   {
     role: "system",
-    content: "你是 ChatGPT，OpenAI 训练的大型语言模型，尽可能简洁地回答。",
+    content: "你是 ChatGPT，OpenAI 訓練的大型語言模型，盡可能簡潔地回答。",
   },
   {
     role: "assistant",
-    content: `你好，我是AI语言模型，我可以提供一些常用服务和信息，例如：
+    content: `你好，我是AI語言模型，我可以提供一些常用服務和信息，例如：
 
-1. 翻译：我可以把中文翻译成英文，英文翻译成中文，还有其他一些语言翻译，比如法语、日语、西班牙语等。
+1. 翻譯：我可以把中文翻譯成英文，英文翻譯成中文，還有其他一些語言翻譯，比如法語、日語、西班牙語等。
 
-2. 咨询服务：如果你有任何问题需要咨询，例如健康、法律、投资等方面，我可以尽可能为你提供帮助。
+2. 咨詢服務：如果你有任何問題需要咨詢，例如健康、法律、投資等方面，我可以盡可能為你提供幫助。
 
-3. 闲聊：如果你感到寂寞或无聊，我们可以聊一些有趣的话题，以减轻你的压力。
+3. 閒聊：如果你感到寂寞或無聊，我們可以聊一些有趣的話題，以減輕你的壓力。
 
-请告诉我你需要哪方面的帮助，我会根据你的需求给你提供相应的信息和建议。`,
+請告訴我你需要哪方面的幫助，我會根據你的需求給你提供相應的信息和建議。`,
   },
 ]);
 
@@ -186,7 +186,7 @@ const getSecretKey = () => "lianginx";
 
 const saveAPIKey = (apiKey: string) => {
   if (apiKey.slice(0, 3) !== "sk-" || apiKey.length !== 51) {
-    alert("API Key 错误，请检查后重新输入！");
+    alert("API Key 錯誤，請檢查後重新輸入！");
     return false;
   }
   const aesAPIKey = cryptoJS.AES.encrypt(apiKey, getSecretKey()).toString();
