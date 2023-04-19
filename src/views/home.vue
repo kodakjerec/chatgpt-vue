@@ -2,11 +2,13 @@
   <div class="flex flex-col h-screen">
     <div class="flex flex-nowrap fixed w-full items-baseline top-0 px-6 py-4 bg-gray-100">
       <div class="text-2xl font-bold">ChatGPT</div>
-      <div class="ml-4 text-sm text-gray-500">基於 OpenAI 的 ChatGPT 自然語言模型人工智能對話</div>
+      <div class="ml-4 text-sm text-gray-500">Log: {{ chatLogSize }} MB(Max:10)</div>
       <div
         class="ml-auto px-3 py-2 text-sm cursor-pointer hover:bg-white rounded-md"
-        @click="clickConfig()"
-      >設置</div>
+        @click="resetChatLog();calChatLogSize();">清除Log</div>
+      <div
+        class="ml-auto px-3 py-2 text-sm cursor-pointer hover:bg-white rounded-md"
+        @click="clickConfig()">設置</div>
     </div>
 
     <div class="flex-1 mx-2 mt-20 mb-2" ref="chatListDom">
@@ -60,28 +62,14 @@
   const chatListDom = ref<HTMLDivElement>();
   const decoder = new TextDecoder("utf-8");
   const roleAlias = { user: "ME", assistant: "ChatGPT", system: "System" };
-  const messageList = ref<ChatMessage[]>([
-    {
-      role: "system",
-      content: "你是 ChatGPT，OpenAI 訓練的大型語言模型，盡可能簡潔地回答。",
-    },
-    {
-      role: "assistant",
-      content: `你好，我是AI語言模型，我可以提供一些常用服務和信息，例如：
-
-  1. 翻譯：我可以把中文翻譯成英文，英文翻譯成中文，還有其他一些語言翻譯，比如法語、日語、西班牙語等。
-
-  2. 咨詢服務：如果你有任何問題需要咨詢，例如健康、法律、投資等方面，我可以盡可能為你提供幫助。
-
-  3. 閒聊：如果你感到寂寞或無聊，我們可以聊一些有趣的話題，以減輕你的壓力。
-
-  請告訴我你需要哪方面的幫助，我會根據你的需求給你提供相應的信息和建議。`,
-    },
-  ]);
+  const messageList = ref<ChatMessage[]>([]);
+  let chatLogSize:float = 0; // log尺寸
 
   onMounted(() => {
     if (getAPIKey()) {
+      getChatLog();
       switchConfigStatus();
+      nextTick(() => scrollToBottom());
     }
   });
 
@@ -116,9 +104,16 @@
       appendLastMessageContent(error);
     } finally {
       isTalking.value = false;
+      setChatLog();
+      calChatLogSize();
     }
   };
 
+  /**
+   * 解析chatGpt回傳的stream
+   * @param reader 格式
+   * @param status response回傳狀態
+   */
   const readStream = async (
     reader: ReadableStreamDefaultReader<Uint8Array>,
     status: number
@@ -159,9 +154,15 @@
     }
   };
 
+  /**
+   * 將chatGpt回傳的單字組合
+   */
   const appendLastMessageContent = (content: string) =>
     (messageList.value[messageList.value.length - 1].content += content);
 
+  /**
+   * 傳送指令 或是 儲存api字串
+   */
   const sendOrSave = () => {
     if (!messageContent.value.length) return;
     if (isConfig.value) {
@@ -174,6 +175,9 @@
     }
   };
 
+  /**
+   * 開啟設置畫面
+   */
   const clickConfig = () => {
     if (!isConfig.value) {
       messageContent.value = getAPIKey();
@@ -184,7 +188,10 @@
   };
 
   const getSecretKey = () => "lianginx";
-
+  /**
+   * 儲存apiKey
+   * @param apiKey 明文apiKey
+   */
   const saveAPIKey = (apiKey: string) => {
     if (apiKey.slice(0, 3) !== "sk-" || apiKey.length !== 51) {
       alert("API Key 錯誤，請檢查後重新輸入！");
@@ -194,7 +201,10 @@
     localStorage.setItem("apiKey", aesAPIKey);
     return true;
   };
-
+  /**
+   * 取得apiKey
+   *  @return 明文apiKey
+   */
   const getAPIKey = () => {
     if (apiKey) return apiKey;
     const aesAPIKey = localStorage.getItem("apiKey") ?? "";
@@ -204,15 +214,62 @@
     return apiKey;
   };
 
+  // 取得log
+  const getChatLog = () => {
+    let chatLog = localStorage.getItem('chatLog');
+    if (chatLog) {
+      Object.assign(messageList.value, JSON.parse(chatLog));
+      calChatLogSize();
+    } else {
+      resetChatLog();
+      setChatLog();
+      calChatLogSize();
+    }
+  }
+  // 紀錄log
+  const setChatLog = () => {
+    let saveItem = JSON.stringify(messageList.value);
+    localStorage.setItem('chatLog', saveItem);
+  }
+  // 重置log
+  const resetChatLog = () => {
+    messageList.value.length=0;
+    messageList.value.push(
+      {
+        role: "system",
+        content: "你是 ChatGPT，OpenAI 訓練的大型語言模型，盡可能簡潔地回答。",
+      });
+    messageList.value.push(
+    {
+      role: "assistant",
+      content: `你好，我是AI語言模型，我可以提供一些常用服務和信息，例如：
+                1. 翻譯：我可以把中文翻譯成英文，英文翻譯成中文，還有其他一些語言翻譯，比如法語、日語、西班牙語等。
+                2. 咨詢服務：如果你有任何問題需要咨詢，例如健康、法律、投資等方面，我可以盡可能為你提供幫助。
+                3. 閒聊：如果你感到寂寞或無聊，我們可以聊一些有趣的話題，以減輕你的壓力。
+                請告訴我你需要哪方面的幫助，我會根據你的需求給你提供相應的信息和建議。`,
+    });
+  }
+  // 計算logsize
+  const calChatLogSize = () => {
+    let saveItem = JSON.stringify(messageList.value);
+    let bytes = new Blob([saveItem]).size;
+    let megabytes = bytes / (1024 * 1024);
+    // console.log("儲存此 JSON 配置文件所需的 MB 為：" + megabytes + " (max:10 MB)");
+    chatLogSize = megabytes.toFixed(4);
+  }
+
+  // 切換設置狀態
   const switchConfigStatus = () => (isConfig.value = !isConfig.value);
 
+  // 清除輸入框內容
   const clearMessageContent = () => (messageContent.value = "");
 
+  // 移到畫面最下方
   const scrollToBottom = () => {
     if (!chatListDom.value) return;
     scrollTo(0, chatListDom.value.scrollHeight);
   };
-
+  // list有更新將畫面移到最下方
   watch(messageList.value, () => nextTick(() => scrollToBottom()));
 </script>
 
