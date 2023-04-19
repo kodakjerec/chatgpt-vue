@@ -5,7 +5,7 @@
       <div class="ml-4 text-sm text-gray-500">Log: {{ chatLogSize }} MB(Max:10)</div>
       <div
         class="ml-auto px-3 py-2 text-sm cursor-pointer hover:bg-white rounded-md"
-        @click="resetChatLog();calChatLogSize();">清除Log</div>
+        @click="clickClearLog()">清除Log</div>
       <div
         class="ml-auto px-3 py-2 text-sm cursor-pointer hover:bg-white rounded-md"
         @click="clickConfig()">設置</div>
@@ -176,6 +176,13 @@
   };
 
   /**
+   * 按下 清除log
+   */
+  const clickClearLog = () => {
+      resetChatLog();
+      setChatLog();
+  };
+  /**
    * 開啟設置畫面
    */
   const clickConfig = () => {
@@ -275,7 +282,7 @@
 
 <style scoped>
 pre {
-  font-family: -apple-system, "Noto Sans", "Helvetica Neue", Helvetica,
+  font-family: "Microsoft JhengHei", -apple-system, "Noto Sans", "Helvetica Neue", Helvetica,
     "Nimbus Sans L", Arial, "Liberation Sans", "PingFang SC", "Hiragino Sans GB",
     "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN",
     "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti",
