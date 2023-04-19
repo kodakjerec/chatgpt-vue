@@ -31,9 +31,10 @@
     <div class="sticky bottom-0 w-full p-6 pb-8 bg-gray-100">
       <div class="-mt-2 mb-2 text-sm text-gray-500" v-if="isConfig">請輸入 API Key：</div>
       <div class="flex">
-        <textarea
+        <input v-if="isConfig" class="input" type="password" :paceholder="sk-xxxxxxxxxx" v-model="messageContent">
+        <textarea v-else
           class="input"
-          :placeholder="isConfig ? 'sk-xxxxxxxxxx' : '請輸入'"
+          placeholder="請輸入"
           v-model="messageContent"
           @keydown="keydownEvent"
         ></textarea>
