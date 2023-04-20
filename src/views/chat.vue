@@ -1,0 +1,245 @@
+<template>
+  <div class="bg-white w-5/6 overflow-y-auto content" ref="chatListDom">
+    <div class="flex flex-col h-screen">
+      <div class="flex flex-nowrap fixed w-5/6 items-baseline top-0 py-4 bg-gray-100">
+        <div class="text-2xl font-bold">{{ fromLogName }}</div>
+      </div>
+
+      <div class="flex-1 mx-2 mt-20 mb-2">
+        <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg"
+          v-for="item of messageList.filter((v) => v.role !== 'system')">
+          <div class="flex justify-between items-center mb-2">
+            <div class="font-bold">{{ roleAlias[item.role] }}：</div>
+            <Copy class="invisible group-hover:visible" :content="item.content" />
+          </div>
+          <div>
+            <div class="prose text-sm text-slate-600 leading-relaxed" v-html="md.render(item.content)"></div>
+            <Loding v-if="!item.content && isTalking" />
+          </div>
+        </div>
+      </div>
+
+      <div class="sticky bottom-0 w-full p-6 pb-8 bg-gray-100">
+        <div class="flex">
+          <textarea class="input" placeholder="請輸入" v-model="messageContent" @keydown="keydownEvent"></textarea>
+          <button class="btn" :disabled="isTalking" @click="sendOrSave()">{{ "發送" }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import type { ChatMessage } from "@/types";
+import cryptoJS from "crypto-js";
+import { ref, nextTick } from "vue";
+import { chat } from "@/libs/gpt";
+import Loding from "@/components/Loding.vue";
+import Copy from "@/components/Copy.vue";
+import { md } from "@/libs/markdown";
+
+export default {
+  name: 'chat',
+  components: {
+    Loding, Copy
+  },
+  props: {
+    sendLogName: {
+      type: String,
+      default: ''
+    }
+  },
+  data() {
+    return {
+      md: md,
+      fromLogName: "",
+      apiKey: "",
+      getSecretKey: "lianginx",
+      isTalking: false,
+      messageContent: "",
+      decoder: new TextDecoder("utf-8"),
+      roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
+      messageList: ref<ChatMessage[]>([]),
+      chatLogSize: '0' // log尺寸
+    }
+  },
+  watch: {
+    // 同一個路徑下改變設定,更新對話紀錄
+    sendLogName() {
+      this.fromLogName = this.sendLogName;
+      this.getChatLog(this.fromLogName);
+    },
+    messageList: {
+      handler() {
+        this.$nextTick(() => {
+          this.scrollToBottom()
+        })
+      },
+      deep: true
+    }
+  },
+  mounted() {
+    this.fromLogName = this.sendLogName;
+    this.getChatLog(this.fromLogName);
+    nextTick(() => this.scrollToBottom());
+  },
+  methods: {
+    keydownEvent(e: any) {
+      if (e.altKey && e.keyCode === 13) {
+        this.messageContent += "\n";
+      } else if (e.keyCode === 13) {
+        e.preventDefault();
+        this.sendChatMessage();
+      }
+    },
+    /**
+     * 送出聊天訊息
+     */
+    async sendChatMessage() {
+      let content: string = this.messageContent
+      try {
+        this.isTalking = true;
+        if (this.messageList.length === 2) {
+          this.messageList.pop();
+        }
+        this.messageList.push({ role: "user", content });
+        this.clearMessageContent();
+        this.messageList.push({ role: "assistant", content: "" });
+
+        const { body, status } = await chat(this.messageList, this.getAPIKey());
+        if (body) {
+          const reader = body.getReader();
+          await this.readStream(reader, status);
+        }
+      } catch (error: any) {
+        this.appendLastMessageContent(error);
+      } finally {
+        this.isTalking = false;
+        this.setChatLog(this.fromLogName);
+      }
+    },
+
+    /**
+     * 解析chatGpt回傳的stream
+     * @param reader 格式
+     * @param status response回傳狀態
+     */
+    async readStream(
+      reader: ReadableStreamDefaultReader<Uint8Array>,
+      status: number
+    ) {
+      let partialLine = "";
+
+      while (true) {
+        // eslint-disable-next-line no-await-in-loop
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const decodedText = this.decoder.decode(value, { stream: true });
+
+        if (status !== 200) {
+          const json = JSON.parse(decodedText); // start with "data: "
+          const content = json.error.message ?? decodedText;
+          this.appendLastMessageContent(content);
+          return;
+        }
+
+        const chunk = partialLine + decodedText;
+        const newLines = chunk.split(/\r?\n/);
+
+        partialLine = newLines.pop() ?? "";
+
+        for (const line of newLines) {
+          if (line.length === 0) continue; // ignore empty message
+          if (line.startsWith(":")) continue; // ignore sse comment message
+          if (line === "data: [DONE]") return; //
+
+          const json = JSON.parse(line.substring(6)); // start with "data: "
+          const content =
+            status === 200
+              ? json.choices[0].delta.content ?? ""
+              : json.error.message;
+          this.appendLastMessageContent(content);
+        }
+      }
+    },
+    /**
+     * 將chatGpt回傳的單字組合
+     */
+    appendLastMessageContent(content: string) {
+      this.messageList[this.messageList.length - 1].content += content
+    },
+    /**
+     * 傳送指令 或是 儲存api字串
+     */
+    sendOrSave() {
+      if (!this.messageContent.length) return;
+      this.sendChatMessage();
+    },
+    /**
+     * 取得apiKey
+     *  @return 明文apiKey
+     */
+    getAPIKey() {
+      if (this.apiKey) return this.apiKey;
+      const aesAPIKey = localStorage.getItem("apiKey") ?? "";
+      this.apiKey = cryptoJS.AES.decrypt(aesAPIKey, this.getSecretKey).toString(
+        cryptoJS.enc.Utf8
+      );
+      return this.apiKey;
+    },
+    // 取得log
+    getChatLog(logName: string) {
+      let chatLog = localStorage.getItem(logName);
+      if (chatLog) {
+        Object.assign(this.messageList, JSON.parse(chatLog));
+      } else {
+        this.resetChatLog();
+        this.setChatLog(logName);
+      }
+    },
+    // 紀錄log
+    setChatLog(logName: string) {
+      let saveItem = JSON.stringify(this.messageList);
+      localStorage.setItem(logName, saveItem);
+    },
+    // 重置log
+    resetChatLog() {
+      this.messageList.length = 0;
+      this.messageList.push(
+        {
+          role: "system",
+          content: "你是 ChatGPT，OpenAI 訓練的大型語言模型，盡可能簡潔地回答。",
+        });
+      this.messageList.push(
+        {
+          role: "assistant",
+          content: `你好，我是AI語言模型，我可以提供一些常用服務和信息，例如：
+                1. 翻譯：我可以把中文翻譯成英文，英文翻譯成中文，還有其他一些語言翻譯，比如法語、日語、西班牙語等。
+                2. 咨詢服務：如果你有任何問題需要咨詢，例如健康、法律、投資等方面，我可以盡可能為你提供幫助。
+                3. 閒聊：如果你感到寂寞或無聊，我們可以聊一些有趣的話題，以減輕你的壓力。
+                請告訴我你需要哪方面的幫助，我會根據你的需求給你提供相應的信息和建議。`,
+        });
+    },
+    // 清除輸入框內容
+    clearMessageContent() { this.messageContent = "" },
+
+    // 移到畫面最下方
+    scrollToBottom() {
+      if (!this.$refs.chatListDom) return;
+      let dom = <HTMLDivElement>this.$refs.chatListDom;
+      dom.scrollTop = dom.scrollHeight;
+    }
+  }
+}
+</script>
+
+<style scoped>
+pre {
+  font-family: "Microsoft JhengHei", -apple-system, "Noto Sans", "Helvetica Neue", Helvetica,
+    "Nimbus Sans L", Arial, "Liberation Sans", "PingFang SC", "Hiragino Sans GB",
+    "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN",
+    "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti",
+    SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
+}
+</style>
