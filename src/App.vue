@@ -1,6 +1,3 @@
-<script lang="ts">
-</script>
-
 <template>
   <div class="flex h-screen">
     <!-- Sidebar -->
@@ -15,8 +12,11 @@
             New Chat
           </div>
         </li>
-        <li class="py-2 border-t border-gray-700 flex items-center" v-for="item in logList">
-          <div :class="{ 'text-green': selectLog === item }" @click="clickLogName(item)">{{ item }}</div>
+        <li class="py-2 border-t border-gray-700 flex items-center" v-for="(item, index) in logList" :key="index">
+          <div :class="{ 'text-green': selectLog === item }" v-if="item !== editing" @dblclick="editLogName(item)"
+            @click="clickLogName(item)">{{ item }}</div>
+          <input type="text" class="update-input" v-else @keyup.enter="updateLogName(index)" @blur="cancelUpdateLogName"
+            v-model="newLogName" ref="editingLogName">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-12 0 36 24" stroke-width="1.5"
             stroke="currentColor" class="w-6 h-6 trashCan" v-show="logList.length > 1" @click="delChatLog(item)">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -38,6 +38,8 @@ export default {
   data() {
     return {
       selectLog: '',
+      editing: '',
+      newLogName: '',
       logList: [],
       messageList: []
     }
@@ -95,26 +97,54 @@ export default {
      * 刪除一個對話
      */
     delChatLog(logName) {
-      if(this.logList.length<2) return;
+      if (this.logList.length < 2) return;
 
       localStorage.removeItem(logName);
       let findIndex = this.logList.findIndex(element => element === logName);
-      if (findIndex>-1) {
+      if (findIndex > -1) {
         this.logList.splice(findIndex, 1);
         this.setLogList();
       }
       this.clickLogName(this.logList[0]);
     },
+    editLogName(item) {
+      this.editing = item;
+      this.newLogName = item;
+      this.$nextTick(() => {
+        const refInput = this.$refs.editingLogName[0];
+        refInput.select();
+      })
+    },
+    updateLogName(index) {
+      this.editing = '';
+      this.newLogName = this.newLogName.trim();
+
+      // 這裡可以連結 API 更新 item
+      if (this.newLogName) {
+        const oldName = this.logList[index];
+        // change list
+        this.logList[index] = this.newLogName;
+        this.setLogList();
+        // change chatLog
+        let chatLog = localStorage.getItem(oldName);
+        localStorage.setItem(this.newLogName, chatLog);
+        localStorage.removeItem(oldName);
+        this.clickLogName(this.newLogName);
+      }
+    },
+    cancelUpdateLogName() {
+      this.editing = '';
+    },
     /**
      * 按下按鈕 chatlog
-     */ 
+     */
     clickLogName(logName) {
-      this.selectLog=logName;
+      this.selectLog = logName;
       this.gotoChat();
     },
     /**
      * 跳頁
-     */ 
+     */
     gotoChat() {
       this.$router.push({ name: 'chat', params: { sendLogName: this.selectLog } })
     }
@@ -150,5 +180,10 @@ body,
 
 .text-green {
   color: green;
+}
+
+.update-input {
+  background-color: #ccc;
+  color: black;
 }
 </style>
