@@ -35,10 +35,16 @@
     <RouterView />
   </div>
 </template>
-<script>
+<script lang="ts">
 export default {
   name: 'App',
-  data() {
+  data(): {
+    selectLog: string,
+      editing: string,
+      newLogName: string,
+      logList: Array<string>,
+      messageList: Array<any>
+  } {
     return {
       selectLog: '',
       editing: '',
@@ -70,10 +76,10 @@ export default {
      * 新增一個對話
      */
     newChatLog() {
-      let generatedString = ""
-      const alphabet = "abcdefghijklmnopqrstuvwxyz"
-      const stringLength = 6
-      let isDuplicate = true
+      let generatedString: string = ""
+      const alphabet: string = "abcdefghijklmnopqrstuvwxyz"
+      const stringLength: number = 6
+      let isDuplicate: boolean = true
 
       while (isDuplicate) {
         // 生成一個隨機6個字符的字符串
@@ -95,7 +101,7 @@ export default {
     /**
      * 刪除一個對話
      */
-    delChatLog(logName) {
+    delChatLog(logName: string) {
       if (this.logList.length < 2) return;
 
       localStorage.removeItem(logName);
@@ -106,15 +112,17 @@ export default {
       }
       this.clickLogName(this.logList[0]);
     },
-    editLogName(item) {
+    editLogName(item: any) {
       this.editing = item;
       this.newLogName = item;
       this.$nextTick(() => {
-        const refInput = this.$refs.editingLogName[0];
-        refInput.select();
+        if (this.$refs.editingLogName){
+          const refInput = (this.$refs.editingLogName as HTMLInputElement[])[0];
+          refInput.select();
+        }
       })
     },
-    updateLogName(index) {
+    updateLogName(index: number) {
       this.editing = '';
       this.newLogName = this.newLogName.trim();
 
@@ -125,7 +133,7 @@ export default {
         this.logList[index] = this.newLogName;
         this.setLogList();
         // change chatLog
-        let chatLog = localStorage.getItem(oldName);
+        let chatLog = localStorage.getItem(oldName)??"";
         localStorage.setItem(this.newLogName, chatLog);
         localStorage.removeItem(oldName);
         this.clickLogName(this.newLogName);
@@ -137,7 +145,7 @@ export default {
     /**
      * 按下按鈕 chatlog
      */
-    clickLogName(logName) {
+    clickLogName(logName: string) {
       this.selectLog = logName;
       this.gotoChat();
     },
