@@ -16,12 +16,15 @@
     "ne:build": "npm run build && cp -r electron/. dist && cd dist && npm i && npm run build"
   },
   "dependencies": {
+    "@dqbd/tiktoken": "^1.0.6",
     "@icon-park/vue-next": "^1.4.2",
     "@tailwindcss/typography": "^0.5.9",
     "crypto-js": "^4.1.1",
     "faker": "^6.6.6",
     "highlight.js": "^11.7.0",
     "markdown-it": "^13.0.1",
+    "vite-plugin-top-level-await": "^1.3.0",
+    "vite-plugin-wasm": "^3.2.2",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"
   },

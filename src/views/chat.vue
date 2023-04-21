@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-white w-full overflow-y-auto content" ref="chatListDom">
+  <div class="bg-white w-full overflow-y-auto max-h-screen" ref="chatListDom">
     <div class="flex flex-col h-screen">
       <div class="flex flex-nowrap fixed w-full items-baseline top-0 py-4 bg-gray-100">
-        <div class="text-2xl font-bold">{{ fromLogName }}</div>
+        <div class="text-2xl font-bold">{{ fromLogName }}<span class="text-xs text-gray-500" title="tokens">{{ calAllTiktoken() }}</span></div>
       </div>
 
       <div class="flex-1 mx-2 mt-20 mb-2">
@@ -13,7 +13,7 @@
             <Copy class="invisible group-hover:visible" :content="item.content" />
           </div>
           <div>
-            <div class="prose text-sm text-slate-600 leading-relaxed" v-html="md.render(item.content)"></div>
+            <div class="prose max-w-full text-sm text-slate-600 leading-relaxed" v-html="md.render(item.content)"></div>
             <Loding v-if="!item.content && isTalking" />
           </div>
         </div>
@@ -37,6 +37,7 @@ import { chat } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
 import Copy from "@/components/Copy.vue";
 import { md } from "@/libs/markdown";
+import { get_encoding, encoding_for_model } from '@dqbd/tiktoken';
 
 export default {
   name: 'chat',
@@ -60,7 +61,7 @@ export default {
       decoder: new TextDecoder("utf-8"),
       roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
       messageList: ref<ChatMessage[]>([]),
-      chatLogSize: '0' // log尺寸
+      enc: '0' // log尺寸
     }
   },
   watch: {
@@ -79,11 +80,18 @@ export default {
     }
   },
   mounted() {
+    this.enc = encoding_for_model("gpt-3.5-turbo");
     this.fromLogName = this.sendLogName;
     this.getChatLog(this.fromLogName);
     nextTick(() => this.scrollToBottom());
   },
+  beforeDestroy() {
+    this.enc.free();
+  },
   methods: {
+    /**
+     * 鍵盤指令
+     */
     keydownEvent(e: any) {
       if (e.altKey && e.keyCode === 13) {
         this.messageContent += "\n";
@@ -192,7 +200,7 @@ export default {
     getChatLog(logName: string) {
       let chatLog = localStorage.getItem(logName);
       if (chatLog) {
-        Object.assign(this.messageList, JSON.parse(chatLog));
+        this.messageList=JSON.parse(chatLog);
       } else {
         this.resetChatLog();
         this.setChatLog(logName);
@@ -229,6 +237,20 @@ export default {
       if (!this.$refs.chatListDom) return;
       let dom = <HTMLDivElement>this.$refs.chatListDom;
       dom.scrollTop = dom.scrollHeight;
+    },
+    /**
+     * 計算此段的token數量
+     */
+    calTiktoken(text: string) {
+      let tokenArray = this.enc.encode(text);
+      return tokenArray.length;
+    },
+    calAllTiktoken() {
+      let tokens = 0;
+      this.messageList.map(item=>{
+        tokens += this.calTiktoken(item.content);
+      })
+      return tokens;
     }
   }
 }
