@@ -1,20 +1,21 @@
 <template>
     <div class="ml-6">
-        <p class="text-2xl font-bold mt-10">剛開始</p>
-        <p>1. 先進入 <strong>Settings</strong> 匯入 API Key</p>
-        <p>2. 新增一個對話，開始交談</p>
+        <p class="text-2xl font-bold mt-10">Starting Guide</p>
+        <p>1. Enter  <router-link to="/settings"><span style="color:blue">Settings</span></router-link> and import an API key.</p>
+        <p>2. Create a new conversation and start chatting.</p>
 
-        <p class="text-2xl font-bold mt-10">對話紀錄</p>
+        <p class="text-2xl font-bold mt-10">Conversation Log</p>
         <ul>
-            <li>點一下：進入對話內容</li>
-            <li>點兩下：修改對話名稱，按下Enter生效</li>
-            <li>垃圾桶：清除對話</li>
+            <li>Single click: View conversation contents.</li>
+            <li>Double click: Rename the conversation (leave input to save).</li>
+            <li>Trash can: Clear the conversation.</li>
         </ul>
 
-        <p class="text-2xl font-bold mt-10">特色</p>
+        <p class="text-2xl font-bold mt-10">Features</p>
         <ul class="ml-4" style="list-style-type: disc;">
-            <li>所有紀錄皆存在於localStorage</li>
-            <li>對話紀錄最多4096個token，超過chatGPT會提示無法送出，此時請重開新對話</li>
+            <li>This system uses the gpt-3.5-turbo model.</li>
+            <li>All logs are stored locally in localStorage.</li>
+            <li>Conversation logs are limited to a maximum of 4096 tokens. If exceeded, chatGPT will display a prompt and you’ll need to create a new conversation.</li>
         </ul>
     </div>
 </template>

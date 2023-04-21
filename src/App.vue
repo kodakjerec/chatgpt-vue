@@ -1,8 +1,14 @@
 <template>
   <div class="flex h-screen">
     <!-- Sidebar -->
-    <div class="bg-gray-800 text-white w-1/6 px-4">
+    <div class="sidebar-toggle" @click="toggleSidebar">
+      Menu
+    </div>
+    <div class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }">
       <ul class="mt-8 flex flex-col justify-between">
+        <li class="py-2 border-t border-gray-700 flex items-center">
+          <span @click="toggleSidebar">Hide Menu</span>
+        </li>
         <li class="py-2 border-t border-gray-700 flex items-center">
           <span @click="goHome()">Home</span>
         </li>
@@ -18,7 +24,7 @@
         <li class="py-2 border-t border-gray-700 flex items-center" v-for="(item, index) in logList" :key="index">
           <div :class="{ 'text-green': selectLog === item }" v-if="item !== editing" @dblclick="editLogName(item)"
             @click="clickLogName(item)">{{ item }}</div>
-          <input type="text" class="update-input" v-else @keyup.enter="updateLogName(index)" @blur="cancelUpdateLogName"
+          <input type="text" class="update-input" v-else @blur="updateLogName(index)"
             v-model="newLogName" ref="editingLogName">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-12 0 36 24" stroke-width="1.5"
             stroke="currentColor" class="w-6 h-6 trashCan" v-show="logList.length > 1" @click="delChatLog(item)">
@@ -32,10 +38,13 @@
       </ul>
     </div>
     <!-- Content -->
+    <div class="blockContent" v-if="sidebarActive"></div>
     <RouterView />
   </div>
 </template>
 <script lang="ts">
+import faker from 'faker';
+
 export default {
   name: 'App',
   data(): {
@@ -43,14 +52,16 @@ export default {
       editing: string,
       newLogName: string,
       logList: Array<string>,
-      messageList: Array<any>
+      messageList: Array<any>,
+      sidebarActive: boolean
   } {
     return {
       selectLog: '',
       editing: '',
       newLogName: '',
       logList: [],
-      messageList: []
+      messageList: [],
+      sidebarActive: false
     }
   },
   mounted() {
@@ -77,15 +88,12 @@ export default {
      */
     newChatLog() {
       let generatedString: string = ""
-      const alphabet: string = "abcdefghijklmnopqrstuvwxyz"
       const stringLength: number = 6
       let isDuplicate: boolean = true
 
       while (isDuplicate) {
         // 生成一個隨機6個字符的字符串
-        for (let i = 0; i < stringLength; i++) {
-          generatedString += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
-        }
+        generatedString = faker.name.findName();
 
         // 檢查新字符串是否已經存在於列表中
         if (!this.logList.includes(generatedString)) {
@@ -139,9 +147,6 @@ export default {
         this.clickLogName(this.newLogName);
       }
     },
-    cancelUpdateLogName() {
-      this.editing = '';
-    },
     /**
      * 按下按鈕 chatlog
      */
@@ -157,6 +162,9 @@ export default {
     },
     goHome() {
       this.$router.push({ name: 'home' });
+    },
+    toggleSidebar() {
+      this.sidebarActive = !this.sidebarActive;
     }
   }
 }
@@ -195,5 +203,40 @@ body,
 .update-input {
   background-color: #ccc;
   color: black;
+}
+/* 預設側邊欄樣式 */
+.sidebar {
+  width: 150px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: -150px;
+  z-index: 999;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* 預設側邊欄隱藏 */
+.sidebar-toggle + .sidebar {
+  transform: translateX(-150px);
+}
+
+/* 小方塊樣式 */
+.sidebar-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 24px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+/* 側邊欄展開時的樣式 */
+.sidebar.active {
+  transform: translateX(150px);
+}
+.blockContent {
+  width:150px;
+  flex-shrink: 0;
 }
 </style>

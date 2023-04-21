@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white w-5/6 overflow-y-auto content" ref="chatListDom">
+  <div class="bg-white w-full overflow-y-auto content" ref="chatListDom">
     <div class="flex flex-col h-screen">
-      <div class="flex flex-nowrap fixed w-5/6 items-baseline top-0 py-4 bg-gray-100">
+      <div class="flex flex-nowrap fixed w-full items-baseline top-0 py-4 bg-gray-100">
         <div class="text-2xl font-bold">{{ fromLogName }}</div>
       </div>
 
@@ -21,8 +21,8 @@
 
       <div class="sticky bottom-0 w-full p-6 pb-8 bg-gray-100">
         <div class="flex">
-          <textarea class="input" placeholder="請輸入" v-model="messageContent" @keydown="keydownEvent"></textarea>
-          <button class="btn" :disabled="isTalking" @click="sendOrSave()">{{ "發送" }}</button>
+          <textarea class="input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
+          <button class="btn" :disabled="isTalking" @click="sendOrSave()">{{ "Send" }}</button>
         </div>
       </div>
     </div>
