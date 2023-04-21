@@ -2,7 +2,8 @@
   <div class="bg-white w-full overflow-y-auto max-h-screen" ref="chatListDom">
     <div class="flex flex-col h-screen">
       <div class="flex flex-nowrap fixed w-full items-baseline top-0 py-4 bg-gray-100">
-        <div class="text-2xl font-bold">{{ fromLogName }}<span class="text-xs text-gray-500" title="tokens">{{ calAllTiktoken() }}</span></div>
+        <div class="text-2xl font-bold">{{ fromLogName }}<span class="text-xs text-gray-500" title="tokens">{{
+          calAllTiktoken() }}</span></div>
       </div>
 
       <div class="flex-1 mx-2 mt-20 mb-2">
@@ -21,7 +22,8 @@
 
       <div class="sticky bottom-0 w-full p-6 pb-8 bg-gray-100">
         <div class="flex">
-          <textarea class="input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
+          <textarea class="input" placeholder="Please input something" v-model="messageContent"
+            @keydown="keydownEvent"></textarea>
           <button class="btn" :disabled="isTalking" @click="sendOrSave()">{{ "Send" }}</button>
         </div>
       </div>
@@ -37,7 +39,7 @@ import { chat } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
 import Copy from "@/components/Copy.vue";
 import { md } from "@/libs/markdown";
-import { get_encoding, encoding_for_model } from '@dqbd/tiktoken';
+import { encoding_for_model, Tiktoken } from '@dqbd/tiktoken';
 
 export default {
   name: 'chat',
@@ -50,7 +52,18 @@ export default {
       default: ''
     }
   },
-  data() {
+  data(): {
+    md: any,
+    fromLogName: string,
+    apiKey: string,
+    getSecretKey: string,
+    isTalking: boolean,
+    messageContent: string,
+    decoder: TextDecoder,
+    roleAlias: any,
+    messageList: Array<any>,
+    enc: any
+  } {
     return {
       md: md,
       fromLogName: "",
@@ -60,8 +73,8 @@ export default {
       messageContent: "",
       decoder: new TextDecoder("utf-8"),
       roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
-      messageList: ref<ChatMessage[]>([]),
-      enc: '0' // log尺寸
+      messageList: [],
+      enc: null // log尺寸
     }
   },
   watch: {
@@ -200,7 +213,7 @@ export default {
     getChatLog(logName: string) {
       let chatLog = localStorage.getItem(logName);
       if (chatLog) {
-        this.messageList=JSON.parse(chatLog);
+        this.messageList = JSON.parse(chatLog);
       } else {
         this.resetChatLog();
         this.setChatLog(logName);
@@ -247,7 +260,7 @@ export default {
     },
     calAllTiktoken() {
       let tokens = 0;
-      this.messageList.map(item=>{
+      this.messageList.map(item => {
         tokens += this.calTiktoken(item.content);
       })
       return tokens;
