@@ -3,6 +3,9 @@
     <!-- Sidebar -->
     <div class="bg-gray-800 text-white w-1/6 px-4">
       <ul class="mt-8 flex flex-col justify-between">
+        <li class="py-2 border-t border-gray-700 flex items-center">
+          <span @click="goHome()">Home</span>
+        </li>
         <li class="py-2 border-t border-gray-700 flex items-center newChat">
           <div class="flex items-center" @click="newChatLog()">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 36 24" stroke-width="1.5"
@@ -46,8 +49,6 @@ export default {
   },
   mounted() {
     this.getLogList();
-    this.clickLogName(this.logList[0]);
-    this.setLogList();
   },
   methods: {
     /**
@@ -57,8 +58,6 @@ export default {
       let logList = localStorage.getItem('logList');
       if (logList) {
         Object.assign(this.logList, JSON.parse(logList));
-      } else {
-        this.logList = ["chatGPT"];
       }
     },
     /**
@@ -147,6 +146,9 @@ export default {
      */
     gotoChat() {
       this.$router.push({ name: 'chat', params: { sendLogName: this.selectLog } })
+    },
+    goHome() {
+      this.$router.push({ name: 'home' });
     }
   }
 }
