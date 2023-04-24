@@ -23,7 +23,6 @@ const router = createRouter({
 });
 
 router.beforeEach((to,from,next)=>{
-  console.log(from)
   if (!from.name && to.name!="home") {
     next({ name: 'home'});
   } else {

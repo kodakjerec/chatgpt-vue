@@ -296,7 +296,7 @@ export default {
           break;
         }
       }
-      let tokens = Math.ceil(tokenArray.length * (isChinese ? (Math.random() * 0.5 + 1.5) : 1));
+      let tokens = Math.ceil(tokenArray.length * (isChinese ? 2 : 1));
       return tokens;
     },
     calAllTiktoken(targetArray: Array<any>): number {
