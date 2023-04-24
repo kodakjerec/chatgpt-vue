@@ -22,12 +22,19 @@ const router = createRouter({
   ]
 });
 
-router.beforeEach((to,from,next)=>{
-  if (!from.name && to.name!="home") {
-    next({ name: 'home'});
-  } else {
-    next();
+const history = window.history;
+const hasPushState = typeof history.pushState === 'function';
+
+if (hasPushState) {
+  const replaceState = history.replaceState.bind(history);
+
+  history.replaceState = function(state) {
+    try {
+      replaceState.apply(this, arguments);
+    } catch (e) {
+      window.location.href = "/";
+    }
   }
-})
+}
 
 export default router;
