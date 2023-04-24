@@ -162,13 +162,13 @@ export default {
      * 跳頁
      */
     gotoChat() {
-      this.$router.replace({ name: 'chat', params: { sendLogName: this.selectLog } })
+      this.$router.push({ name: 'chat', params: { sendLogName: this.selectLog } })
     },
     goHome() {
-      this.$router.replace({ name: 'home' });
+      this.$router.push({ name: 'home' });
     },
     goSettings() {
-      this.$router.replace({ name: 'settings' });
+      this.$router.push({ name: 'settings' });
     },
     toggleSidebar() {
       if (!this.sidebarActive) {
