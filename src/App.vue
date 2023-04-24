@@ -4,7 +4,8 @@
     <div class="sidebar-toggle" @click="toggleSidebar">
       Menu
     </div>
-    <div class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }">
+    <div class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0"
+      @blur="toggleSidebar">
       <ul class="mt-8 flex flex-col justify-between cursor-pointer">
         <li class="py-2 border-t border-gray-700 flex items-center" @click="toggleSidebar">
           <span>Hide Menu</span>
@@ -12,7 +13,8 @@
         <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="goHome()">
           <span>Home</span>
         </li>
-        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="newChatLog()">
+        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
+          @click="newChatLog()">
           <div class="flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 36 24" stroke-width="1.5"
               stroke="currentColor" class="w-6 h-6">
@@ -21,10 +23,10 @@
             New Chat
           </div>
         </li>
-        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="clickLogName(item)"
-          v-for="(item, index) in logList" :key="index">
-          <div :class="{ 'text-yellow-300': selectLog === item }" v-if="item !== editing" @dblclick="editLogName(item)"
-            >{{ item }}</div>
+        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
+          @click="clickLogName(item)" v-for="(item, index) in logList" :key="index">
+          <div :class="{ 'text-yellow-300': selectLog === item }" v-if="item !== editing" @dblclick="editLogName(item)">{{
+            item }}</div>
           <input type="text" class="text-black bg-slate-400" v-else @blur="updateLogName(index)" v-model="newLogName"
             ref="editingLogName">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-12 0 36 24" stroke-width="1.5"
@@ -95,7 +97,7 @@ export default {
 
       while (isDuplicate) {
         // 生成一個隨機6個字符的字符串
-        generatedString = faker.internet.userName();
+        generatedString = faker.word.adjective(6);
 
         // 檢查新字符串是否已經存在於列表中
         if (!this.logList.includes(generatedString)) {
@@ -216,4 +218,5 @@ body,
 .blockContent {
   width: 150px;
   flex-shrink: 0;
-}</style>
+}
+</style>

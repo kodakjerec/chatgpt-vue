@@ -14,6 +14,7 @@ export async function chat(messageList: ChatMessage[], apiKey: string) {
         model: "gpt-3.5-turbo",
         stream: true,
         messages: messageList,
+        max_tokens:1024
       }),
     });
     return result;

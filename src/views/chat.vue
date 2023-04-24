@@ -3,20 +3,34 @@
     <div class="flex flex-col h-screen">
       <div class="flex flex-nowrap fixed w-full items-baseline top-0 py-4 bg-gray-100">
         <div class="text-2xl font-bold">{{ fromLogName }}<span class="text-xs text-gray-500" title="tokens">{{
-          calAllTiktoken() }}</span></div>
+          totalTokens }}</span></div>
       </div>
 
       <div class="flex-1 mx-2 mt-20 mb-2">
-        <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg"
-          v-for="item of messageList.filter((v) => v.role !== 'system')">
-          <div class="flex justify-between items-center mb-2">
-            <div class="font-bold">{{ roleAlias[item.role] }}：</div>
-            <Copy class="invisible group-hover:visible" :content="item.content" />
-          </div>
-          <div>
-            <div class="prose max-w-full text-sm text-slate-600 leading-relaxed" v-html="md.render(item.content)"></div>
-            <Loding v-if="!item.content && isTalking" />
-          </div>
+        <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="item of messageListView">
+          <!-- chatGPT -->
+          <template v-if="item.role !== 'user'">
+            <div class="flex justify-between items-center mb-2">
+              <div class="font-bold">{{ roleAlias[item.role] }}：</div>
+              <Copy class="invisible group-hover:visible" :content="item.content" />
+            </div>
+            <div>
+              <div class="prose max-w-full text-sm text-slate-600 leading-relaxed" v-html="mdRender(item.content)"></div>
+              <Loding v-if="!item.content && isTalking" />
+            </div>
+          </template>
+          <!-- Me -->
+          <template v-else>
+            <div class="flex justify-end items-center mb-2">
+              <Copy class="invisible group-hover:visible" :content="item.content" />
+              <div class="font-bold">{{ roleAlias[item.role] }}：</div>
+            </div>
+            <div>
+              <div class="prose max-w-full text-sm text-slate-600 leading-relaxed bg-green-300 rounded"
+                v-html="mdRender(item.content)"></div>
+              <Loding v-if="!item.content && isTalking" />
+            </div>
+          </template>
         </div>
       </div>
 
@@ -59,6 +73,7 @@ export default {
     getSecretKey: string,
     isTalking: boolean,
     messageContent: string,
+    totalTokens: number,
     decoder: TextDecoder,
     roleAlias: any,
     messageList: Array<any>,
@@ -71,10 +86,16 @@ export default {
       getSecretKey: "lianginx",
       isTalking: false,
       messageContent: "",
+      totalTokens: 0,
       decoder: new TextDecoder("utf-8"),
       roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
       messageList: [],
       enc: null // log尺寸
+    }
+  },
+  computed: {
+    messageListView() {
+      return this.messageList.filter((v) => v.role !== 'system');
     }
   },
   watch: {
@@ -83,13 +104,10 @@ export default {
       this.fromLogName = this.sendLogName;
       this.getChatLog(this.fromLogName);
     },
-    messageList: {
-      handler() {
-        this.$nextTick(() => {
-          this.scrollToBottom()
-        })
-      },
-      deep: true
+    'messageList.length'() {
+      this.$nextTick(() => {
+        this.scrollToBottom()
+      })
     }
   },
   mounted() {
@@ -113,6 +131,9 @@ export default {
         this.sendChatMessage();
       }
     },
+    mdRender(content: string) {
+      return md.render(content);
+    },
     /**
      * 送出聊天訊息
      */
@@ -127,7 +148,20 @@ export default {
         this.clearMessageContent();
         this.messageList.push({ role: "assistant", content: "" });
 
-        const { body, status } = await chat(this.messageList, this.getAPIKey());
+        let calTokens: number = 0;
+        let sendMessageList = [];
+        for (let i = this.messageList.length - 1; i >= 0; i--) {
+          let newTokens = this.calTiktoken(this.messageList[i].content);
+
+          if (calTokens + newTokens < 3072) {
+            calTokens += newTokens; // 計算訊息長度總和
+            sendMessageList.push(this.messageList[i]);
+          } else {
+            break;
+          }
+        }
+        sendMessageList = sendMessageList.reverse(); // 原本是倒著算, 要把陣列反過來
+        const { body, status } = await chat(sendMessageList, this.getAPIKey());
         if (body) {
           const reader = body.getReader();
           await this.readStream(reader, status);
@@ -137,9 +171,9 @@ export default {
       } finally {
         this.isTalking = false;
         this.setChatLog(this.fromLogName);
+        this.totalTokens = this.calAllTiktoken(this.messageList);
       }
     },
-
     /**
      * 解析chatGpt回傳的stream
      * @param reader 格式
@@ -218,6 +252,7 @@ export default {
         this.resetChatLog();
         this.setChatLog(logName);
       }
+      this.totalTokens = this.calAllTiktoken(this.messageList);
     },
     // 紀錄log
     setChatLog(logName: string) {
@@ -243,8 +278,9 @@ export default {
         });
     },
     // 清除輸入框內容
-    clearMessageContent() { this.messageContent = "" },
-
+    clearMessageContent() {
+      this.messageContent = ""
+    },
     // 移到畫面最下方
     scrollToBottom() {
       if (!this.$refs.chatListDom) return;
@@ -255,12 +291,21 @@ export default {
      * 計算此段的token數量
      */
     calTiktoken(text: string) {
-      let tokenArray = this.enc.encode(text);
-      return tokenArray.length;
+      let tokenArray = this.enc.encode_ordinary(text);
+      // 如果有中文, 計算token會不準確, 大概會多1.5~2倍token
+      let isChinese = false;
+      for (let i = 0; i < text.length; i++) {
+        if (text.charCodeAt(i) >= 0x4e00 && text.charCodeAt(i) <= 0x9fff) {
+          isChinese = true;
+          break;
+        }
+      }
+      let tokens = Math.ceil(tokenArray.length * (isChinese ? (Math.random() * 0.5 + 1.5) : 1));
+      return tokens;
     },
-    calAllTiktoken() {
+    calAllTiktoken(targetArray: Array<any>): number {
       let tokens = 0;
-      this.messageList.map(item => {
+      targetArray.map(item => {
         tokens += this.calTiktoken(item.content);
       })
       return tokens;
