@@ -30,7 +30,7 @@ if (hasPushState) {
 
   history.replaceState = function(state) {
     try {
-      replaceState.apply(this, arguments);
+      replaceState.apply(this, (arguments as any));
     } catch (e) {
       window.location.href = "/";
     }
