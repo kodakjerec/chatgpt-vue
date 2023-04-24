@@ -4,8 +4,8 @@
     <div class="sidebar-toggle" @click="toggleSidebar">
       Menu
     </div>
-    <div class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0"
-      @blur="toggleSidebar">
+    <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0"
+      @blur="closeSidebar">
       <ul class="mt-8 flex flex-col justify-between cursor-pointer">
         <li class="py-2 border-t border-gray-700 flex items-center" @click="toggleSidebar">
           <span>Hide Menu</span>
@@ -171,7 +171,14 @@ export default {
       this.$router.push({ name: 'settings' });
     },
     toggleSidebar() {
+      if (!this.sidebarActive) {
+        if (this.$refs.sidebar)
+          (this.$refs.sidebar as HTMLBodyElement).focus();
+      }
       this.sidebarActive = !this.sidebarActive;
+    },
+    closeSidebar() {
+      this.sidebarActive = false;
     }
   }
 }
