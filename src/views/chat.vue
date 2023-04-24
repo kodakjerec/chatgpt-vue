@@ -8,12 +8,12 @@
 
       <div class="flex-1 mx-2 mt-20 mb-2">
         <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="item of messageListView">
+          <div class="flex justify-between items-center mb-2">
+            <div class="font-bold">{{ roleAlias[item.role] }}：</div>
+            <Copy class="invisible group-hover:visible" :content="item.content" />
+          </div>
           <!-- chatGPT -->
           <template v-if="item.role !== 'user'">
-            <div class="flex justify-between items-center mb-2">
-              <div class="font-bold">{{ roleAlias[item.role] }}：</div>
-              <Copy class="invisible group-hover:visible" :content="item.content" />
-            </div>
             <div>
               <div class="prose max-w-full text-sm text-slate-600 leading-relaxed" v-html="mdRender(item.content)"></div>
               <Loding v-if="!item.content && isTalking" />
@@ -21,10 +21,6 @@
           </template>
           <!-- Me -->
           <template v-else>
-            <div class="flex justify-end items-center mb-2">
-              <Copy class="invisible group-hover:visible" :content="item.content" />
-              <div class="font-bold">{{ roleAlias[item.role] }}：</div>
-            </div>
             <div>
               <div class="prose max-w-full text-sm text-slate-600 leading-relaxed bg-green-300 rounded"
                 v-html="mdRender(item.content)"></div>

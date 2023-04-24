@@ -19,7 +19,16 @@ const router = createRouter({
       name: "settings",
       component: () => import("@/views/settings.vue"),
     },
-  ],
+  ]
 });
+
+router.beforeEach((to,from,next)=>{
+  console.log(from)
+  if (!from.name && to.name!="home") {
+    next({ name: 'home'});
+  } else {
+    next();
+  }
+})
 
 export default router;
