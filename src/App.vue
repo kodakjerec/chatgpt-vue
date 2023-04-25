@@ -4,7 +4,8 @@
     <div class="sidebar-toggle" @click="toggleSidebar">
       Menu
     </div>
-    <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }">
+    <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0"
+      @blur="closeSidebar">
       <ul class="mt-8 flex flex-col justify-between cursor-pointer">
         <li class="py-2 border-t border-gray-700 flex items-center" @click="toggleSidebar">
           <span>Hide Menu</span>
@@ -23,11 +24,8 @@
           </div>
         </li>
         <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
-          @click="clickLogName(item)" v-for="(item, index) in logList" :key="index">
-          <div :class="{ 'text-yellow-300': selectLog === item }" v-if="item !== editing" @dblclick="editLogName(item)">{{
-            item }}</div>
-          <input type="text" class="text-black bg-slate-400" v-else @blur="updateLogName(index)" v-model="newLogName"
-            ref="editingLogName">
+          v-for="(item, index) in logList" :key="index">
+          <div :class="{ 'text-yellow-300': selectLog === item }" @click="clickLogName(item)">{{ item }}</div>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-12 0 36 24" stroke-width="1.5"
             stroke="currentColor" class="w-6 h-6 text-gray-500 hover:text-red-500" v-show="logList.length > 1"
             @click="delChatLog(item)">
@@ -42,10 +40,10 @@
     </div>
     <!-- Content -->
     <div class="blockContent" v-if="sidebarActive"></div>
-    <router-view tabindex="0" @focus="closeSidebar" v-if="nowPath === 'home'" name="home"
-      @fromClick="nowPath = 'settings'" />
-    <router-view tabindex="1" @focus="closeSidebar" v-if="nowPath === 'chat'" name="chat" :sendLogName="selectLog" />
-    <router-view tabindex="2" @focus="closeSidebar" v-if="nowPath === 'settings'" name="settings" />
+    <router-view v-if="nowPath === 'home'" name="home" @fromClick="nowPath = 'settings'" />
+    <router-view v-if="nowPath.slice(0, 4) === 'chat'" name="chat" :sendLogName="selectLog"
+      @updateLogName="updateLogName" />
+    <router-view v-if="nowPath === 'settings'" name="settings" />
   </div>
 </template>
 <script lang="ts">
@@ -56,8 +54,6 @@ export default {
   data(): {
     nowPath: string,
     selectLog: string,
-    editing: string,
-    newLogName: string,
     logList: Array<string>,
     messageList: Array<any>,
     sidebarActive: boolean
@@ -65,8 +61,6 @@ export default {
     return {
       nowPath: 'home',
       selectLog: '',
-      editing: '',
-      newLogName: '',
       logList: [],
       messageList: [],
       sidebarActive: false
@@ -83,6 +77,14 @@ export default {
       let logList = localStorage.getItem('logList');
       if (logList) {
         Object.assign(this.logList, JSON.parse(logList));
+      }
+
+      let lastPath = localStorage.getItem('lastPath');
+      if (lastPath) {
+        this.nowPath = lastPath;
+        if (this.nowPath.slice(0, 4) === 'chat') {
+          this.selectLog = this.nowPath.substring(5, this.nowPath.length);
+        }
       }
     },
     /**
@@ -118,41 +120,12 @@ export default {
      * 刪除一個對話
      */
     delChatLog(logName: string) {
-      if (this.logList.length < 2) return;
-
       localStorage.removeItem(logName);
       let findIndex = this.logList.findIndex(element => element === logName);
       if (findIndex > -1) {
         this.logList.splice(findIndex, 1);
+        this.clickLogName(this.logList[0]);
         this.setLogList();
-      }
-      this.clickLogName(this.logList[0]);
-    },
-    editLogName(item: any) {
-      this.editing = item;
-      this.newLogName = item;
-      this.$nextTick(() => {
-        if (this.$refs.editingLogName) {
-          const refInput = (this.$refs.editingLogName as HTMLInputElement[])[0];
-          refInput.select();
-        }
-      })
-    },
-    updateLogName(index: number) {
-      this.editing = '';
-      this.newLogName = this.newLogName.trim();
-
-      // 這裡可以連結 API 更新 item
-      if (this.newLogName) {
-        const oldName = this.logList[index];
-        // change list
-        this.logList[index] = this.newLogName;
-        this.setLogList();
-        // change chatLog
-        let chatLog = localStorage.getItem(oldName) ?? "";
-        localStorage.setItem(this.newLogName, chatLog);
-        localStorage.removeItem(oldName);
-        this.clickLogName(this.newLogName);
       }
     },
     /**
@@ -162,17 +135,38 @@ export default {
       this.selectLog = logName;
       this.gotoChat();
     },
+    updateLogName(fromObject: { newLogName: string, oldName: string }) {
+      let newLogName = fromObject.newLogName;
+      let oldName = fromObject.oldName;
+      console.log(newLogName, oldName);
+      let index = this.logList.findIndex(item => item === oldName);
+      // 這裡可以連結 API 更新 item
+      if (newLogName) {
+        const oldName = this.logList[index];
+        // change list
+        this.logList[index] = newLogName;
+        this.setLogList();
+        // change chatLog
+        let chatLog = localStorage.getItem(oldName) ?? "";
+        localStorage.setItem(newLogName, chatLog);
+        localStorage.removeItem(oldName);
+        this.clickLogName(newLogName);
+      }
+    },
     /**
      * 跳頁
      */
     gotoChat() {
-      this.nowPath = 'chat';
+      this.nowPath = 'chat/' + this.selectLog;
+      localStorage.setItem('lastPath', this.nowPath);
     },
     goHome() {
       this.nowPath = 'home';
+      localStorage.setItem('lastPath', this.nowPath);
     },
     goSettings() {
       this.nowPath = 'settings';
+      localStorage.setItem('lastPath', this.nowPath);
     },
     toggleSidebar() {
       if (!this.sidebarActive) {

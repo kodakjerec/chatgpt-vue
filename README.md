@@ -38,7 +38,6 @@ VITE v3.2.5  ready in 294 ms
 # Conversation Log
 
 * Single click: View conversation contents.  
-* Double click: Rename the conversation (leave input to save).  
 * Trash can: Clear the conversation.
 # Features
 

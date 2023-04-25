@@ -2,8 +2,17 @@
   <div class="bg-white w-full overflow-y-auto max-h-screen" ref="chatListDom">
     <div class="flex flex-col h-screen">
       <div class="flex flex-nowrap fixed w-full items-baseline top-0 py-4 bg-gray-100">
-        <div class="text-2xl font-bold">{{ fromLogName }}<span class="text-xs text-gray-500" title="tokens">{{
-          totalTokens }}</span></div>
+        <div class="text-2xl font-bold" v-if="!editing">{{ fromLogName }}
+          <div class="inline-flex cursor-pointer" @click="editLogName"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            </svg>
+          </div>
+          <span class="text-xs text-gray-500" title="tokens">{{ totalTokens }}</span>
+        </div>
+        <input type="text" class="text-black bg-slate-400" v-else @blur="updateLogName" v-model="newLogName"
+          ref="editingLogName">
       </div>
 
       <div class="flex-1 mx-2 mt-20 mb-2">
@@ -64,6 +73,8 @@ export default {
   },
   data(): {
     md: any,
+    editing: string,
+    newLogName: string,
     fromLogName: string,
     apiKey: string,
     getSecretKey: string,
@@ -77,6 +88,8 @@ export default {
   } {
     return {
       md: md,
+      editing: '',
+      newLogName: '',
       fromLogName: "",
       apiKey: "",
       getSecretKey: "lianginx",
@@ -106,22 +119,6 @@ export default {
       })
     }
   },
-  beforeRouteUpdate(to, from, next) {
-    // 判断当前路由是否为目标路由
-    if (to.path === '/') {
-      // 跳转到目标路径
-      next({
-        path: '/'
-      });
-    } else {
-      // 继续路由更新
-      next()
-    }
-  },
-  created() {
-    // 在created生命周期中添加以下代码
-    window.addEventListener('beforeunload', this.onBeforeUnload);
-  },
   mounted() {
     this.enc = encoding_for_model("gpt-3.5-turbo");
     this.fromLogName = this.sendLogName;
@@ -132,12 +129,6 @@ export default {
     this.enc.free();
   },
   methods: {
-    onBeforeUnload(event: any) {
-      // 阻止默认弹窗显示
-      event.preventDefault();
-      // 触发路由变化
-      this.$router.replace('/');
-    },
     /**
      * 鍵盤指令
      */
@@ -328,6 +319,20 @@ Please let me know what kind of help you need, and I will provide relevant infor
         tokens += this.calTiktoken(item.content);
       })
       return tokens;
+    },
+    editLogName() {
+      this.editing = this.fromLogName;
+      this.newLogName = this.fromLogName;
+      this.$nextTick(() => {
+        if (this.$refs.editingLogName) {
+          const refInput = (this.$refs.editingLogName as HTMLInputElement);
+          refInput.select();
+        }
+      })
+    },
+    updateLogName() {
+      this.$emit('updateLogName', { newLogName: this.newLogName, oldName: this.editing });
+      this.editing = '';
     }
   }
 }

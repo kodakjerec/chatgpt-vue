@@ -1,6 +1,6 @@
 <template>
     <div class="sticky bottom-0 w-full p-6 pb-8 bg-gray-100">
-        <div class="-mt-2 mb-2 text-sm text-gray-500">請輸入 API Key：</div>
+        <div class="-mt-2 mb-2 text-sm text-gray-500 mt-10">請輸入 API Key：</div>
         <div class="flex">
             <input class="input" type="password" paceholder="sk - xxxxxxxxxx" v-model="messageContent">
             <button class="btn" @click="sendOrSave()">{{ "保存" }}</button>

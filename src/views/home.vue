@@ -7,7 +7,6 @@
         <p class="text-2xl font-bold mt-10">Conversation Log</p>
         <ul>
             <li>Single click: View conversation contents.</li>
-            <li>Double click: Rename the conversation (leave input to save).</li>
             <li>Trash can: Clear the conversation.</li>
         </ul>
 
