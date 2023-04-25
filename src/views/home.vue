@@ -1,7 +1,7 @@
 <template>
     <div class="ml-6">
         <p class="text-2xl font-bold mt-10">Starting Guide</p>
-        <p>1. Enter  <router-link to="/settings"><span class="text-blue-500">Settings</span></router-link> and import an API key.</p>
+        <p>1. Enter <span class="text-blue-500" @click="goToSettings">Settings</span> and import an API key.</p>
         <p>2. Create a new conversation and start chatting.</p>
 
         <p class="text-2xl font-bold mt-10">Conversation Log</p>
@@ -15,7 +15,18 @@
         <ul class="ml-4" style="list-style-type: disc;">
             <li>This system uses the gpt-3.5-turbo model.</li>
             <li>All logs are stored locally in localStorage.</li>
-            <li>Conversation logs are limited to a maximum of 4096 tokens. If exceeded, chatGPT will display a prompt and you’ll need to create a new conversation.</li>
+            <li>Conversation logs are limited to a maximum of 4096 tokens. If exceeded, chatGPT will display a prompt and
+                you’ll need to create a new conversation.</li>
         </ul>
     </div>
 </template>
+<script lang="ts">
+export default {
+    name: 'home',
+    methods: {
+        goToSettings() {
+            this.$emit('fromClick');
+        }
+    }
+}
+</script>

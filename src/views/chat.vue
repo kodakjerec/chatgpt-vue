@@ -106,6 +106,22 @@ export default {
       })
     }
   },
+  beforeRouteUpdate(to, from, next) {
+    // 判断当前路由是否为目标路由
+    if (to.path === '/') {
+      // 跳转到目标路径
+      next({
+        path: '/'
+      });
+    } else {
+      // 继续路由更新
+      next()
+    }
+  },
+  created() {
+    // 在created生命周期中添加以下代码
+    window.addEventListener('beforeunload', this.onBeforeUnload);
+  },
   mounted() {
     this.enc = encoding_for_model("gpt-3.5-turbo");
     this.fromLogName = this.sendLogName;
@@ -116,6 +132,12 @@ export default {
     this.enc.free();
   },
   methods: {
+    onBeforeUnload(event: any) {
+      // 阻止默认弹窗显示
+      event.preventDefault();
+      // 触发路由变化
+      this.$router.replace('/');
+    },
     /**
      * 鍵盤指令
      */

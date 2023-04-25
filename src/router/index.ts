@@ -6,19 +6,12 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: () => import("@/views/home.vue"),
-    },
-    {
-      path: "/chat/:sendLogName",
-      name: "chat",
-      component: () => import("@/views/chat.vue"),
-      props: true
-    },
-    {
-      path: "/settings",
-      name: "settings",
-      component: () => import("@/views/settings.vue"),
-    },
+      components:{
+        home: () => import("@/views/home.vue"),
+        chat:() => import("@/views/chat.vue"),
+        settings:() => import("@/views/settings.vue")
+      }
+    }
   ]
 });
 

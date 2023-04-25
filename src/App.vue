@@ -43,7 +43,9 @@
     </div>
     <!-- Content -->
     <div class="blockContent" v-if="sidebarActive"></div>
-    <RouterView />
+    <router-view v-if="nowPath === 'home'" name="home" @fromClick="nowPath = 'settings'" />
+    <router-view v-if="nowPath === 'chat'" name="chat" :sendLogName="selectLog" />
+    <router-view v-if="nowPath === 'settings'" name="settings" />
   </div>
 </template>
 <script lang="ts">
@@ -52,6 +54,7 @@ import { faker } from '@faker-js/faker';
 export default {
   name: 'App',
   data(): {
+    nowPath: string,
     selectLog: string,
     editing: string,
     newLogName: string,
@@ -60,6 +63,7 @@ export default {
     sidebarActive: boolean
   } {
     return {
+      nowPath: 'home',
       selectLog: '',
       editing: '',
       newLogName: '',
@@ -162,13 +166,13 @@ export default {
      * 跳頁
      */
     gotoChat() {
-      this.$router.push({ name: 'chat', params: { sendLogName: this.selectLog } })
+      this.nowPath = 'chat';
     },
     goHome() {
-      this.$router.push({ name: 'home' });
+      this.nowPath = 'home';
     },
     goSettings() {
-      this.$router.push({ name: 'settings' });
+      this.nowPath = 'settings';
     },
     toggleSidebar() {
       if (!this.sidebarActive) {
