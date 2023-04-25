@@ -4,7 +4,7 @@
 
 A simple chat dialogue using Vue3 + Typescript + Tailwind CSS framework, utilizing OpenAI’s gpt-3.5-turbo model API, supporting continuous dialogue(maximum 3072 tokens).
 
-![preview](img/preview.jpg)
+<img src="img/preview.jpg" width="300">
 
 ## Installation
 
