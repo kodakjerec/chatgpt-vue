@@ -4,8 +4,7 @@
     <div class="sidebar-toggle" @click="toggleSidebar">
       Menu
     </div>
-    <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0"
-      @blur="closeSidebar">
+    <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }">
       <ul class="mt-8 flex flex-col justify-between cursor-pointer">
         <li class="py-2 border-t border-gray-700 flex items-center" @click="toggleSidebar">
           <span>Hide Menu</span>
@@ -43,9 +42,10 @@
     </div>
     <!-- Content -->
     <div class="blockContent" v-if="sidebarActive"></div>
-    <router-view v-if="nowPath === 'home'" name="home" @fromClick="nowPath = 'settings'" />
-    <router-view v-if="nowPath === 'chat'" name="chat" :sendLogName="selectLog" />
-    <router-view v-if="nowPath === 'settings'" name="settings" />
+    <router-view tabindex="0" @focus="closeSidebar" v-if="nowPath === 'home'" name="home"
+      @fromClick="nowPath = 'settings'" />
+    <router-view tabindex="1" @focus="closeSidebar" v-if="nowPath === 'chat'" name="chat" :sendLogName="selectLog" />
+    <router-view tabindex="2" @focus="closeSidebar" v-if="nowPath === 'settings'" name="settings" />
   </div>
 </template>
 <script lang="ts">

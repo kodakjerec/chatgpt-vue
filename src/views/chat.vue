@@ -283,16 +283,17 @@ export default {
       this.messageList.push(
         {
           role: "system",
-          content: "你是 ChatGPT，OpenAI 訓練的大型語言模型，盡可能簡潔地回答。",
+          content: "You are ChatGPT, a large-scale language model trained by OpenAI, and you respond as concisely as possible.",
         });
       this.messageList.push(
         {
           role: "assistant",
-          content: `你好，我是AI語言模型，我可以提供一些常用服務和信息，例如：
-                1. 翻譯：我可以把中文翻譯成英文，英文翻譯成中文，還有其他一些語言翻譯，比如法語、日語、西班牙語等。
-                2. 咨詢服務：如果你有任何問題需要咨詢，例如健康、法律、投資等方面，我可以盡可能為你提供幫助。
-                3. 閒聊：如果你感到寂寞或無聊，我們可以聊一些有趣的話題，以減輕你的壓力。
-                請告訴我你需要哪方面的幫助，我會根據你的需求給你提供相應的信息和建議。`,
+          content: `Hello, I am an AI language model and I can provide some common services and information, such as:
+
+Translation: I can translate Chinese to English, English to Chinese, and other languages such as French, Japanese, Spanish, etc.
+Consultation Services: If you need advice for any questions, such as health, legal, investment, etc., I will do my best to help you.
+Chatting: If you feel lonely or bored, we can talk about some interesting topics to relieve your stress.
+Please let me know what kind of help you need, and I will provide relevant information and advice based on your needs.`,
         });
     },
     // 清除輸入框內容
