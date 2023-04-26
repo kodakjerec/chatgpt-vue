@@ -9,7 +9,8 @@ const router = createRouter({
       components:{
         home: () => import("@/views/home.vue"),
         chat:() => import("@/views/chat.vue"),
-        settings:() => import("@/views/settings.vue")
+        settings:() => import("@/views/settings.vue"),
+        createOneImage:() => import("@/views/createOneImage.vue")
       }
     }
   ]
