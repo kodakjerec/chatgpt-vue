@@ -31,6 +31,7 @@
           <!-- Me -->
           <template v-else>
             <div>
+              <div class="pyramid ml-2"></div>
               <div class="prose max-w-full text-sm text-slate-600 leading-relaxed bg-green-300 rounded"
                 v-html="mdRender(item.content)"></div>
               <Loding v-if="!item.content && isTalking" />
@@ -345,5 +346,13 @@ pre {
     "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN",
     "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti",
     SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
+}
+
+.pyramid {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 20px solid rgb(134, 239, 172, 1);
 }
 </style>
