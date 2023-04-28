@@ -132,11 +132,18 @@ export default {
      * 鍵盤指令
      */
     keydownEvent(e: any) {
-      if (e.altKey && e.keyCode === 13) {
-        this.messageContent += "\n";
-      } else if (e.keyCode === 13) {
-        e.preventDefault();
-        this.sendChatMessage();
+      if (e.keyCode === 13 && !e.shiftKey) {
+        // 不按shift視為電腦上的enter
+        this.handleEnterKeydown(e);
+      }
+    },
+    handleEnterKeydown(e: any) {
+      // 在手機上按下Return鍵時換行
+      if (navigator.userAgent.match(/(iPod|iPhone|iPad|Android)/)) {
+        if (e.keyCode === 13) {
+          e.preventDefault();
+          this.messageContent += '\n';
+        }
       }
     },
     mdRender(content: string) {
@@ -187,8 +194,8 @@ export default {
      */
     stopSend() {
       let stopMessageList = [{
-          role: "role",
-          content: "stop",
+        role: "role",
+        content: "stop",
       }];
       stop(stopMessageList);
     },

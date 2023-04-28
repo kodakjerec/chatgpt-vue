@@ -1,9 +1,12 @@
 <template>
-    <div class="sticky bottom-0 w-full p-6 pb-8 bg-gray-100">
-        <div class="-mt-2 mb-2 text-sm text-gray-500 mt-10">請輸入 API Key：</div>
-        <div class="flex">
-            <input class="input" type="password" paceholder="sk - xxxxxxxxxx" v-model="messageContent">
-            <button class="btn" @click="sendOrSave()">{{ "保存" }}</button>
+    <div class="bg-white w-full overflow-y-auto max-h-screen">
+        <div class="py-4 bg-gray-100 w-full h-10"></div>
+        <div class="bg-gray-100">
+            <div class="-mt-2 mb-2 text-sm text-gray-500">請輸入 API Key：</div>
+            <div class="flex">
+                <input class="input" type="password" paceholder="sk - xxxxxxxxxx" v-model="messageContent">
+                <button class="btn" @click="sendOrSave()">{{ "保存" }}</button>
+            </div>
         </div>
     </div>
 </template>
