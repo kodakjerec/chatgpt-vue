@@ -1,46 +1,54 @@
 <template>
     <div class="bg-white w-full overflow-y-auto max-h-screen">
-      <div class="mt-10">
-        <label class="block font-medium text-black" for="prompt">Prompt</label>
-        <textarea
-          class="block w-full mt-1 rounded-md border-red-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          rows="3"
-          placeholder="請輸入 Prompt"
-          v-model="inputPrompt"
-        ></textarea>
+      <div class="bg-gray-100">
+        <div class="mt-10">
+          <label class="block font-medium text-black" for="prompt">Prompt</label>
+          <textarea
+            class="block w-full mt-1 rounded-md border-red-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            rows="3"
+            placeholder="請輸入 Prompt"
+            v-model="inputPrompt"
+          ></textarea>
+        </div>
+          <div class="flex">
+            <div class="w-1/3">
+              <label class="block font-medium text-black" for="number">Number</label>
+              <input
+                class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                type="number"
+                placeholder="請輸入 Number"
+                v-model="inputNumber"
+              >
+            </div>
+            <div class="w-1/3">
+              <label class="block font-medium text-black" for="size">Size</label>
+              <select
+                class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                v-model="inputSize">
+                <option>256x256</option>
+                <option>512x512</option>
+                <option>1024x1024</option>
+              </select>
+            </div>
+          </div>
+        <div>
+          <button
+            class="btn"
+            id="createButton"
+            :disabled="isTalking"
+            @click="createImage"
+          >Create</button>
+        </div>
       </div>
+      <!-- images -->
       <div>
-        <label class="block font-medium text-black" for="number">Number</label>
-        <input
-          class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          type="number"
-          placeholder="請輸入 Number"
-          v-model="inputNumber"
-        >
+        <Loding v-if="isTalking" />
+        <div v-else>
+          <div v-for="(item, index) in results" :key="index">
+            <img class="w-1/3 h-1/3" :src="item.url">
+          </div>
+        </div>
       </div>
-      <div>
-        <label class="block font-medium text-black" for="size">Size</label>
-        <select
-          class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          v-model="inputSize">
-          <option>256x256</option>
-          <option>512x512</option>
-          <option>1024x1024</option>
-        </select>
-      </div>
-      <div>
-        <button
-          class="btn"
-          id="createButton"
-          :disabled="isTalking"
-          @click="createImage"
-        >Create</button>
-      </div>
-    </div>
-    <!-- images -->
-    <Loding v-if="isTalking" />
-    <div v-else>
-      <img class="w-100 h-50" :src="resultURL">
     </div>
 </template>
 
@@ -56,22 +64,20 @@ export default {
   },
   data(): {
         isTalking: boolean,
-        apiKey: string,
-        getSecretKey: string,
         decoder: TextDecoder,
-        resultURL: string,
+        results: Array<any>,
+        sampleURL: string,
         inputPrompt: string,
         inputNumber: number,
         inputSize: string
     } {
     return {
         isTalking: false,
-        apiKey: "",
-        getSecretKey: "lianginx",
         decoder: new TextDecoder("utf-8"),
-        resultURL: "/favicon.ico",
+        results: [],
+        sampleURL: "/favicon.ico",
         inputPrompt: "An otter",
-        inputNumber: 1,
+        inputNumber: 2,
         inputSize: "256x256"
     }
   },
@@ -84,7 +90,7 @@ export default {
             size: this.inputSize
         };
         try {
-            const { body, status } = await createImage(sendObject, this.getAPIKey());
+            const { body, status } = await createImage(sendObject);
             if (body) {
                 const reader = body.getReader();
                 await this.readStream(reader, status);
@@ -93,18 +99,6 @@ export default {
         } finally {
         this.isTalking = false;
         }
-    },
-    /**
-     * 取得apiKey
-     *  @return 明文apiKey
-     */
-    getAPIKey() {
-      if (this.apiKey) return this.apiKey;
-      const aesAPIKey = localStorage.getItem("apiKey") ?? "";
-      this.apiKey = cryptoJS.AES.decrypt(aesAPIKey, this.getSecretKey).toString(
-        cryptoJS.enc.Utf8
-      );
-      return this.apiKey;
     },
     /**
      * 解析chatGpt回傳的stream
@@ -131,10 +125,10 @@ export default {
 
         // 回傳URL
         let response = JSON.parse(decodedText);
-        this.resultURL = response.data[0].url;
-        console.log(this.resultURL)
-
+        this.sampleURL = response.data;
       }
+
+      this.results = JSON.parse(this.sampleURL);
     }
   }
 };

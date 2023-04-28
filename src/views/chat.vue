@@ -39,12 +39,14 @@
           </template>
         </div>
       </div>
-
       <div class="sticky bottom-0 w-full p-6 pb-8 bg-gray-100">
-        <div class="flex">
-          <textarea class="input" placeholder="Please input something" v-model="messageContent"
-            @keydown="keydownEvent"></textarea>
-          <button class="btn" :disabled="isTalking" @click="sendOrSave()">{{ "Send" }}</button>
+        <div>
+          <div class="flex">
+            <textarea class="input" placeholder="Please input something" v-model="messageContent"
+              @keydown="keydownEvent"></textarea>
+            <button class="btn" v-if="!isTalking" :disabled="isTalking" @click="sendOrSave()">{{ "Send" }}</button>
+            <button class="btn bg-red-500" v-else @click="stopSend()">{{ "Stop" }}</button>
+          </div>
         </div>
       </div>
     </div>
@@ -77,8 +79,6 @@ export default {
     editing: string,
     newLogName: string,
     fromLogName: string,
-    apiKey: string,
-    getSecretKey: string,
     isTalking: boolean,
     messageContent: string,
     totalTokens: number,
@@ -92,8 +92,6 @@ export default {
       editing: '',
       newLogName: '',
       fromLogName: "",
-      apiKey: "",
-      getSecretKey: "lianginx",
       isTalking: false,
       messageContent: "",
       totalTokens: 0,
@@ -171,7 +169,7 @@ export default {
           }
         }
         sendMessageList = sendMessageList.reverse(); // 原本是倒著算, 要把陣列反過來
-        const { body, status } = await chat(sendMessageList, this.getAPIKey());
+        const { body, status } = await chat(sendMessageList);
         if (body) {
           const reader = body.getReader();
           await this.readStream(reader, status);
@@ -183,6 +181,16 @@ export default {
         this.setChatLog(this.fromLogName);
         this.totalTokens = this.calAllTiktoken(this.messageList);
       }
+    },
+    /**
+     * 停止訊息
+     */
+    stopSend() {
+      let stopMessageList = [{
+          role: "role",
+          content: "stop",
+      }];
+      stop(stopMessageList);
     },
     /**
      * 解析chatGpt回傳的stream
@@ -240,18 +248,6 @@ export default {
     sendOrSave() {
       if (!this.messageContent.length) return;
       this.sendChatMessage();
-    },
-    /**
-     * 取得apiKey
-     *  @return 明文apiKey
-     */
-    getAPIKey() {
-      if (this.apiKey) return this.apiKey;
-      const aesAPIKey = localStorage.getItem("apiKey") ?? "";
-      this.apiKey = cryptoJS.AES.decrypt(aesAPIKey, this.getSecretKey).toString(
-        cryptoJS.enc.Utf8
-      );
-      return this.apiKey;
     },
     // 取得log
     getChatLog(logName: string) {
