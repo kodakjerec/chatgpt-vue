@@ -221,12 +221,10 @@ export default {
       let lastActiveTime: number = Number(localStorage.getItem('lastActiveTime') ?? new Date().getTime());
       let currentTime: number = new Date().getTime();
       let timeDiff: number = currentTime - lastActiveTime;
-
+      localStorage.setItem('lastActiveTime', currentTime.toString());
       // 如果背景中放置的時間超過指定時間，就重新載入頁面
       if (timeDiff > 10 * 60 * 1000) { // 10 分鐘
         location.reload();
-      } else {
-        localStorage.setItem('lastActiveTime', currentTime.toString());
       }
     }
   }

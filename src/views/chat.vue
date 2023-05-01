@@ -44,8 +44,7 @@
           <div class="flex">
             <textarea class="input" placeholder="Please input something" v-model="messageContent"
               @keydown="keydownEvent"></textarea>
-            <button class="btn" v-if="!isTalking" :disabled="isTalking" @click="sendOrSave()">{{ "Send" }}</button>
-            <button class="btn bg-red-500" v-else @click="stopSend()">{{ "Stop" }}</button>
+            <button class="btn" :disabled="isTalking" @click="sendOrSave()">{{ "Send" }}</button>
           </div>
         </div>
       </div>
@@ -144,6 +143,8 @@ export default {
           e.preventDefault();
           this.messageContent += '\n';
         }
+      } else {
+        this.sendOrSave();
       }
     },
     mdRender(content: string) {
@@ -156,12 +157,11 @@ export default {
       let content: string = this.messageContent
       try {
         this.isTalking = true;
-        if (this.messageList.length === 2) {
-          this.messageList.pop();
+        if (this.messageList[0].role === "system") {
+          this.messageList = [];
         }
         this.messageList.push({ role: "user", content });
         this.clearMessageContent();
-        this.messageList.push({ role: "assistant", content: "" });
 
         let calTokens: number = 0;
         let sendMessageList = [];
@@ -178,6 +178,7 @@ export default {
         sendMessageList = sendMessageList.reverse(); // 原本是倒著算, 要把陣列反過來
         const { body, status } = await chat(sendMessageList);
         if (body) {
+          this.messageList.push({ role: "assistant", content: "" }); // 有回應, 準備塞進去資料
           const reader = body.getReader();
           await this.readStream(reader, status);
         }
@@ -188,16 +189,6 @@ export default {
         this.setChatLog(this.fromLogName);
         this.totalTokens = this.calAllTiktoken(this.messageList);
       }
-    },
-    /**
-     * 停止訊息
-     */
-    stopSend() {
-      let stopMessageList = [{
-        role: "role",
-        content: "stop",
-      }];
-      stop(stopMessageList);
     },
     /**
      * 解析chatGpt回傳的stream
@@ -212,11 +203,10 @@ export default {
 
       while (true) {
         // eslint-disable-next-line no-await-in-loop
-        const { value, done } = await reader.read();
+        const { done, value } = await reader.read();
         if (done) break;
 
         const decodedText = this.decoder.decode(value, { stream: true });
-
         if (status !== 200) {
           const json = JSON.parse(decodedText); // start with "data: "
           const content = json.error.message ?? decodedText;
@@ -235,6 +225,7 @@ export default {
           if (line === "data: [DONE]") return; //
 
           const json = JSON.parse(line.substring(6)); // start with "data: "
+          console.log(json)
           const content =
             status === 200
               ? json.choices[0].delta.content ?? ""

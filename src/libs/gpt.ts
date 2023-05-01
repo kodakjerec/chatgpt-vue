@@ -28,7 +28,8 @@ export async function chat(messageList: ChatMessage[]) {
         model: "gpt-3.5-turbo",
         stream: true,
         messages: messageList,
-        stop: 'stop'
+        presence_penalty: 2,
+        frequency_penalty: 2
       }),
     });
     return result;
@@ -36,7 +37,7 @@ export async function chat(messageList: ChatMessage[]) {
     throw error;
   }
 }
-export async function stop(messageList: ChatMessage[]) {
+export async function stopMessage(messageList: ChatMessage[]) {
   if (!apiKey) { getAPIKey() };
 
   try {
@@ -51,8 +52,7 @@ export async function stop(messageList: ChatMessage[]) {
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
         stream: true,
-        messages: messageList,
-        stop: 'stop'
+        messages: messageList
       }),
     });
   } catch (error) {
