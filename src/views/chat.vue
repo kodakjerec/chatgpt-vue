@@ -225,8 +225,6 @@ export default {
           if (line === "data: [DONE]") return; //
 
           const json = JSON.parse(line.substring(6)); // start with "data: "
-          console.log(json)
-          const content =
             status === 200
               ? json.choices[0].delta.content ?? ""
               : json.error.message;
