@@ -175,10 +175,11 @@ export default {
             break;
           }
         }
+
         sendMessageList = sendMessageList.reverse(); // 原本是倒著算, 要把陣列反過來
+        this.messageList.push({ role: "assistant", content: "" }); // 準備塞進去資料
         const { body, status } = await chat(sendMessageList);
         if (body) {
-          this.messageList.push({ role: "assistant", content: "" }); // 有回應, 準備塞進去資料
           const reader = body.getReader();
           await this.readStream(reader, status);
         }
@@ -225,6 +226,7 @@ export default {
           if (line === "data: [DONE]") return; //
 
           const json = JSON.parse(line.substring(6)); // start with "data: "
+          const content =
             status === 200
               ? json.choices[0].delta.content ?? ""
               : json.error.message;
