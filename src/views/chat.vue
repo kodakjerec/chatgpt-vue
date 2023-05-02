@@ -44,7 +44,7 @@
           <div class="flex">
             <textarea class="input" placeholder="Please input something" v-model="messageContent"
               @keydown="keydownEvent"></textarea>
-            <button class="btn" :disabled="isTalking" @click="sendOrSave()">{{ "Send" }}</button>
+            <button ref="btn" class="btn" :disabled="isTalking" @click="sendOrSave()">{{ "Send" }}</button>
           </div>
         </div>
       </div>
@@ -131,20 +131,18 @@ export default {
      * 鍵盤指令
      */
     keydownEvent(e: any) {
-      if (e.keyCode === 13 && !e.shiftKey) {
-        // 不按shift視為電腦上的enter
-        this.handleEnterKeydown(e);
-      }
-    },
-    handleEnterKeydown(e: any) {
-      // 在手機上按下Return鍵時換行
-      if (navigator.userAgent.match(/(iPod|iPhone|iPad|Android)/)) {
-        if (e.keyCode === 13) {
+      if (e.keyCode === 13) {
+        // cellphone
+        if (navigator.userAgent.match(/(iPod|iPhone|iPad|Android)/)) {
           e.preventDefault();
           this.messageContent += '\n';
+        } else {
+          // pc
+          if (!e.shiftKey) {
+            e.preventDefault();
+            this.sendOrSave();
+          }
         }
-      } else {
-        this.sendOrSave();
       }
     },
     mdRender(content: string) {
