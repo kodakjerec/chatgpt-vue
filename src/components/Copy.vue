@@ -13,8 +13,7 @@
 
 <script lang="ts">
 import { Copy, Loading, CheckOne, CloseOne } from "@icon-park/vue-next";
-import { Theme } from "@icon-park/vue-next/lib/runtime";
-// import { ref } from "vue";
+import type { Theme } from "@icon-park/vue-next/lib/runtime";
 
 export default {
   name: "CopyContent",
@@ -32,15 +31,15 @@ export default {
       btnConfig: {
         size: 14,
         fill: "#999",
-        theme: "outline",
-      },
+        theme: 'outline' as Theme,
+      } as { [key: string]: any },
       btnTips: {
         copy: "Copy All!",
         loading: "",
         success: "Copy to clipboard！",
         error: "Copy failed！",
-      },
-      btnStatus: "copy"
+      } as { [key: string]: any },
+      btnStatus: "copy" as string
     }
   },
   methods: {

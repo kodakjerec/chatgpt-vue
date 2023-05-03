@@ -7,9 +7,10 @@
       "@/*": ["./src/*"]
     },
     "resolveJsonModule": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
     "lib": ["ESNext", "DOM"]
   },
-
   "references": [
     {
       "path": "./tsconfig.config.json"

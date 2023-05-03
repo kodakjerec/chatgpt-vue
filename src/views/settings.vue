@@ -79,6 +79,10 @@
 <script lang="ts">
 import cryptoJS from "crypto-js";
 
+interface MyObject {
+  [key: string]: any;
+}
+
 export default {
     name: 'settings',
     data() {
@@ -147,11 +151,16 @@ export default {
          * 調整chat設定
          */
         chatValueChange(event: any) {
-            const target = event.target;
-            if (target.value<parseInt(target.min)) {
-                this.chat[target.name] = target.min;
-            } else if (target.value>parseInt(target.max)) {
-                this.chat[target.name] = target.max;
+            const target = event.target as HTMLInputElement;
+
+            if (target.value<target.min) {
+                if(target.name) {
+                    (this.chat as MyObject)[target.name] = parseInt(target.min);
+                }
+            } else if (target.value>target.max) {
+                if(target.name) {
+                    (this.chat as MyObject)[target.name] = parseInt(target.max);
+                }
             }
             localStorage.setItem('settings_chat', JSON.stringify(this.chat));
         },
@@ -159,7 +168,12 @@ export default {
          * 重設chat設定
          */
         resetChatValue() {
-            this.chat = this.$options.data().chat;
+            this.chat = {
+                model: 'gpt-3.5-turbo',
+                temperature: 1,
+                presence_penalty: 0,
+                frequency_penalty: 0
+            };
             localStorage.setItem('settings_chat', JSON.stringify(this.chat));
         },
         /**

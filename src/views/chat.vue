@@ -82,7 +82,7 @@ export default {
       totalTokens: 0,
       decoder: new TextDecoder("utf-8"),
       roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
-      messageList: [],
+      messageList: [] as Array<any>,
       enc: null // log尺寸
     }
   },
@@ -148,7 +148,7 @@ export default {
         this.clearMessageContent();
 
         let calTokens: number = 0;
-        let sendMessageList = [];
+        let sendMessageList: Array<any> = [];
         for (let i = this.messageList.length - 1; i >= 0; i--) {
           let newTokens = this.calTiktoken(this.messageList[i].content);
 
