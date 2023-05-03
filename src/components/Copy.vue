@@ -1,38 +1,5 @@
-<script setup lang="ts">
-import { Copy, Loading, CheckOne, CloseOne } from "@icon-park/vue-next";
-import type { Theme } from "@icon-park/vue-next/lib/runtime";
-import { ref } from "vue";
-
-const porps = defineProps<{ content: string }>();
-const btnConfig: {
-  size: number;
-  fill: string;
-  theme: Theme;
-} = {
-  size: 14,
-  fill: "#999",
-  theme: "outline",
-};
-const btnTips = {
-  copy: "复制全文",
-  loading: "",
-  success: "已复制到剪贴板！",
-  error: "复制失败！",
-};
-const btnStatus = ref<"copy" | "loading" | "success" | "error">("copy");
-
-const copyToClipboard = (content: string = porps.content) => {
-  btnStatus.value = "loading";
-  navigator.clipboard
-    .writeText(content)
-    .then(() => setTimeout(() => (btnStatus.value = "success"), 150))
-    .catch(() => (btnStatus.value = "error"))
-    .finally(() => setTimeout(() => (btnStatus.value = "copy"), 1500));
-};
-</script>
-
 <template>
-  <div class="flex items-center cursor-pointer" @click="copyToClipboard()">
+  <div class="flex items-center cursor-pointer" @click="copyToClipboard()" ref="copy">
     <copy v-show="btnStatus === 'copy'" :theme="btnConfig.theme" :size="btnConfig.size" :fill="btnConfig.fill" />
     <loading class="rotate" v-show="btnStatus === 'loading'" :theme="btnConfig.theme" :size="btnConfig.size"
       :fill="btnConfig.fill" />
@@ -43,6 +10,51 @@ const copyToClipboard = (content: string = porps.content) => {
     }}</span>
   </div>
 </template>
+
+<script lang="ts">
+import { Copy, Loading, CheckOne, CloseOne } from "@icon-park/vue-next";
+import { Theme } from "@icon-park/vue-next/lib/runtime";
+// import { ref } from "vue";
+
+export default {
+  name: "CopyContent",
+  components: {
+    Copy, Loading, CheckOne, CloseOne
+  },
+  props: {
+    content: {
+      type: String,
+      default: ''
+    }
+  },
+  data() {
+    return {
+      btnConfig: {
+        size: 14,
+        fill: "#999",
+        theme: "outline",
+      },
+      btnTips: {
+        copy: "Copy All!",
+        loading: "",
+        success: "Copy to clipboard！",
+        error: "Copy failed！",
+      },
+      btnStatus: "copy"
+    }
+  },
+  methods: {
+    copyToClipboard(content: string = this.content) {
+      this.btnStatus = "loading";
+      (navigator as any).clipboard
+        .writeText(content)
+        .then(() => setTimeout(() => (this.btnStatus = "success"), 150))
+        .catch(() => (this.btnStatus = "error"))
+        .finally(() => setTimeout(() => (this.btnStatus = "copy"), 1500));
+    }
+  }
+}
+</script>
 
 <style scoped>
 @keyframes spin {

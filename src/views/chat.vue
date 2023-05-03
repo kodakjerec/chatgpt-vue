@@ -16,10 +16,10 @@
       </div>
 
       <div class="flex-1 mx-2 mt-20 mb-2">
-        <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="item of messageListView">
+        <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="(item, index) of messageListView" :key="index">
           <div class="flex justify-between items-center mb-2">
             <div class="font-bold">{{ roleAlias[item.role] }}：</div>
-            <Copy class="invisible group-hover:visible" :content="item.content" />
+            <CopyContent class="invisible group-hover:visible w-20 h-10" :content="item.content" />
           </div>
           <!-- chatGPT -->
           <template v-if="item.role !== 'user'">
@@ -53,19 +53,17 @@
 </template>
 
 <script lang="ts">
-import type { ChatMessage } from "@/types";
 import cryptoJS from "crypto-js";
-import { ref, nextTick } from "vue";
 import { chat } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
-import Copy from "@/components/Copy.vue";
+import CopyContent from "@/components/Copy.vue";
 import { md } from "@/libs/markdown";
 import { encoding_for_model, Tiktoken } from '@dqbd/tiktoken';
 
 export default {
   name: 'chat',
   components: {
-    Loding, Copy
+    Loding, CopyContent
   },
   props: {
     sendLogName: {
@@ -109,7 +107,7 @@ export default {
     this.enc = encoding_for_model("gpt-3.5-turbo");
     this.fromLogName = this.sendLogName;
     this.getChatLog(this.fromLogName);
-    nextTick(() => this.scrollToBottom());
+    this.$nextTick(() => this.scrollToBottom());
   },
   beforeDestroy() {
     this.enc.free();
