@@ -38,8 +38,9 @@
             </div>
           </template>
         </div>
+          <div class="w-full h-24 md:h-28 flex-shrink-0"></div>
       </div>
-      <div class="sticky bottom-0 w-full p-4 pb-4 bg-gray-100">
+      <div class="absolute bottom-0 w-full p-4 pb-4 bg-gray-100">
         <div>
           <div class="flex">
             <textarea class="input" placeholder="Please input something" v-model="messageContent"
