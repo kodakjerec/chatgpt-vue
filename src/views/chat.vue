@@ -16,7 +16,7 @@
       </div>
 
       <div class="flex-1 mx-2 mt-20 mb-2">
-        <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="(item, index) of messageListView" :key="index">
+        <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="item of messageListView">
           <div class="flex justify-between items-center mb-2">
             <div class="font-bold">{{ roleAlias[item.role] }}：</div>
             <CopyContent class="invisible group-hover:visible w-20 h-10" :content="item.content" />

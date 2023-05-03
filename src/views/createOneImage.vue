@@ -25,7 +25,6 @@
       <div>
         <button class="btn" id="createButton" :disabled="isTalking" @click="createImage">Create</button>
       </div>
-    </div>
     <!-- images -->
     <div>
       <Loding v-if="isTalking" />
@@ -46,6 +45,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </template>
