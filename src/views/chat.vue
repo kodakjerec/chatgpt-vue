@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white w-full overflow-y-auto max-h-screen" ref="chatListDom">
-    <div class="flex flex-col h-screen">
+    <div class="bg-gray-100 h-full w-full">
       <div class="flex flex-nowrap fixed w-full items-baseline top-0 py-4 bg-gray-100">
         <div class="text-2xl font-bold" v-if="!editing">{{ fromLogName }}
           <div class="inline-flex cursor-pointer" @click="editLogName"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -39,7 +39,7 @@
           </template>
         </div>
       </div>
-      <div class="sticky bottom-0 w-full p-6 pb-8 bg-gray-100">
+      <div class="sticky bottom-0 w-full p-4 pb-4 bg-gray-100">
         <div>
           <div class="flex">
             <textarea class="input" placeholder="Please input something" v-model="messageContent"
@@ -73,19 +73,7 @@ export default {
       default: ''
     }
   },
-  data(): {
-    md: any,
-    editing: string,
-    newLogName: string,
-    fromLogName: string,
-    isTalking: boolean,
-    messageContent: string,
-    totalTokens: number,
-    decoder: TextDecoder,
-    roleAlias: any,
-    messageList: Array<any>,
-    enc: any
-  } {
+  data() {
     return {
       md: md,
       editing: '',

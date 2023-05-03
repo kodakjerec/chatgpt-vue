@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white w-full overflow-y-auto max-h-screen">
+    <div class="bg-gray-100 h-full w-full">
     <div class="py-4 bg-gray-100 w-full h-10"></div>
-    <div class="bg-gray-100">
       <div class="">
         <label class="block font-medium text-black" for="prompt">Prompt</label>
         <textarea class="block w-full mt-1 rounded-md border-red-300 shadow-sm input" rows="3" placeholder="請輸入 Prompt"
@@ -60,15 +60,7 @@ export default {
   components: {
     Loding
   },
-  data(): {
-    isTalking: boolean,
-    decoder: TextDecoder,
-    results: Array<any>,
-    testURL: string,
-    inputPrompt: string,
-    inputNumber: number,
-    inputSize: string
-  } {
+  data() {
     return {
       isTalking: false,
       decoder: new TextDecoder("utf-8"),
@@ -85,8 +77,7 @@ export default {
       let sendObject = {
         prompt: this.inputPrompt,
         n: this.inputNumber,
-        size: this.inputSize,
-        response_format: 'b64_json'
+        size: this.inputSize
       };
       try {
         const { body, status } = await createImage(sendObject);

@@ -3,6 +3,12 @@ import cryptoJS from "crypto-js";
 
 const getSecretKey:string = "lianginx";
 let apiKey:string = "";
+let chatSettings:any = {};
+
+  /**
+   * 取得apiKey
+   *  @return 明文apiKey
+   */
 function getAPIKey() {
   if (apiKey) return apiKey;
   const aesAPIKey = localStorage.getItem("apiKey") ?? "";
@@ -11,9 +17,27 @@ function getAPIKey() {
   );
   return apiKey;
 }
+/**
+ * 取得chat settings
+ * @return chat settings
+ */
+function getSettingsChat() {
+  let settings_Chat = localStorage.getItem("settings_chat");
+  if (!settings_Chat) {
+      return {
+          model: 'gpt-3.5-turbo',
+          temperature: 1,
+          presence_penalty: 0,
+          frequency_penalty: 0
+      };
+  }
+  
+  return JSON.parse(settings_Chat);
+}
 
 export async function chat(messageList: ChatMessage[]) {
   if (!apiKey) { getAPIKey() };
+  chatSettings = getSettingsChat();
 
   try {
     const result = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -25,11 +49,12 @@ export async function chat(messageList: ChatMessage[]) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: chatSettings.model,
         stream: true,
         messages: messageList,
-        presence_penalty: 2,
-        frequency_penalty: 2
+        temperature: chatSettings.temperature,
+        presence_penalty: chatSettings.presence_penalty,
+        frequency_penalty: chatSettings.frequency_penalty
       }),
     });
     return result;
