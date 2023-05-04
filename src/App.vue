@@ -14,10 +14,7 @@
         <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
           @click="newChatLog()">
           <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 36 24" stroke-width="1.5"
-              stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
+            <plus theme="outline" size="24" fill="#fff"/>
             New Chat
           </div>
         </li>
@@ -25,23 +22,22 @@
           <li class="py-2 border-t flex-auto border-gray-700 items-center hover:bg-slate-700 hover:rounded">
             <div :class="{ 'text-yellow-300': selectLog === item }" @click="clickLogName(item)">{{ item }}</div>
           </li>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"
-            class="mt-2 w-6 h-6 text-gray-500 hover:text-red-500" v-show="logList.length > 1" @click="delChatLog(item)">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-          </svg>
+            <delete theme="outline" size="20" fill="#fff" class="mt-3" v-show="logList.length > 1" @click="delChatLog(item)"/>
         </div>
         <li>==========</li>
         <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
           @click="gotoCreateOneImage()">
           <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 36 24" stroke-width="1.5"
-              stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M19.2277 18.7321L20.9955 16.9644L22.7632 18.7321C23.7395 19.7084 23.7395 21.2914 22.7632 22.2677C21.7869 23.244 20.204 23.244 19.2277 22.2677C18.2514 21.2914 18.2514 19.7084 19.2277 18.7321ZM8.87861 1.07959L20.1923 12.3933C20.5828 12.7838 20.5828 13.417 20.1923 13.8075L11.707 22.2928C11.3165 22.6833 10.6833 22.6833 10.2928 22.2928L1.80754 13.8075C1.41702 13.417 1.41702 12.7838 1.80754 12.3933L9.58572 4.61512L7.4644 2.4938L8.87861 1.07959ZM10.9999 6.02934L3.92886 13.1004L10.9999 20.1715L18.071 13.1004L10.9999 6.02934Z">
-              </path>
-            </svg>
+            <photograph theme="outline" size="24" fill="#fff"/>
             Image
+          </div>
+        </li>
+        <li>==========</li>
+        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
+          @click="gototranslation()">
+          <div class="flex items-center">
+            <translate theme="outline" size="24" fill="#fff"/>
+            translation
           </div>
         </li>
         <li>==========</li>
@@ -56,14 +52,19 @@
     <router-view v-if="nowPath.slice(0, 4) === 'chat'" name="chat" :sendLogName="selectLog"
       @updateLogName="updateLogName" />
     <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
+    <router-view v-if="nowPath === 'translation'" name="translation" />
     <router-view v-if="nowPath === 'settings'" name="settings" />
   </div>
 </template>
 <script lang="ts">
 import { faker } from '@faker-js/faker';
+import { Photograph, Translate, Plus, Delete } from "@icon-park/vue-next";
 
 export default {
   name: 'App',
+  components: {
+    Photograph, Translate, Plus, Delete
+  },
   data(): {
     nowPath: string,
     selectLog: string,
@@ -196,6 +197,10 @@ export default {
      */
     gotoCreateOneImage() {
       this.nowPath = 'createOneImage';
+      localStorage.setItem('lastPath', this.nowPath);
+    },
+    gototranslation() {
+      this.nowPath = 'translation';
       localStorage.setItem('lastPath', this.nowPath);
     },
     /**

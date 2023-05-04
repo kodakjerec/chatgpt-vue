@@ -23,7 +23,7 @@
         </div>
       </div>
       <div>
-        <button class="btn" id="createButton" :disabled="isTalking" @click="createImage">Create</button>
+        <button class="btn" id="createButton" :disabled="isTalking" @click="imagesGenerations">Create</button>
       </div>
     <!-- images -->
     <div>
@@ -34,12 +34,7 @@
             <img class="w-1/3 h-1/3" :src="item.url">
             <div class="modal-buttons">
               <button @click="saveImage(item.url)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                  class="w-6 h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M13 10H18L12 16L6 10H11V3H13V10ZM4 19H20V12H22V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V12H4V19Z">
-                  </path>
-                </svg>
+                <download theme="outline" size="24" fill="#000"/>
               </button>
             </div>
           </div>
@@ -52,13 +47,14 @@
 
 <script lang="ts">
 import cryptoJS from "crypto-js";
-import { createImage } from "@/libs/gpt";
+import { imagesGenerations } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
+import { Download } from "@icon-park/vue-next";
 
 export default {
   name: "createOneImage",
   components: {
-    Loding
+    Loding, Download
   },
   data() {
     return {
@@ -72,7 +68,7 @@ export default {
     }
   },
   methods: {
-    async createImage() {
+    async imagesGenerations() {
       this.isTalking = true;
       let sendObject = {
         prompt: this.inputPrompt,
@@ -80,7 +76,7 @@ export default {
         size: this.inputSize
       };
       try {
-        const { body, status } = await createImage(sendObject);
+        const { body, status } = await imagesGenerations(sendObject);
         if (body) {
           const reader = body.getReader();
           await this.readStream(reader, status);

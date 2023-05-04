@@ -62,30 +62,8 @@ export async function chat(messageList: ChatMessage[]) {
     throw error;
   }
 }
-export async function stopMessage(messageList: ChatMessage[]) {
-  if (!apiKey) { getAPIKey() };
 
-  try {
-    fetch("https://api.openai.com/v1/chat/completions", {
-      method: "post",
-      // signal: AbortSignal.timeout(8000),
-      // 開啟後到達設定時間會中斷輸出
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        stream: true,
-        messages: messageList
-      }),
-    });
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function createImage(sendObject: Object) {
+export async function imagesGenerations(sendObject: Object) {
   if (!apiKey) { getAPIKey() };
   
   try {
@@ -98,6 +76,67 @@ export async function createImage(sendObject: Object) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(sendObject),
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function files() {
+  if (!apiKey) { getAPIKey() };
+  
+  try {
+    const result = await fetch("https://api.openai.com/v1/files", {
+      method: "get",
+      // signal: AbortSignal.timeout(8000),
+      // 開啟後到達設定時間會中斷輸出
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function fileUpload(file:File, purpose:string) {
+  if (!apiKey) { getAPIKey() };
+  let fileReader = new FileReader();
+  const stream = await new Promise( (resolve, reject) => {
+        fileReader.onload = () => {
+          try {
+            // 将文本按行分割，并去除空白字符
+            const lines = (fileReader.result as string).trim().split(/\r?\n/);
+            // 将每一行解析为 JSON 对象，并拼接成 JSONL 字符串
+            // const jsonl = lines.map(line => JSON.stringify(JSON.parse(line))).join('\n');
+            console.log(lines);
+            resolve(lines);
+          } catch (error) {
+            reject(error);
+          }
+        },
+        fileReader.onerror = () => {
+          reject(fileReader.error);
+        };
+        fileReader.readAsText(file, 'utf-8');
+    });
+
+  try {
+    const result = await fetch("https://api.openai.com/v1/files", {
+      method: "post",
+      // signal: AbortSignal.timeout(8000),
+      // 開啟後到達設定時間會中斷輸出
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        file: stream,
+        purpose: purpose
+      })
     });
     return result;
   } catch (error) {

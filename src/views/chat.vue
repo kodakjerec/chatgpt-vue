@@ -3,20 +3,17 @@
     <div class="bg-gray-100 h-full w-full">
       <div class="flex flex-nowrap fixed w-full items-baseline top-0 py-4 bg-gray-100">
         <div class="text-2xl font-bold" v-if="!editing">{{ fromLogName }}
-          <div class="inline-flex cursor-pointer" @click="editLogName"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
-              viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-            </svg>
+          <div class="inline-flex cursor-pointer" @click="editLogName">
+            <edit theme="outline" size="24" fill="#000"/>
           </div>
           <span class="text-xs text-gray-500" title="tokens">{{ totalTokens }}</span>
         </div>
-        <input type="text" class="text-black bg-slate-400" v-else @blur="updateLogName" v-model="newLogName"
+        <input type="text" class="px-4 py-2 text-gray-700 bg-white border rounded-md mr-2 text-black bg-slate-400" v-else @blur="updateLogName" v-model="newLogName"
           ref="editingLogName">
       </div>
 
       <div class="flex-1 mx-2 mt-20 mb-2">
-        <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="item of messageListView" :key="item">
+        <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="(item,index) of messageListView" :key="index">
           <div class="flex justify-between items-center mb-2">
             <div class="font-bold">{{ roleAlias[item.role] }}：</div>
             <CopyContent class="invisible group-hover:visible w-20 h-10" :content="item.content" />
@@ -60,11 +57,12 @@ import Loding from "@/components/Loding.vue";
 import CopyContent from "@/components/Copy.vue";
 import { md } from "@/libs/markdown";
 import { encoding_for_model, Tiktoken } from '@dqbd/tiktoken';
+import { Edit } from "@icon-park/vue-next";
 
 export default {
   name: 'chat',
   components: {
-    Loding, CopyContent
+    Loding, CopyContent, Edit
   },
   props: {
     sendLogName: {
