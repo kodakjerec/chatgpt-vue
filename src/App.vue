@@ -7,7 +7,7 @@
     <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0"
       @blur="closeSidebar">
       <ul class="mt-8 flex flex-col justify-between cursor-pointer">
-        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="goHome()">
+        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="gotoPath('home')">
           <span>Home</span>
         </li>
         <li>==========</li>
@@ -26,7 +26,7 @@
         </div>
         <li>==========</li>
         <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
-          @click="gotoCreateOneImage()">
+          @click="gotoPath('createOneImage')">
           <div class="flex items-center line-through">
             <photograph theme="outline" size="24" fill="#fff"/>
             Image
@@ -34,14 +34,22 @@
         </li>
         <li>==========</li>
         <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
-          @click="gototranslation()">
+          @click="gotoPath('translation')">
           <div class="flex items-center">
             <translate theme="outline" size="24" fill="#fff"/>
             translation
           </div>
         </li>
         <li>==========</li>
-        <li class="mt-auto py-2 border-t border-b border-gray-700 hover:bg-slate-700 hover:rounded" @click="goSettings()">
+        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
+          @click="gotoPath('transcription')">
+          <div class="flex items-center">
+            <translate theme="outline" size="24" fill="#fff"/>
+            transcription
+          </div>
+        </li>
+        <li>==========</li>
+        <li class="mt-auto py-2 border-t border-b border-gray-700 hover:bg-slate-700 hover:rounded" @click="gotoPath('settings')">
           <span>Settings</span>
         </li>
       </ul>
@@ -53,6 +61,7 @@
       @updateLogName="updateLogName" />
     <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
     <router-view v-if="nowPath === 'translation'" name="translation" />
+    <router-view v-if="nowPath === 'transcription'" name="transcription" />
     <router-view v-if="nowPath === 'settings'" name="settings" />
   </div>
 </template>
@@ -151,7 +160,7 @@ export default {
      */
     clickLogName(logName: string) {
       this.selectLog = logName;
-      this.gotoChat();
+      this.gotoPath('chat/' + this.selectLog);
     },
     updateLogName(fromObject: { newLogName: string, oldName: string }) {
       let newLogName = fromObject.newLogName;
@@ -171,36 +180,8 @@ export default {
         this.clickLogName(newLogName);
       }
     },
-    /**
-     * 跳頁
-     */
-    gotoChat() {
-      this.nowPath = 'chat/' + this.selectLog;
-      localStorage.setItem('lastPath', this.nowPath);
-    },
-    /**
-     * 跳到 home
-     */
-    goHome() {
-      this.nowPath = 'home';
-      localStorage.setItem('lastPath', this.nowPath);
-    },
-    /**
-     * 跳到 settings
-     */
-    goSettings() {
-      this.nowPath = 'settings';
-      localStorage.setItem('lastPath', this.nowPath);
-    },
-    /**
-     * 跳到 image
-     */
-    gotoCreateOneImage() {
-      this.nowPath = 'createOneImage';
-      localStorage.setItem('lastPath', this.nowPath);
-    },
-    gototranslation() {
-      this.nowPath = 'translation';
+    gotoPath(path:string) {
+      this.nowPath = path;
       localStorage.setItem('lastPath', this.nowPath);
     },
     /**

@@ -2,8 +2,8 @@
     <div class="bg-white w-full overflow-y-auto max-h-screen">
         <div class="bg-gray-100 h-full w-full">
         <div class="py-4 bg-gray-100 w-full h-10"></div>
-            <div class="flex flex-wrap my-5 rounded bg-white m-2 p-2" tabindex="0">
-                <div class="w-full text-center my-4">
+            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="0">
+                <div class="w-full text-center my-1">
                     <label class="text-gray-700 font-bold text-xl">API Key</label>
                 </div>
                 <div class="mb-2 text-sm text-gray-500">Input API Key：</div>
@@ -12,9 +12,9 @@
                     <button class="btn" @click="sendOrSave()">Save</button>
                 </div>
             </div>
-            <div class="flex flex-wrap my-5 rounded bg-white m-2 p-2" tabindex="1" @focus="showTooltip('')">
-                <div class="w-full text-center my-4">
-                    <label class="text-gray-700 font-bold text-xl">openAI Chat Settings</label>
+            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1" @focus="showChatTooltip('')">
+                <div class="w-full text-center my-1">
+                    <label class="text-gray-700 font-bold text-xl">Chat</label>
                 </div>
                 <div class="w-full md:w-1/4 grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
@@ -22,7 +22,7 @@
                         <select v-model="chat.model"
                                 class="input"
                                 id= "model"
-                                name= "model" @change="$event=>chatValueChange($event)" @focus="showTooltip('model')">
+                                name= "model" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('model')">
                             <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
                             <option value="gpt-4">gpt-4</option>
                         </select>
@@ -38,7 +38,7 @@
                                 type ="number"
                                 step =".1"
                                 placeholder="0 to 2"
-                                required :min="0" :max="2" @change="$event=>chatValueChange($event)" @focus="showTooltip('temperature')"/>
+                                required :min="0" :max="2" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('temperature')"/>
                     </label>
                 </div>
                 <div class="w-full md:w-1/4 grow">
@@ -51,7 +51,7 @@
                                 type ="number"
                                 step =".1"
                                 placeholder="-2 to 2"
-                                required :min="-2" :max="2" @change="$event=>chatValueChange($event)" @focus="showTooltip('presence_penalty')"/>
+                                required :min="-2" :max="2" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('presence_penalty')"/>
                     </label>
                 </div>
                 <div class="w-full md:w-1/4 grow">
@@ -64,11 +64,11 @@
                                 type ="number"
                                 step =".1"
                                 placeholder="-2 to 2"
-                                required :min="-2" :max="2" @change="$event=>chatValueChange($event)" @focus="showTooltip('frequency_penalty')"/>
+                                required :min="-2" :max="2" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('frequency_penalty')"/>
                     </label>
                 </div>
                 <div class="w-full text-right mt-2">
-                    <p class="text-justify text-yellow-700">{{ chatTooltipText }}<br>{{ chatTooltipTextTw }}</p>
+                    <p class="text-justify text-yellow-700" v-show="chatTooltipText">{{ chatTooltipText }}<br>{{ chatTooltipTextTw }}</p>
                     <button class="btn" @click="resetChatValue()">Default</button>
                 </div>
             </div>
@@ -179,7 +179,7 @@ export default {
         /**
          * 顯示說明
          */
-        showTooltip(type: string) {
+        showChatTooltip(type: string) {
             switch(type) {
                 case "model":
                     this.chatTooltipText = "ID of the model to use. GPT-4 is currently in a limited beta and only accessible to those who have been granted access.";

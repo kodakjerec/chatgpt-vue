@@ -30,15 +30,15 @@
             </div>
             <!-- Text -->
             <div class="w-full flex flex-col">
-                <p class="flex">Translation Result<Loding class="mt-1" v-if="isLoading" /></p>
-                <textarea :disabled="isLoading" v-model="result" class="input w-full text-justify" rows="18" placeholder="Translation Result" ></textarea>
+                <p class="flex">transcription Result<Loding class="mt-1" v-if="isLoading" /></p>
+                <textarea :disabled="isLoading" v-model="result" class="input w-full text-justify" rows="18" placeholder="transcription Result" ></textarea>
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { audioTranslations } from "@/libs/gpt";
+import { audiotranscriptions } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
 
 interface fileDetail {
@@ -50,7 +50,7 @@ interface fileDetail {
     purpose: string
 }
 export default {
-    name: 'translation',
+    name: 'transcription',
     data() {
         return {
             prompt: "" as string,
@@ -86,7 +86,7 @@ export default {
         },
         async uploadFile(file:File) {
             try {
-                const { body, status } = await audioTranslations(file, this.prompt);
+                const { body, status } = await audiotranscriptions(file, this.prompt);
                 if (body) {
                     const reader = body.getReader();
                     await this.readStream(reader, status);

@@ -125,3 +125,28 @@ export async function audioTranslations(file:File, prompt:string) {
     throw error;
   }
 }
+
+export async function audiotranscriptions(file:File, prompt:string) {
+  if (!apiKey) { getAPIKey() };
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('model', 'whisper-1');
+  formData.append('language', 'zh');
+  if (prompt)
+  formData.append('prompt', prompt);
+
+  try {
+    const result = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+      method: "post",
+      // signal: AbortSignal.timeout(8000),
+      // 開啟後到達設定時間會中斷輸出
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: formData
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
