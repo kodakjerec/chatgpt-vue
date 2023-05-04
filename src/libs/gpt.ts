@@ -102,41 +102,23 @@ export async function files() {
   }
 }
 
-export async function fileUpload(file:File, purpose:string) {
+export async function audioTranslations(file:File, prompt:string) {
   if (!apiKey) { getAPIKey() };
-  let fileReader = new FileReader();
-  const stream = await new Promise( (resolve, reject) => {
-        fileReader.onload = () => {
-          try {
-            // 将文本按行分割，并去除空白字符
-            const lines = (fileReader.result as string).trim().split(/\r?\n/);
-            // 将每一行解析为 JSON 对象，并拼接成 JSONL 字符串
-            // const jsonl = lines.map(line => JSON.stringify(JSON.parse(line))).join('\n');
-            console.log(lines);
-            resolve(lines);
-          } catch (error) {
-            reject(error);
-          }
-        },
-        fileReader.onerror = () => {
-          reject(fileReader.error);
-        };
-        fileReader.readAsText(file, 'utf-8');
-    });
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('model', 'whisper-1');
+  if (prompt)
+  formData.append('prompt', prompt);
 
   try {
-    const result = await fetch("https://api.openai.com/v1/files", {
+    const result = await fetch("https://api.openai.com/v1/audio/translations", {
       method: "post",
       // signal: AbortSignal.timeout(8000),
       // 開啟後到達設定時間會中斷輸出
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        file: stream,
-        purpose: purpose
-      })
+      body: formData
     });
     return result;
   } catch (error) {

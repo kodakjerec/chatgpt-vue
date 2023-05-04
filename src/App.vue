@@ -27,7 +27,7 @@
         <li>==========</li>
         <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
           @click="gotoCreateOneImage()">
-          <div class="flex items-center">
+          <div class="flex items-center line-through">
             <photograph theme="outline" size="24" fill="#fff"/>
             Image
           </div>
