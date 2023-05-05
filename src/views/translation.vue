@@ -6,7 +6,7 @@
             <div class="w-full">
                 <div class="flex flex-col">
                     <input type="file" ref="fileInput" @change="handleFileSelect" :disabled="isLoading">
-                    <div class="border border-dashed border-blue-500 p-10 text-center" @dragover.prevent @drop="handleDrop"
+                    <div class="border border-dashed border-blue-500 py-10 text-center" @dragover.prevent @drop="handleDrop"
                         @dragenter="isDragging = true" @dragleave="isDragging = false" :class="{ 'dragging': isDragging }">
                         <p>Drag and drop files here</p>
                         <p>The audio file to translate, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.

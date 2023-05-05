@@ -2,7 +2,7 @@
   <div class="flex">
     <div class="flex items-center cursor-pointer" @click="deleteItem()" ref="delete">
       <delete :theme="btnConfig.theme" :size="btnConfig.size" :fill="btnConfig.fill" />
-      <span class="text-xs text-gray-500 leading-none mr-10">Delete</span>
+      <span class="text-xs text-gray-500 leading-none mr-4">Delete</span>
     </div>
     <div class="flex items-center cursor-pointer" @click="copyToClipboard()" ref="copy">
       <copy v-show="btnStatus === 'copy'" :theme="btnConfig.theme" :size="btnConfig.size" :fill="btnConfig.fill" />
@@ -19,7 +19,6 @@
 
 <script lang="ts">
 import { Copy, Loading, CheckOne, CloseOne, Delete } from "@icon-park/vue-next";
-import type { Theme } from "@icon-park/vue-next/lib/runtime";
 
 export default {
   name: "CopyContent",
@@ -41,7 +40,7 @@ export default {
       btnConfig: {
         size: 14,
         fill: "#999",
-        theme: 'outline' as Theme,
+        theme: 'outline',
       } as { [key: string]: any },
       btnTips: {
         copy: "Copy All",
