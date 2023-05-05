@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-gray-100 w-full overflow-y-auto max-h-screen">
+    <div class="w-screen overflow-y-auto max-h-screen">
         <div class="h-full w-full">
             <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100"></div>
             <!-- upload -->
@@ -21,7 +21,7 @@
             </div>
             <!-- Text -->
             <div class="w-full flex flex-col">
-                <p class="flex">transcription Result
+                <p class="flex">Transcription Result
                     <Loding class="mt-1" v-if="isLoading" />
                 </p>
                 <textarea :disabled="isLoading" v-model="result" class="input w-full text-justify" rows="18"

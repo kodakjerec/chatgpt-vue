@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-100 w-full overflow-y-auto max-h-screen" ref="chatListDom">
+  <div class="w-screen overflow-y-auto max-h-screen" ref="chatListDom">
     <div class="min-h-screen w-full">
       <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100">
         <div class="text-2xl font-bold" v-if="!editing">{{ fromLogName }}

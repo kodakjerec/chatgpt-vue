@@ -1,9 +1,7 @@
 <template>
-  <div class="flex h-screen">
+  <div class="bg-gray-100 flex h-screen">
     <!-- Sidebar -->
-    <div class="sidebar-toggle" @click="toggleSidebar">
-      Menu
-    </div>
+    <div class="sidebar-toggle" @click="toggleSidebar">Menu</div>
     <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0"
       @blur="closeSidebar">
       <ul class="mt-8 flex flex-col justify-between cursor-pointer">
@@ -56,13 +54,15 @@
     </div>
     <!-- Content -->
     <div class="blockContent" v-if="sidebarActive"></div>
-    <router-view v-if="nowPath === 'home'" name="home" @fromClick="nowPath = 'settings'" />
-    <router-view v-if="nowPath.slice(0, 4) === 'chat'" name="chat" :sendLogName="selectLog"
-      @updateLogName="updateLogName" />
-    <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
-    <router-view v-if="nowPath === 'translation'" name="translation" />
-    <router-view v-if="nowPath === 'transcription'" name="transcription" />
-    <router-view v-if="nowPath === 'settings'" name="settings" />
+    <div>
+      <div v-if="sidebarActive" class="absolute w-full h-full bg-slate-100 opacity-80 z-10"></div>
+      <router-view v-if="nowPath === 'home'" name="home" @fromClick="nowPath = 'settings'" />
+      <router-view v-if="nowPath.slice(0, 4) === 'chat'" name="chat" :sendLogName="selectLog" @updateLogName="updateLogName" />
+      <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
+      <router-view v-if="nowPath === 'translation'" name="translation" />
+      <router-view v-if="nowPath === 'transcription'" name="transcription" />
+      <router-view v-if="nowPath === 'settings'" name="settings" />
+    </div>
   </div>
 </template>
 <script lang="ts">
