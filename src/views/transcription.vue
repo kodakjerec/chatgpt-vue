@@ -62,7 +62,7 @@ export default {
             if (!event.target) return;
             this.isLoading = true;
             this.result = "";
-            const file = (event.target as HTMLInputElement).files ?? [0];
+            const file = (event.target as HTMLInputElement).files[0];
             this.uploadFile(file);
             (event.target as HTMLInputElement).value = "";
         },
