@@ -9,8 +9,8 @@
                     <div class="border border-dashed border-blue-500 py-10 text-center" @dragover.prevent @drop="handleDrop"
                         @dragenter="isDragging = true" @dragleave="isDragging = false" :class="{ 'dragging': isDragging }">
                         <p>Drag and drop files here</p>
-                        <p>The audio file to translate, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.
-                        </p>
+                        <p>The audio file to translate, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.</p>
+                        <p>Caution! “m4a” has a few errors.</p>
                     </div>
                 </div>
                 <label for="prompt" class="text-gray-700 mb2 flex items-center">
