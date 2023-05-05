@@ -1,78 +1,78 @@
 <template>
-    <div class="bg-white w-full overflow-y-auto max-h-screen">
-        <div class="bg-gray-100 h-full w-full">
-        <div class="py-4 bg-gray-100 w-full h-10"></div>
-            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="0">
-                <div class="w-full text-center my-1">
-                    <label class="text-gray-700 font-bold text-xl">API Key</label>
+    <div class="bg-gray-100 w-full overflow-y-auto max-h-screen">
+        <div class="h-full w-full">
+            <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100"></div>
+                <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="0">
+                    <div class="w-full text-center my-1">
+                        <label class="text-gray-700 font-bold text-xl">API Key</label>
+                    </div>
+                    <div class="mb-2 text-sm text-gray-500">Input API Key：</div>
+                    <div class="flex w-full">
+                        <input class="input" type="password" paceholder="sk - xxxxxxxxxx" v-model="messageContent">
+                        <button class="btn" @click="sendOrSave()">Save</button>
+                    </div>
                 </div>
-                <div class="mb-2 text-sm text-gray-500">Input API Key：</div>
-                <div class="flex w-full">
-                    <input class="input" type="password" paceholder="sk - xxxxxxxxxx" v-model="messageContent">
-                    <button class="btn" @click="sendOrSave()">Save</button>
+                <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1" @focus="showChatTooltip('')">
+                    <div class="w-full text-center my-1">
+                        <label class="text-gray-700 font-bold text-xl">Chat</label>
+                    </div>
+                    <div class="w-full md:w-1/4 grow">
+                        <label for="temperature" class="text-gray-700 mb2 flex items-center">
+                            <span class="w-1/2">model</span>
+                            <select v-model="chat.model"
+                                    class="input"
+                                    id= "model"
+                                    name= "model" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('model')">
+                                <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                                <option value="gpt-4">gpt-4</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="w-full md:w-1/4 grow">
+                        <label for="temperature" class="text-gray-700 mb2 flex items-center">
+                            <span class="w-1/2">Temperature</span>
+                            <input v-model.number.trim.lazy="chat.temperature"
+                                    class="input"
+                                    id= "temperature"
+                                    name= "temperature"
+                                    type ="number"
+                                    step =".1"
+                                    placeholder="0 to 2"
+                                    required :min="0" :max="2" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('temperature')"/>
+                        </label>
+                    </div>
+                    <div class="w-full md:w-1/4 grow">
+                        <label for="presence_penalty" class="text-gray-700 mb2 flex items-center">
+                            <span class="w-1/2">Presence_penalty</span>
+                            <input v-model.number.trim.lazy="chat.presence_penalty"
+                                    class="input"
+                                    id= "presence_penalty"
+                                    name= "presence_penalty"
+                                    type ="number"
+                                    step =".1"
+                                    placeholder="-2 to 2"
+                                    required :min="-2" :max="2" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('presence_penalty')"/>
+                        </label>
+                    </div>
+                    <div class="w-full md:w-1/4 grow">
+                        <label for="frequency_penalty" class="text-gray-700 mb2 flex items-center">
+                            <span class="w-1/2">Frequency_penalty</span>
+                            <input v-model.number.trim.lazy="chat.frequency_penalty"
+                                    class="input"
+                                    id= "frequency_penalty"
+                                    name= "frequency_penalty"
+                                    type ="number"
+                                    step =".1"
+                                    placeholder="-2 to 2"
+                                    required :min="-2" :max="2" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('frequency_penalty')"/>
+                        </label>
+                    </div>
+                    <div class="w-full text-right mt-2">
+                        <p class="text-justify text-yellow-700" v-show="chatTooltipText">{{ chatTooltipText }}<br>{{ chatTooltipTextTw }}</p>
+                        <button class="btn" @click="resetChatValue()">Default</button>
+                    </div>
                 </div>
             </div>
-            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1" @focus="showChatTooltip('')">
-                <div class="w-full text-center my-1">
-                    <label class="text-gray-700 font-bold text-xl">Chat</label>
-                </div>
-                <div class="w-full md:w-1/4 grow">
-                    <label for="temperature" class="text-gray-700 mb2 flex items-center">
-                        <span class="w-1/2">model</span>
-                        <select v-model="chat.model"
-                                class="input"
-                                id= "model"
-                                name= "model" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('model')">
-                            <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-                            <option value="gpt-4">gpt-4</option>
-                        </select>
-                    </label>
-                </div>
-                <div class="w-full md:w-1/4 grow">
-                    <label for="temperature" class="text-gray-700 mb2 flex items-center">
-                        <span class="w-1/2">Temperature</span>
-                        <input v-model.number.trim.lazy="chat.temperature"
-                                class="input"
-                                id= "temperature"
-                                name= "temperature"
-                                type ="number"
-                                step =".1"
-                                placeholder="0 to 2"
-                                required :min="0" :max="2" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('temperature')"/>
-                    </label>
-                </div>
-                <div class="w-full md:w-1/4 grow">
-                    <label for="presence_penalty" class="text-gray-700 mb2 flex items-center">
-                        <span class="w-1/2">Presence_penalty</span>
-                        <input v-model.number.trim.lazy="chat.presence_penalty"
-                                class="input"
-                                id= "presence_penalty"
-                                name= "presence_penalty"
-                                type ="number"
-                                step =".1"
-                                placeholder="-2 to 2"
-                                required :min="-2" :max="2" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('presence_penalty')"/>
-                    </label>
-                </div>
-                <div class="w-full md:w-1/4 grow">
-                    <label for="frequency_penalty" class="text-gray-700 mb2 flex items-center">
-                        <span class="w-1/2">Frequency_penalty</span>
-                        <input v-model.number.trim.lazy="chat.frequency_penalty"
-                                class="input"
-                                id= "frequency_penalty"
-                                name= "frequency_penalty"
-                                type ="number"
-                                step =".1"
-                                placeholder="-2 to 2"
-                                required :min="-2" :max="2" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('frequency_penalty')"/>
-                    </label>
-                </div>
-                <div class="w-full text-right mt-2">
-                    <p class="text-justify text-yellow-700" v-show="chatTooltipText">{{ chatTooltipText }}<br>{{ chatTooltipTextTw }}</p>
-                    <button class="btn" @click="resetChatValue()">Default</button>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 

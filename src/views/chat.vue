@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white w-full overflow-y-auto max-h-screen" ref="chatListDom">
-    <div class="bg-gray-100 h-full w-full">
-      <div class="flex flex-nowrap fixed w-full items-baseline top-0 py-4 bg-gray-100">
+  <div class="bg-gray-100 w-full overflow-y-auto max-h-screen" ref="chatListDom">
+    <div class="min-h-screen w-full">
+      <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100">
         <div class="text-2xl font-bold" v-if="!editing">{{ fromLogName }}
           <div class="inline-flex cursor-pointer" @click="editLogName">
             <edit theme="outline" size="24" fill="#000"/>
@@ -11,12 +11,11 @@
         <input type="text" class="px-4 py-2 text-gray-700 bg-white border rounded-md mr-2 text-black bg-slate-400" v-else @blur="updateLogName" v-model="newLogName"
           ref="editingLogName">
       </div>
-
       <div class="flex-1 mx-2 mt-20 mb-2">
         <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="(item,index) of messageListView" :key="index">
           <div class="flex justify-between items-center mb-2">
             <div class="font-bold">{{ roleAlias[item.role] }}：</div>
-            <CopyContent class="invisible group-hover:visible w-20 h-10" :content="item.content" />
+            <CopyContent class="invisible group-hover:visible w-30 h-10" :content="item.content" :index="index" @deleteItem="deleteItem" />
           </div>
           <!-- chatGPT -->
           <template v-if="item.role !== 'user'">
@@ -35,15 +34,14 @@
             </div>
           </template>
         </div>
-          <div class="w-full h-24 md:h-28 flex-shrink-0"></div>
       </div>
-      <div class="absolute bottom-0 w-full p-4 pb-4 bg-gray-100">
-        <div>
-          <div class="flex">
-            <textarea class="input" placeholder="Please input something" v-model="messageContent"
-              @keydown="keydownEvent"></textarea>
-            <button ref="btn" class="btn" :disabled="isTalking" @click="sendOrSave()">{{ "Send" }}</button>
-          </div>
+    </div>
+    <div class="sticky bottom-0 w-full p-4 pb-4 bg-gray-100">
+      <div>
+        <div class="flex">
+          <textarea class="input" placeholder="Please input something" v-model="messageContent"
+            @keydown="keydownEvent"></textarea>
+          <button ref="btn" class="btn" :disabled="isTalking" @click="sendOrSave()">{{ "Send" }}</button>
         </div>
       </div>
     </div>
@@ -57,12 +55,12 @@ import Loding from "@/components/Loding.vue";
 import CopyContent from "@/components/Copy.vue";
 import { md } from "@/libs/markdown";
 import { encoding_for_model, Tiktoken } from '@dqbd/tiktoken';
-import { Edit } from "@icon-park/vue-next";
+import { Edit, Delete } from "@icon-park/vue-next";
 
 export default {
   name: 'chat',
   components: {
-    Loding, CopyContent, Edit
+    Loding, CopyContent, Edit, Delete
   },
   props: {
     sendLogName: {
@@ -311,6 +309,13 @@ Please let me know what kind of help you need, and I will provide relevant infor
     updateLogName() {
       this.$emit('updateLogName', { newLogName: this.newLogName, oldName: this.editing });
       this.editing = '';
+    },
+    /**
+     * 刪除單一聊天紀錄
+     * @param index 順序
+     */
+    deleteItem(index:Number) {
+      this.messageList.splice(index, 1);
     }
   }
 }

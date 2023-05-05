@@ -1,7 +1,7 @@
 <template>
-    <div class="bg-white w-full overflow-y-auto max-h-screen">
-        <div class="bg-gray-100 h-full w-full">
-            <div class="py-4 bg-gray-100 w-full h-10"></div>
+    <div class="bg-gray-100 w-full overflow-y-auto max-h-screen">
+        <div class="h-full w-full">
+            <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100"></div>
             <!-- upload -->
             <div class="w-full">
                 <div class="flex flex-col">

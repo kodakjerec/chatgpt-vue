@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white w-full overflow-y-auto max-h-screen">
-    <div class="bg-gray-100 h-full w-full">
-    <div class="py-4 bg-gray-100 w-full h-10"></div>
+  <div class="bg-gray-100 w-full overflow-y-auto max-h-screen">
+    <div class="min-h-screen w-full">
+    <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100"></div>
       <div class="">
         <label class="block font-medium text-black" for="prompt">Prompt</label>
         <textarea class="block w-full mt-1 rounded-md border-red-300 shadow-sm input" rows="3" placeholder="請輸入 Prompt"
