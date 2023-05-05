@@ -253,7 +253,7 @@ export default {
                     break;
                 case "frequency_penalty":
                     this.chatTooltipText = "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.";
-                    this.chatTooltipTextTw = "在 0 到2之間選擇使用哪種取樣，高值如 0.8 將使輸出更加隨機，而低值 如 0.2則會讓它變得更有焦點和確定性。";
+                    this.chatTooltipTextTw = "數字介於-2.0和2.0之間。正值會根據文本中現有詞彙的頻率對新令牌進行處罰，減少模型重複原話的可能性。";
                     break;
                 default:
                     this.chatTooltipText = "";
