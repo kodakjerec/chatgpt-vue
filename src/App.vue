@@ -55,7 +55,7 @@
     <!-- Content -->
     <div class="blockContent" v-if="sidebarActive"></div>
     <div>
-      <div v-if="sidebarActive" class="absolute w-full h-full bg-slate-100 opacity-80 z-10"></div>
+      <div v-if="sidebarActive" class="absolute w-full h-full bg-slate-100 opacity-60 z-10"></div>
       <router-view v-if="nowPath === 'home'" name="home" @fromClick="nowPath = 'settings'" />
       <router-view v-if="nowPath.slice(0, 4) === 'chat'" name="chat" :sendLogName="selectLog" @updateLogName="updateLogName" />
       <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
@@ -98,7 +98,7 @@ export default {
   },
   methods: {
     /**
-     * 取得所有的 對話紀錄清單
+     * get all log list
      */
     getLogList() {
       let logList = localStorage.getItem('logList');
@@ -115,13 +115,13 @@ export default {
       }
     },
     /**
-     * 儲存 對話紀錄清單
+     * save log list
      */
     setLogList() {
       localStorage.setItem('logList', JSON.stringify(this.logList));
     },
     /**
-     * 新增一個對話
+     * add new chat block
      */
     newChatLog() {
       let generatedString: string = ""
@@ -144,7 +144,7 @@ export default {
       this.setLogList();
     },
     /**
-     * 刪除一個對話
+     * delete one chat block
      */
     delChatLog(logName: string) {
       localStorage.removeItem(logName);
@@ -156,7 +156,7 @@ export default {
       }
     },
     /**
-     * 按下按鈕 chatlog
+     * select one chat
      */
     clickLogName(logName: string) {
       this.selectLog = logName;
@@ -167,7 +167,7 @@ export default {
       let oldName = fromObject.oldName;
       console.log(newLogName, oldName);
       let index = this.logList.findIndex(item => item === oldName);
-      // 這裡可以連結 API 更新 item
+
       if (newLogName) {
         const oldName = this.logList[index];
         // change list
@@ -185,7 +185,7 @@ export default {
       localStorage.setItem('lastPath', this.nowPath);
     },
     /**
-     * 點下sidebar
+     * click sidebar
      */
     toggleSidebar() {
       if (!this.sidebarActive) {
@@ -195,13 +195,13 @@ export default {
       this.sidebarActive = !this.sidebarActive;
     },
     /**
-     * 關閉sidebar
+     * close sidebar
      */
     closeSidebar() {
       this.sidebarActive = false;
     },
     /**
-     * 閒置過久重新整理畫面
+     * Refresh the screen after being idle for a long time
      */
     handlePageFocus() {
       let lastActiveTime: number = Number(localStorage.getItem('lastActiveTime') ?? new Date().getTime());
@@ -209,7 +209,7 @@ export default {
       let timeDiff: number = currentTime - lastActiveTime;
       localStorage.setItem('lastActiveTime', currentTime.toString());
       // 如果背景中放置的時間超過指定時間，就重新載入頁面
-      if (timeDiff > 10 * 60 * 1000) { // 10 分鐘
+      if (timeDiff > 60 * 60 * 1000) { // 60 分鐘
         location.reload();
       }
     }
@@ -223,7 +223,7 @@ body,
   height: 100%;
 }
 
-/* 預設側邊欄樣式 */
+/* Default sidebar styles */
 .sidebar {
   width: 150px;
   height: 100%;
@@ -234,12 +234,12 @@ body,
   transition: transform 0.3s ease-in-out;
 }
 
-/* 預設側邊欄隱藏 */
+/* Default sidebar hide */
 .sidebar-toggle+.sidebar {
   transform: translateX(-150px);
 }
 
-/* 小方塊樣式 */
+/* sidebar icon */
 .sidebar-toggle {
   position: fixed;
   top: 20px;
@@ -250,7 +250,7 @@ body,
   z-index: 1000;
 }
 
-/* 側邊欄展開時的樣式 */
+/* sidebar active */
 .sidebar.active {
   transform: translateX(150px);
 }

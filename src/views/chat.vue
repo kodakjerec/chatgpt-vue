@@ -12,8 +12,8 @@
           ref="editingLogName">
       </div>
       <div class="flex-1 mx-2 mt-20 mb-2">
-        <div class="group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg" v-for="(item,index) of messageListView" :key="index">
-          <div class="flex justify-between items-center mb-2">
+        <div class="group flex flex-col px-2 py-1 hover:bg-slate-100 rounded-lg" v-for="(item,index) of messageListView" :key="index">
+          <div class="flex justify-between items-center">
             <div class="font-bold">{{ roleAlias[item.role] }}：</div>
             <CopyContent class="invisible group-hover:visible w-30 h-10" :content="item.content" :index="index" @deleteItem="deleteItem" />
           </div>
@@ -36,7 +36,7 @@
         </div>
       </div>
     </div>
-    <div class="sticky bottom-0 w-full p-4 pb-4 bg-gray-100">
+    <div class="sticky bottom-0 w-full p-2 bg-gray-100">
       <div>
         <div class="flex">
           <textarea class="input" placeholder="Please input something" v-model="messageContent"
@@ -339,8 +339,8 @@ pre {
 .pyramid {
   width: 0;
   height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-bottom: 20px solid rgb(134, 239, 172, 1);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 8px solid rgb(134, 239, 172, 1);
 }
 </style>

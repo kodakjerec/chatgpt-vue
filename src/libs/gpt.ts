@@ -6,6 +6,8 @@ let signal = controller.signal;
 const getSecretKey:string = "lianginx";
 let apiKey:string = "";
 let chatSettings:any = {};
+let translationSettings:any = {};
+let transcriptionSettings:any = {};
 
   /**
    * get apiKey
@@ -126,12 +128,12 @@ export async function files() {
 // send translations
 export async function audioTranslations(file:File, prompt:string) {
   if (!apiKey) { getAPIKey() };
-  chatSettings = getSettingsTrans();
+  translationSettings = getSettingsTrans();
 
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('model', chatSettings.model);
-  formData.append('temperature', chatSettings.temperature);
+  formData.append('model', translationSettings.model);
+  formData.append('temperature', translationSettings.temperature);
   if (prompt)
   formData.append('prompt', prompt);
 
@@ -152,13 +154,13 @@ export async function audioTranslations(file:File, prompt:string) {
 // send transcriptions
 export async function audioTranscriptions(file:File, prompt:string) {
   if (!apiKey) { getAPIKey() };
-  chatSettings = getSettingsTrans();
+  transcriptionSettings = getSettingsTrans();
 
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('model', chatSettings.model);
-  formData.append('temperature', chatSettings.temperature);
-  formData.append('language', chatSettings.language);
+  formData.append('model', transcriptionSettings.model);
+  formData.append('temperature', transcriptionSettings.temperature);
+  formData.append('language', transcriptionSettings.language);
   if (prompt)
   formData.append('prompt', prompt);
 

@@ -1,6 +1,6 @@
 <template>
-  <div class="com__box">
-    <div class="loading">
+  <div class="flex">
+    <div class="loading mt-1">
       <div></div>
       <div></div>
       <div></div>
@@ -11,6 +11,7 @@
       <div></div>
       <div></div>
     </div>
+    <div class="text-gray-500">Waiting</div>
   </div>
 </template>
 
