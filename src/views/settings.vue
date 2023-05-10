@@ -10,6 +10,7 @@
                 <input class="input" type="password" paceholder="sk - xxxxxxxxxx" v-model="messageContent">
                 <button class="btn" @click="sendOrSave()">Save</button>
             </div>
+            <!-- Chat -->
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1" @focus="showChatTooltip('')">
                 <div class="w-full text-center my-1 flex">
                     <div class="w-1/3"></div>
@@ -22,9 +23,7 @@
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">model</span>
                         <select v-model="chat.model"
-                                class="input"
-                                id= "model"
-                                name= "model" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('model')">
+                                class="input" @change="$event=>chatValueChange($event)" @focus="showChatTooltip('model')">
                             <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
                             <option value="gpt-4">gpt-4</option>
                         </select>
@@ -35,8 +34,6 @@
                         <span class="w-1/2">Temperature</span>
                         <input v-model.number.trim.lazy="chat.temperature"
                                 class="input"
-                                id= "temperature"
-                                name= "temperature"
                                 type ="number"
                                 step =".1"
                                 placeholder="0 to 2"
@@ -48,8 +45,6 @@
                         <span class="w-1/2">Presence_penalty</span>
                         <input v-model.number.trim.lazy="chat.presence_penalty"
                                 class="input"
-                                id= "presence_penalty"
-                                name= "presence_penalty"
                                 type ="number"
                                 step =".1"
                                 placeholder="-2 to 2"
@@ -61,8 +56,6 @@
                         <span class="w-1/2">Frequency_penalty</span>
                         <input v-model.number.trim.lazy="chat.frequency_penalty"
                                 class="input"
-                                id= "frequency_penalty"
-                                name= "frequency_penalty"
                                 type ="number"
                                 step =".1"
                                 placeholder="-2 to 2"
@@ -73,6 +66,7 @@
                     <p class="text-justify text-yellow-700" v-show="chatTooltipText">{{ chatTooltipText }}<br>{{ chatTooltipTextTw }}</p>
                 </div>
             </div>
+            <!-- Transcription -->
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="2" @focus="showTransTooltip('')">
                 <div class="w-full text-center my-1 flex">
                     <div class="w-1/3"></div>
@@ -81,37 +75,31 @@
                         <button class="btn" @click="resetTransValue()">Default</button>
                     </div>
                 </div>
-                <div class="w-full md:w-1/4 grow">
+                <div class="w-full md:w-1/3 grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">model</span>
                         <select v-model="trans.model"
-                                class="input"
-                                id= "model"
-                                name= "model" @change="$event=>transValueChange($event)" @focus="showTransTooltip('model')">
+                                class="input" @change="$event=>transValueChange($event)" @focus="showTransTooltip('model')">
                             <option value="whisper-1">whisper-1</option>
                         </select>
                     </label>
                 </div>
-                <div class="w-full md:w-1/4 grow">
+                <div class="w-full md:w-1/3 grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Temperature</span>
                         <input v-model.number.trim.lazy="trans.temperature"
                                 class="input"
-                                id= "temperature"
-                                name= "temperature"
                                 type ="number"
                                 step =".1"
                                 placeholder="0 to 2"
                                 required :min="0" :max="2" @change="$event=>transValueChange($event)" @focus="showTransTooltip('temperature')"/>
                     </label>
                 </div>
-                <div class="w-full md:w-1/4 grow">
+                <div class="w-full md:w-1/3 grow">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">language</span>
                         <select v-model="trans.language"
-                                class="input"
-                                id= "language"
-                                name= "language" @change="$event=>transValueChange($event)" @focus="showTransTooltip('language')">
+                                class="input" @change="$event=>transValueChange($event)" @focus="showTransTooltip('language')">
                             <option value="en">en English 英文</option>
                             <option value="zh">zh Chinese 中文</option>
                             <option value="ja">ja Japan 日文</option>
@@ -120,6 +108,63 @@
                 </div>
                 <div class="w-full text-right mt-2">
                     <p class="text-justify text-yellow-700" v-show="transTooltipText">{{ transTooltipText }}<br>{{ transTooltipTextTw }}</p>
+                </div>
+            </div>
+            <!-- Speech -->
+            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="2" @focus="showSpeechTooltip('')">
+                <div class="w-full text-center my-1 flex">
+                    <div class="w-1/3"></div>
+                    <label class="text-gray-700 font-bold text-xl w-1/3">Speech</label>
+                    <div class="w-1/3 flex justify-end">
+                        <button class="btn" @click="resetSpeechValue()">Default</button>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/4 grow">
+                    <label for="temperature" class="text-gray-700 mb2 flex items-center">
+                        <span class="w-1/2">Volume</span>
+                        <input v-model.number.trim.lazy="speech.volume"
+                                class="input"
+                                type ="number"
+                                step =".1"
+                                placeholder="0 to 1"
+                                required :min="0" :max="1" @change="$event=>speechValueChange($event)" @focus="showSpeechTooltip('volume')"/>
+                    </label>
+                </div>
+                <div class="w-full md:w-1/4 grow">
+                    <label for="temperature" class="text-gray-700 mb2 flex items-center">
+                        <span class="w-1/2">Rate</span>
+                        <input v-model.number.trim.lazy="speech.rate"
+                                class="input"
+                                type ="number"
+                                step =".1"
+                                placeholder="0 to 10"
+                                required :min="0" :max="10" @change="$event=>speechValueChange($event)" @focus="showSpeechTooltip('rate')"/>
+                    </label>
+                </div>
+                <div class="w-full md:w-1/4 grow">
+                    <label for="temperature" class="text-gray-700 mb2 flex items-center">
+                        <span class="w-1/2">Pitch</span>
+                        <input v-model.number.trim.lazy="speech.pitch"
+                                class="input"
+                                type ="number"
+                                step =".1"
+                                placeholder="0 to 2"
+                                required :min="0" :max="2" @change="$event=>speechValueChange($event)" @focus="showSpeechTooltip('pitch')"/>
+                    </label>
+                </div>
+                <div class="w-full md:w-1/4 grow">
+                    <label for="language" class="text-gray-700 mb2 flex items-center">
+                        <span class="w-1/2">language</span>
+                        <select v-model="speech.lang"
+                                class="input" @change="$event=>speechValueChange($event)" @focus="showSpeechTooltip('language')">
+                            <option value="en-US">en-US English 英文</option>
+                            <option value="zh-TW">zh-TW Chinese 中文</option>
+                            <option value="ja-JP">ja-JP Japan 日文</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="w-full text-right mt-2">
+                    <p class="text-justify text-yellow-700" v-show="speechTooltipText">{{ speechTooltipText }}<br>{{ speechTooltipTextTw }}</p>
                 </div>
             </div>
         </div>
@@ -151,16 +196,26 @@ export default {
                 temperature: 0,
                 language: 'en',
             },
+            speech: {
+                volume: 1, // sound, 0~1, default:1
+                rate: 1, // speed, 0.1~10, default:1
+                pitch: 2, // pitch, 0~2, default:1
+                voice: 'Google 國語（臺灣）', // voice,
+                lang: 'zh-TW', // language example:"en-US"、 "fr-FR", "es-ES","ja-JP"
+            },
             chatTooltipText: "",
             chatTooltipTextTw: "",
             transTooltipText: "",
-            transTooltipTextTw: ""
+            transTooltipTextTw: "",
+            speechTooltipText: "",
+            speechTooltipTextTw: ""
         }
     },
     mounted() {
         this.messageContent = this.getAPIKey();
         this.getSettingsChat();
         this.getSettingsTrans();
+        this.getSettingsSpeech();
     },
     methods: {
         sendOrSave() {
@@ -324,7 +379,73 @@ export default {
                     this.transTooltipTextTw = "";
                     break;
             }
-        }
+        },
+        /**
+         * get speech settings
+         * @return speech settings
+         */
+        getSettingsSpeech() {
+            const settings_Speech = localStorage.getItem("settings_speech");
+            if (!settings_Speech) {
+                this.resetSpeechValue();
+                return;
+            }
+
+            Object.assign(this.speech, JSON.parse(settings_Speech));
+        },
+        /**
+         * adjust speech settings
+         */
+        speechValueChange(event: any) {
+            const target = event.target as HTMLInputElement;
+
+            if (target.value<target.min) {
+                if(target.name) {
+                    (this.speech as MyObject)[target.name] = parseInt(target.min);
+                }
+            } else if (target.value>target.max) {
+                if(target.name) {
+                    (this.speech as MyObject)[target.name] = parseInt(target.max);
+                }
+            }
+            localStorage.setItem('settings_speech', JSON.stringify(this.speech));
+        },
+        /**
+         * reset trans settings
+         */
+        resetSpeechValue() {
+            this.speech = {
+                volume: 1, // sound, 0~1, default:1
+                rate: 1, // speed, 0.1~10, default:1
+                pitch: 2, // pitch, 0~2, default:1
+                voice: 'Google 國語（臺灣）', // voice,
+                lang: 'zh-TW', // language example:"en-US"、 "fr-FR", "es-ES","ja-JP"
+            };
+            localStorage.setItem('settings_speech', JSON.stringify(this.speech));
+        },
+        /**
+         * show speed tooltip
+         */
+        showSpeechTooltip(type: string) {
+            switch(type) {
+                case "volume":
+                    this.speechTooltipText = "Represents the volume value. 0 (lowest) and 1 (highest)";
+                    this.speechTooltipTextTw = "音量值。默認值為1（最大音量）";
+                    break;
+                case "rate":
+                    this.speechTooltipText = "The speed at which the utterance will be spoken at. 0.1 (lowest) and 10 (highest)";
+                    this.speechTooltipTextTw = "朗讀速度。默認值為1（正常語言發聲）";
+                    break;
+                case "pitch":
+                    this.speechTooltipText = "The pitch at which the utterance will be spoken at. 0 (lowest) and 2 (highest)";
+                    this.speechTooltipTextTw = "朗讀音高。默認值為1（正常發聲）";
+                    break;
+                default:
+                    this.speechTooltipText = "";
+                    this.speechTooltipTextTw = "";
+                    break;
+            }
+        },
     }
 }
 </script>
