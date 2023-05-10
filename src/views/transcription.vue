@@ -15,7 +15,7 @@
                 </div>
                 <label for="prompt" class="text-gray-700 mb2 flex items-center">
                     <span class="w-20">prompt</span>
-                    <input v-model.number.trim.lazy="prompt" class="input" id="prompt" name="prompt"
+                    <input v-model.number.trim.lazy="prompt" class="input" id="prompt" name="prompt" :disabled="isLoading"
                         placeholder="An optional text to guide the model's style or continue a previous audio segment. The prompt should be in English." />
                 </label>
             </div>
@@ -92,7 +92,7 @@ export default {
                     await this.readStream(reader, status);
                 }
             } catch (error: any) {
-                console.log(error);
+                this.result = error;
             } finally {
                 this.isLoading = false;
             }

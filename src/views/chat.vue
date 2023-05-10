@@ -14,8 +14,11 @@
       <div class="flex-1 mx-2 mt-20 mb-2">
         <div class="group flex flex-col px-2 py-1 hover:bg-slate-100 rounded-lg" v-for="(item,index) of messageListView" :key="index">
           <div class="flex justify-between items-center">
-            <div class="font-bold">{{ roleAlias[item.role] }}：</div>
-            <CopyContent class="invisible group-hover:visible w-30 h-10" :content="item.content" :index="index" @deleteItem="deleteItem" />
+            <div class="font-bold flex">
+              <span>{{ roleAlias[item.role] }}：</span>
+              <voice :content="item.content" v-show="!isTalking" />
+            </div>
+            <CopyContent class="invisible group-hover:visible w-30 h-10" v-show="!isTalking" :content="item.content" :index="index" @deleteItem="deleteItem" />
           </div>
           <!-- chatGPT -->
           <template v-if="item.role !== 'user'">
@@ -54,6 +57,7 @@ import cryptoJS from "crypto-js";
 import { chat, abortChat } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
 import CopyContent from "@/components/Copy.vue";
+import Voice from "@/components/Voice.vue";
 import { md } from "@/libs/markdown";
 import { encoding_for_model, Tiktoken } from '@dqbd/tiktoken';
 import { Edit, Delete } from "@icon-park/vue-next";
@@ -61,7 +65,8 @@ import { Edit, Delete } from "@icon-park/vue-next";
 export default {
   name: 'chat',
   components: {
-    Loding, CopyContent, Edit, Delete
+    Loding, CopyContent, Voice,
+    Edit, Delete
   },
   props: {
     sendLogName: {
@@ -81,6 +86,7 @@ export default {
       decoder: new TextDecoder("utf-8"),
       roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
       messageList: [] as Array<any>,
+      maxTokens: 3584,
       enc: null // log size
     }
   },
@@ -154,7 +160,7 @@ export default {
         for (let i = this.messageList.length - 1; i >= 0; i--) {
           let newTokens = this.calTiktoken(this.messageList[i].content);
 
-          if (calTokens + newTokens < 3072) {
+          if (calTokens + newTokens < this.maxTokens) {
             calTokens += newTokens; // accumulation of tokens
             sendMessageList.push(this.messageList[i]);
           } else {
@@ -322,6 +328,14 @@ Please let me know what kind of help you need, and I will provide relevant infor
      */
     deleteItem(index:Number) {
       this.messageList.splice(index, 1);
+    },
+    speak(content:string) {
+      let msg = new window.SpeechSynthesisUtterance();
+      msg.text= content;
+      msg.volume= 1 ;
+      msg.rate= 2 ;  
+      msg.pause = 100;   
+      window.speechSynthesis.speak(msg);
     }
   }
 }
