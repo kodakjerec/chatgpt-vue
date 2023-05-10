@@ -1,13 +1,15 @@
 import type { ChatMessage } from "@/types";
 import cryptoJS from "crypto-js";
 
+let controller = new AbortController();
+let signal = controller.signal;
 const getSecretKey:string = "lianginx";
 let apiKey:string = "";
 let chatSettings:any = {};
 
   /**
-   * 取得apiKey
-   *  @return 明文apiKey
+   * get apiKey
+   *  @return apiKey
    */
 function getAPIKey() {
   if (apiKey) return apiKey;
@@ -18,7 +20,7 @@ function getAPIKey() {
   return apiKey;
 }
 /**
- * 取得chat settings
+ * get chat settings
  * @return chat settings
  */
 function getSettingsChat() {
@@ -35,7 +37,7 @@ function getSettingsChat() {
   return JSON.parse(settings_Chat);
 }
 /**
- * 取得trans settings
+ * get trans settings
  * @return trans settings
  */
 function getSettingsTrans() {
@@ -51,15 +53,15 @@ function getSettingsTrans() {
   return JSON.parse(settings_Trans);
 }
 
+// send chat message
 export async function chat(messageList: ChatMessage[]) {
   if (!apiKey) { getAPIKey() };
   chatSettings = getSettingsChat();
 
   try {
     const result = await fetch("https://api.openai.com/v1/chat/completions", {
+      signal,
       method: "post",
-      // signal: AbortSignal.timeout(8000),
-      // 開啟後到達設定時間會中斷輸出
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
@@ -78,6 +80,13 @@ export async function chat(messageList: ChatMessage[]) {
     throw error;
   }
 }
+// abort chat message
+export function abortChat() {
+  controller.abort();
+  // reset
+  controller = new AbortController();
+  signal = controller.signal;
+}
 
 export async function imagesGenerations(sendObject: Object) {
   if (!apiKey) { getAPIKey() };
@@ -85,8 +94,6 @@ export async function imagesGenerations(sendObject: Object) {
   try {
     const result = await fetch("https://api.openai.com/v1/images/generations", {
       method: "post",
-      // signal: AbortSignal.timeout(8000),
-      // 開啟後到達設定時間會中斷輸出
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
@@ -105,8 +112,6 @@ export async function files() {
   try {
     const result = await fetch("https://api.openai.com/v1/files", {
       method: "get",
-      // signal: AbortSignal.timeout(8000),
-      // 開啟後到達設定時間會中斷輸出
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
@@ -118,6 +123,7 @@ export async function files() {
   }
 }
 
+// send translations
 export async function audioTranslations(file:File, prompt:string) {
   if (!apiKey) { getAPIKey() };
   chatSettings = getSettingsTrans();
@@ -132,8 +138,6 @@ export async function audioTranslations(file:File, prompt:string) {
   try {
     const result = await fetch("https://api.openai.com/v1/audio/translations", {
       method: "post",
-      // signal: AbortSignal.timeout(8000),
-      // 開啟後到達設定時間會中斷輸出
       headers: {
         Authorization: `Bearer ${apiKey}`,
       },
@@ -145,7 +149,8 @@ export async function audioTranslations(file:File, prompt:string) {
   }
 }
 
-export async function audiotranscriptions(file:File, prompt:string) {
+// send transcriptions
+export async function audioTranscriptions(file:File, prompt:string) {
   if (!apiKey) { getAPIKey() };
   chatSettings = getSettingsTrans();
 
@@ -160,8 +165,6 @@ export async function audiotranscriptions(file:File, prompt:string) {
   try {
     const result = await fetch("https://api.openai.com/v1/audio/transcriptions", {
       method: "post",
-      // signal: AbortSignal.timeout(8000),
-      // 開啟後到達設定時間會中斷輸出
       headers: {
         Authorization: `Bearer ${apiKey}`,
       },

@@ -93,9 +93,9 @@ export default {
             }
         },
         /**
-         * 解析chatGpt回傳的stream
+         * Parse the stream returned by chatGpt
          * @param reader 格式
-         * @param status response回傳狀態
+         * @param status response
          */
         async readStream(
             reader: ReadableStreamDefaultReader<Uint8Array>,
@@ -116,7 +116,7 @@ export default {
                     return;
                 }
 
-                // 回傳URL
+                // return
                 let response = JSON.parse(decodedText);
                 this.result = response.text;
             }

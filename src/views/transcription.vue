@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { audiotranscriptions } from "@/libs/gpt";
+import { audioTranscriptions } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
 
 interface fileDetail {
@@ -82,7 +82,7 @@ export default {
         },
         async uploadFile(file: File) {
             try {
-                const { body, status } = await audiotranscriptions(file, this.prompt);
+                const { body, status } = await audioTranscriptions(file, this.prompt);
                 if (body) {
                     const reader = body.getReader();
                     await this.readStream(reader, status);
@@ -94,9 +94,9 @@ export default {
             }
         },
         /**
-         * 解析chatGpt回傳的stream
+         * Parse the stream returned by chatGpt
          * @param reader 格式
-         * @param status response回傳狀態
+         * @param status response
          */
         async readStream(
             reader: ReadableStreamDefaultReader<Uint8Array>,
@@ -117,7 +117,7 @@ export default {
                     return;
                 }
 
-                // 回傳URL
+                // return
                 let response = JSON.parse(decodedText);
                 this.result = response.text;
             }

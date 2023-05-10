@@ -87,9 +87,9 @@ export default {
       }
     },
     /**
-     * 解析chatGpt回傳的stream
+     * Parse the stream returned by chatGpt
      * @param reader 格式
-     * @param status response回傳狀態
+     * @param status response
      */
     async readStream(
       reader: ReadableStreamDefaultReader<Uint8Array>,
@@ -109,7 +109,7 @@ export default {
           return;
         }
 
-        // 回傳URL
+        // return
         let response = JSON.parse(decodedText);
         this.results = response.data;
       }
@@ -126,9 +126,6 @@ export default {
       console.log(url, filename)
       link.href = url;
       link.download = filename;
-      // document.body.appendChild(link);
-      // link.click();
-      // document.body.removeChild(link);
 
       // 触发右键菜单
       link.dispatchEvent(new MouseEvent('contextmenu'));

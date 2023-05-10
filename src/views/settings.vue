@@ -168,12 +168,12 @@ export default {
         },
 
         /**
-         * 儲存apiKey
-         * @param apiKey 明文apiKey
+         * save apiKey
+         * @param apiKey apiKey
          */
         saveAPIKey(apiKey: string) {
             if (apiKey.slice(0, 3) !== "sk-" || apiKey.length !== 51) {
-                alert("API Key 錯誤，請檢查後重新輸入！");
+                alert("API Key error, please check and re-enter！");
                 return false;
             }
             const aesAPIKey = cryptoJS.AES.encrypt(apiKey, this.getSecretKey).toString();
@@ -181,8 +181,8 @@ export default {
             return true;
         },
         /**
-         * 取得apiKey
-         *  @return 明文apiKey
+         * get apiKey
+         *  @return apiKey
          */
         getAPIKey() {
             if (this.apiKey) return this.apiKey;
@@ -193,7 +193,7 @@ export default {
             return this.apiKey;
         },
         /**
-         * 取得chat settings
+         * get chat settings
          * @return chat settings
          */
         getSettingsChat() {
@@ -206,7 +206,7 @@ export default {
             Object.assign(this.chat, JSON.parse(settings_Chat));
         },
         /**
-         * 調整chat設定
+         * adjust chat settings
          */
         chatValueChange(event: any) {
             const target = event.target as HTMLInputElement;
@@ -223,7 +223,7 @@ export default {
             localStorage.setItem('settings_chat', JSON.stringify(this.chat));
         },
         /**
-         * 重設chat設定
+         * reset chat settings
          */
         resetChatValue() {
             this.chat = {
@@ -235,7 +235,7 @@ export default {
             localStorage.setItem('settings_chat', JSON.stringify(this.chat));
         },
         /**
-         * 顯示chat說明
+         * show chat tooltip
          */
         showChatTooltip(type: string) {
             switch(type) {
@@ -262,20 +262,20 @@ export default {
             }
         },
         /**
-         * 取得 trans settings
+         * get trans settings
          * @return trans settings
          */
         getSettingsTrans() {
             const settings_Trans = localStorage.getItem("settings_trans");
             if (!settings_Trans) {
-                this.resetChatValue();
+                this.resetTransValue();
                 return;
             }
 
             Object.assign(this.trans, JSON.parse(settings_Trans));
         },
         /**
-         * 調整trans設定
+         * adjust trans settings
          */
         transValueChange(event: any) {
             const target = event.target as HTMLInputElement;
@@ -292,7 +292,7 @@ export default {
             localStorage.setItem('settings_trans', JSON.stringify(this.trans));
         },
         /**
-         * 重設trans設定
+         * reset trans settings
          */
         resetTransValue() {
             this.trans = {
@@ -303,7 +303,7 @@ export default {
             localStorage.setItem('settings_trans', JSON.stringify(this.trans));
         },
         /**
-         * 顯示trans說明
+         * show trans tooltip
          */
         showTransTooltip(type: string) {
             switch(type) {

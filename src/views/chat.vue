@@ -41,7 +41,8 @@
         <div class="flex">
           <textarea class="input" placeholder="Please input something" v-model="messageContent"
             @keydown="keydownEvent"></textarea>
-          <button ref="btn" class="btn" :disabled="isTalking" @click="sendOrSave()">{{ "Send" }}</button>
+          <button class="redBtn" v-if="isTalking"  @click="callAbortChat()">Stop</button>
+          <button class="btn" v-else @click="sendChatMessage()">Send</button>
         </div>
       </div>
     </div>
@@ -50,7 +51,7 @@
 
 <script lang="ts">
 import cryptoJS from "crypto-js";
-import { chat } from "@/libs/gpt";
+import { chat, abortChat } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
 import CopyContent from "@/components/Copy.vue";
 import { md } from "@/libs/markdown";
@@ -80,7 +81,7 @@ export default {
       decoder: new TextDecoder("utf-8"),
       roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
       messageList: [] as Array<any>,
-      enc: null // log尺寸
+      enc: null // log size
     }
   },
   computed: {
@@ -89,7 +90,7 @@ export default {
     }
   },
   watch: {
-    // 同一個路徑下改變設定,更新對話紀錄
+    // vue: under the same path, and change different chat-log
     sendLogName() {
       this.fromLogName = this.sendLogName;
       this.getChatLog(this.fromLogName);
@@ -111,7 +112,7 @@ export default {
   },
   methods: {
     /**
-     * 鍵盤指令
+     * keyboard keydown event
      */
     keydownEvent(e: any) {
       if (e.keyCode === 13) {
@@ -123,7 +124,7 @@ export default {
           // pc
           if (!e.shiftKey) {
             e.preventDefault();
-            this.sendOrSave();
+            this.sendChatMessage();
           }
         }
       }
@@ -132,15 +133,19 @@ export default {
       return md.render(content);
     },
     /**
-     * 送出聊天訊息
+     * send message
      */
     async sendChatMessage() {
+      if (!this.messageContent.length) return;
+
       let content: string = this.messageContent
       try {
         this.isTalking = true;
+        // first time use
         if (this.messageList[0].role === "system") {
           this.messageList = [];
         }
+
         this.messageList.push({ role: "user", content });
         this.clearMessageContent();
 
@@ -150,15 +155,15 @@ export default {
           let newTokens = this.calTiktoken(this.messageList[i].content);
 
           if (calTokens + newTokens < 3072) {
-            calTokens += newTokens; // 計算訊息長度總和
+            calTokens += newTokens; // accumulation of tokens
             sendMessageList.push(this.messageList[i]);
           } else {
             break;
           }
         }
 
-        sendMessageList = sendMessageList.reverse(); // 原本是倒著算, 要把陣列反過來
-        this.messageList.push({ role: "assistant", content: "" }); // 準備塞進去資料
+        sendMessageList = sendMessageList.reverse(); // newest message on top level
+        this.messageList.push({ role: "assistant", content: "" }); // waiting for ai answer
         const { body, status } = await chat(sendMessageList);
         if (body) {
           const reader = body.getReader();
@@ -173,9 +178,9 @@ export default {
       }
     },
     /**
-     * 解析chatGpt回傳的stream
+     * Parse the stream returned by chatGpt
      * @param reader 格式
-     * @param status response回傳狀態
+     * @param status response status
      */
     async readStream(
       reader: ReadableStreamDefaultReader<Uint8Array>,
@@ -216,19 +221,20 @@ export default {
       }
     },
     /**
-     * 將chatGpt回傳的單字組合
+     * combine words to one block (chatGpt block)
      */
     appendLastMessageContent(content: string) {
       this.messageList[this.messageList.length - 1].content += content
     },
     /**
-     * 傳送指令 或是 儲存api字串
+     * Abort chat message
      */
-    sendOrSave() {
-      if (!this.messageContent.length) return;
-      this.sendChatMessage();
+    callAbortChat() {
+      abortChat();
     },
-    // 取得log
+    /**
+     * get saved chat-log
+     *  */ 
     getChatLog(logName: string) {
       let chatLog = localStorage.getItem(logName);
       if (chatLog) {
@@ -239,12 +245,12 @@ export default {
       }
       this.totalTokens = this.calAllTiktoken(this.messageList);
     },
-    // 紀錄log
+    // save log to localStorage
     setChatLog(logName: string) {
       let saveItem = JSON.stringify(this.messageList);
       localStorage.setItem(logName, saveItem);
     },
-    // 重置log
+    // reset log
     resetChatLog() {
       this.messageList.length = 0;
       this.messageList.push(
@@ -263,22 +269,22 @@ Chatting: If you feel lonely or bored, we can talk about some interesting topics
 Please let me know what kind of help you need, and I will provide relevant information and advice based on your needs.`,
         });
     },
-    // 清除輸入框內容
+    // clean message content
     clearMessageContent() {
       this.messageContent = ""
     },
-    // 移到畫面最下方
+    // scroll to screen bottom
     scrollToBottom() {
       if (!this.$refs.chatListDom) return;
       let dom = <HTMLDivElement>this.$refs.chatListDom;
       dom.scrollTop = dom.scrollHeight;
     },
     /**
-     * 計算此段的token數量
+     * calculate one block tokens
      */
     calTiktoken(text: string) {
       let tokenArray = this.enc.encode_ordinary(text);
-      // 如果有中文, 計算token會不準確, 大概會多1.5~2倍token
+      // If there is Chinese, the calculation of token will be inaccurate, probably 1.5~2 times more tokens
       let isChinese = false;
       for (let i = 0; i < text.length; i++) {
         if (text.charCodeAt(i) >= 0x4e00 && text.charCodeAt(i) <= 0x9fff) {
@@ -311,7 +317,7 @@ Please let me know what kind of help you need, and I will provide relevant infor
       this.editing = '';
     },
     /**
-     * 刪除單一聊天紀錄
+     * delete one chat-log block
      * @param index 順序
      */
     deleteItem(index:Number) {
