@@ -26,7 +26,7 @@
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">model</span>
                         <select v-model="chat.model" class="input"
-                            @change="$event => contentValueChange($event, 'settings_chat')"
+                            @change="$event => contentSelectChange($event, 'settings_chat')"
                             @focus="showTooltip('model', 'settings_chat')">
                             <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
                             <option value="gpt-4">gpt-4</option>
@@ -38,7 +38,7 @@
                         <span class="w-1/2">Temperature</span>
                         <input v-model.number.trim.lazy="chat.temperature" class="input" type="number" step=".1"
                             placeholder="0 to 2" required :min="0" :max="2"
-                            @change="$event => contentValueChange($event, 'settings_chat')"
+                            @change="$event => contentInputChange($event, 'settings_chat')"
                             @focus="showTooltip('temperature', 'settings_chat')" />
                     </label>
                 </div>
@@ -47,7 +47,7 @@
                         <span class="w-1/2">Presence_penalty</span>
                         <input v-model.number.trim.lazy="chat.presence_penalty" class="input" type="number" step=".1"
                             placeholder="-2 to 2" required :min="-2" :max="2"
-                            @change="$event => contentValueChange($event, 'settings_chat')"
+                            @change="$event => contentInputChange($event, 'settings_chat')"
                             @focus="showTooltip('presence_penalty', 'settings_chat')" />
                     </label>
                 </div>
@@ -56,7 +56,7 @@
                         <span class="w-1/2">Frequency_penalty</span>
                         <input v-model.number.trim.lazy="chat.frequency_penalty" class="input" type="number" step=".1"
                             placeholder="-2 to 2" required :min="-2" :max="2"
-                            @change="$event => contentValueChange($event, 'settings_chat')"
+                            @change="$event => contentInputChange($event, 'settings_chat')"
                             @focus="showTooltip('frequency_penalty', 'settings_chat')" />
                     </label>
                 </div>
@@ -74,7 +74,7 @@
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">model</span>
                         <select v-model="trans.model" class="input"
-                            @change="$event => contentValueChange($event, 'settings_trans')"
+                            @change="$event => contentSelectChange($event, 'settings_trans')"
                             @focus="showTooltip('model', 'settings_trans')">
                             <option value="whisper-1">whisper-1</option>
                         </select>
@@ -85,7 +85,7 @@
                         <span class="w-1/2">Temperature</span>
                         <input v-model.number.trim.lazy="trans.temperature" class="input" type="number" step=".1"
                             placeholder="0 to 2" required :min="0" :max="2"
-                            @change="$event => contentValueChange($event, 'settings_trans')"
+                            @change="$event => contentInputChange($event, 'settings_trans')"
                             @focus="showTooltip('temperature', 'settings_trans')" />
                     </label>
                 </div>
@@ -93,7 +93,7 @@
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">language</span>
                         <select v-model="trans.language" class="input"
-                            @change="$event => contentValueChange($event, 'settings_trans')"
+                            @change="$event => contentSelectChange($event, 'settings_trans')"
                             @focus="showTooltip('language', 'settings_trans')">
                             <option value="en">en English 英文</option>
                             <option value="zh">zh Chinese 中文</option>
@@ -116,7 +116,7 @@
                         <span class="w-1/2">Volume</span>
                         <input v-model.number.trim.lazy="speech.volume" class="input" type="number" step=".1"
                             placeholder="0 to 1" required :min="0" :max="1"
-                            @change="$event => contentValueChange($event, 'settings_speech')"
+                            @change="$event => contentInputChange($event, 'settings_speech')"
                             @focus="showTooltip('volume', 'settings_speech')" />
                     </label>
                 </div>
@@ -125,7 +125,7 @@
                         <span class="w-1/2">Rate</span>
                         <input v-model.number.trim.lazy="speech.rate" class="input" type="number" step=".1"
                             placeholder="0 to 10" required :min="0" :max="10"
-                            @change="$event => contentValueChange($event, 'settings_speech')"
+                            @change="$event => contentInputChange($event, 'settings_speech')"
                             @focus="showTooltip('rate', 'settings_speech')" />
                     </label>
                 </div>
@@ -134,7 +134,7 @@
                         <span class="w-1/2">Pitch</span>
                         <input v-model.number.trim.lazy="speech.pitch" class="input" type="number" step=".1"
                             placeholder="0 to 2" required :min="0" :max="2"
-                            @change="$event => contentValueChange($event, 'settings_speech')"
+                            @change="$event => contentInputChange($event, 'settings_speech')"
                             @focus="showTooltip('pitch', 'settings_speech')" />
                     </label>
                 </div>
@@ -142,7 +142,7 @@
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">language</span>
                         <select v-model="speech.lang" class="input"
-                            @change="$event => {contentValueChange($event, 'settings_speech');speechLangChange()}"
+                            @change="$event => { contentSelectChange($event, 'settings_speech'); speechLangChange() }"
                             @focus="showTooltip('language', 'settings_speech')">
                             <option value="en">en-US English 英文</option>
                             <option value="zh">zh-TW Chinese 中文</option>
@@ -153,11 +153,12 @@
                 <div class="w-full md:w-1/4 grow">
                     <label for="voice" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">voice</span>
-                        <select v-model="speech.voice" class="input"
-                            @change="$event => contentValueChange($event, 'settings_speech')"
+                        <select v-model="speech.voice" class="input" name="speechVoice"
+                            @change="$event => contentSelectChange($event, 'settings_speech')"
                             @focus="showTooltip('voice', 'settings_speech')">
+                            <option value="">Default</option>
                             <option v-for="(voice, index) of   speechVoiceList " :key="index" :value="voice.index">
-                                {{ voice.index.toString()+' '+voice.name }}
+                                {{ voice.index.toString() + ' ' + voice.name }}
                             </option>
                         </select>
                     </label>
@@ -178,14 +179,14 @@ interface MyObject {
 
 // speech lang compare
 export const languages = [
-    { value: "en-US", speechLabel: 'en'},
-    { value: "zh-TW", speechLabel: 'zh'},
-    { value: "ja-JP", speechLabel: 'ja'}
+    { value: "en-US", speechLabel: 'en' },
+    { value: "zh-TW", speechLabel: 'zh' },
+    { value: "ja-JP", speechLabel: 'ja' }
 ]
 // speech label to value
-export function speechLabelToValue(label: string) {
-    for(let lang of languages) {
-        if (lang.speechLabel===label) {
+export function speechLabelToValue(label: string): any {
+    for (let lang of languages) {
+        if (lang.speechLabel === label) {
             return lang;
         }
     }
@@ -214,25 +215,22 @@ export default {
                 rate: 1, // speed, 0.1~10, default:1
                 pitch: 2, // pitch, 0~2, default:1
                 voice: '', // voice,
-                voiceObject: '',
                 lang: 'zh', // language
             },
             totalVoices: [] as any[],
             speechVoiceList: [] as any[],
             tooltipText: "",
-            tooltipTextTw: ""
+            tooltipTextTw: "",
+            store: useStore()
         }
     },
-    computed: {
-        ...mapState(useStore, ['getTotalVoices']),
-    },
-    mounted() {
+    async mounted() {
         this.messageContent = this.getAPIKey();
         this.getSettings();
 
         // voices
-        console.log(this.getTotalVoices)
-        this.totalVoices = this.getTotalVoices();
+        await this.setTotalVoices();
+        this.totalVoices = this.store.getTotalVoices;
         this.speechLangChange();
     },
     methods: {
@@ -246,7 +244,7 @@ export default {
          */
         saveAPIKey(apiKey: string) {
             if (apiKey.slice(0, 3) !== "sk-" || apiKey.length !== 51) {
-                alert("API Key error, please check and re-enter！");
+                alert("API Key error, please check and re-enter!");
                 return false;
             }
             const aesAPIKey = cryptoJS.AES.encrypt(apiKey, this.getSecretKey).toString();
@@ -321,7 +319,6 @@ export default {
                         rate: 1, // speed, 0.1~10, default:1
                         pitch: 2, // pitch, 0~2, default:1
                         voice: '', // voice,
-                        voiceObject: '',
                         lang: 'zh', // language
                     };
                     break;
@@ -332,7 +329,7 @@ export default {
         /**
          * adjust settings
          */
-        contentValueChange(event: any, myObjectName: string) {
+        contentInputChange(event: any, myObjectName: string) {
             const target = event.target as HTMLInputElement;
 
             let myObject: MyObject = {};
@@ -355,6 +352,29 @@ export default {
                         myObject[target.name] = parseInt(target.max);
                     }
                 }
+            }
+
+            localStorage.setItem(myObjectName, JSON.stringify(myObject));
+        },
+        contentSelectChange(event: any, myObjectName: string) {
+            const target = event.target as HTMLSelectElement;
+
+            let myObject: MyObject = {};
+            switch (myObjectName) {
+                case "settings_chat":
+                    myObject = this.chat; break;
+                case "settings_trans":
+                    myObject = this.trans; break;
+                case "settings_speech":
+                    myObject = this.speech;
+                    if (target.name === "speechVoice") {
+                        if (target.value) {
+                            this.setVoiceObject(this.totalVoices[target.value]);
+                        } else {
+                            this.setVoiceObject("");
+                        }
+                    }
+                    break;
             }
 
             localStorage.setItem(myObjectName, JSON.stringify(myObject));
@@ -430,8 +450,8 @@ export default {
                             this.tooltipTextTw = "朗讀音高。默認值為1（正常發聲）";
                             break;
                         case "voice":
-                            this.tooltipText = "The voice that will be used to speak the utterance.";
-                            this.tooltipTextTw = "朗讀語音的聲音。";
+                            this.tooltipText = "The voice that will be used to speak the utterance. If there is no sound, try resetting to the default settings.";
+                            this.tooltipTextTw = "朗讀語音的聲音。如果沒有聲音試著調回Default";
                             break;
                         default:
                             this.tooltipText = "";

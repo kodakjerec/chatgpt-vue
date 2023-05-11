@@ -4,21 +4,23 @@
       <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100">
         <div class="text-2xl font-bold" v-if="!editing">{{ fromLogName }}
           <div class="inline-flex cursor-pointer" @click="editLogName">
-            <edit theme="outline" size="24" fill="#000"/>
+            <edit theme="outline" size="24" fill="#000" />
           </div>
           <span class="text-xs text-gray-500" title="tokens">{{ totalTokens }}</span>
         </div>
-        <input type="text" class="px-4 py-2 text-gray-700 bg-white border rounded-md mr-2 text-black bg-slate-400" v-else @blur="updateLogName" v-model="newLogName"
-          ref="editingLogName">
+        <input type="text" class="px-4 py-2 text-gray-700 bg-white border rounded-md mr-2 text-black bg-slate-400" v-else
+          @blur="updateLogName" v-model="newLogName" ref="editingLogName">
       </div>
       <div class="flex-1 mx-2 mt-20 mb-2">
-        <div class="group flex flex-col px-2 py-1 hover:bg-slate-100 rounded-lg" v-for="(item,index) of messageListView" :key="index">
+        <div class="group flex flex-col px-2 py-1 hover:bg-slate-100 rounded-lg" v-for="(item, index) of messageListView"
+          :key="index">
           <div class="flex justify-between items-center">
             <div class="font-bold flex">
               <span>{{ roleAlias[item.role] }}：</span>
               <voice :content="item.content" v-show="!isTalking" />
             </div>
-            <CopyContent class="invisible group-hover:visible w-30 h-10" v-show="!isTalking" :content="item.content" :index="index" @deleteItem="deleteItem" />
+            <CopyContent class="invisible group-hover:visible w-30 h-10" v-show="!isTalking" :content="item.content"
+              :index="index" @deleteItem="deleteItem" />
           </div>
           <!-- chatGPT -->
           <template v-if="item.role !== 'user'">
@@ -44,7 +46,7 @@
         <div class="flex">
           <textarea class="input" placeholder="Please input something" v-model="messageContent"
             @keydown="keydownEvent"></textarea>
-          <button class="redBtn" v-if="isTalking"  @click="callAbortChat()">Stop</button>
+          <button class="redBtn" v-if="isTalking" @click="callAbortChat()">Stop</button>
           <button class="btn" v-else @click="sendChatMessage()">Send</button>
         </div>
       </div>
@@ -91,7 +93,7 @@ export default {
     }
   },
   computed: {
-    messageListView():any[] {
+    messageListView(): any[] {
       return this.messageList.filter((v) => v.role !== 'system');
     }
   },
@@ -240,7 +242,7 @@ export default {
     },
     /**
      * get saved chat-log
-     *  */ 
+     *  */
     getChatLog(logName: string) {
       let chatLog = localStorage.getItem(logName);
       if (chatLog) {
@@ -326,16 +328,9 @@ Please let me know what kind of help you need, and I will provide relevant infor
      * delete one chat-log block
      * @param index 順序
      */
-    deleteItem(index:Number) {
+    deleteItem(index: Number) {
       this.messageList.splice(index, 1);
-    },
-    speak(content:string) {
-      let msg = new window.SpeechSynthesisUtterance();
-      msg.text= content;
-      msg.volume= 1 ;
-      msg.rate= 2 ;  
-      msg.pause = 100;   
-      window.speechSynthesis.speak(msg);
+      this.setChatLog();
     }
   }
 }

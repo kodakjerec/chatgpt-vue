@@ -22,16 +22,6 @@ export const useStore  = defineStore({
   }),
   getters: {
       getTotalVoices() {
-          if (!this.totalVoices) {
-            setVoices()
-            .then(voices => {
-                totalVoices = voices.map((voice, index)=>{
-                    voice.index = index;
-                    return voice;
-                });
-                this.setTotalVoices(totalVoices);
-            })
-          }
           return this.totalVoices;
       },
       getVoiceObject() {
@@ -39,8 +29,15 @@ export const useStore  = defineStore({
       }
   },
   actions: {
-    setTotalVoices(voices:any[]) {
-        this.totalVoices = voices;
+    async setTotalVoices() {
+        if (this.totalVoices.length===0) {
+            let voices = await setVoices()
+            this.totalVoices = (voices as any[]).map((voice, index)=>{
+                voice.index = index;
+                return voice;
+            });
+        }
+        return;
     },
     setVoiceObject(voice: any) {
         this.voiceObject = voice

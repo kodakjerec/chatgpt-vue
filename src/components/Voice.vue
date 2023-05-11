@@ -1,11 +1,11 @@
 <template>
     <voice-one theme="outline" size="24" fill="#333" class="hover:cursor-pointer" @click="speak()" v-if="!isSpeaking" />
-    <voice-one theme="multi-color" size="24" :fill="['#2F88FF', '#FFF', '#2F88FF', '#43CCF8']" @click="cancel()" class="cursor-progress" v-else />
+    <voice-one theme="multi-color" size="24" :fill="['#2F88FF', '#FFF', '#2F88FF', '#43CCF8']" @click="cancel()"
+        class="cursor-progress" v-else />
 </template>
 <script lang="ts">
 import { VoiceOne } from "@icon-park/vue-next";
-import { languages, speechLabelToValue } from "@/views/settings.vue";
-import { mapActions } from 'pinia';
+import { speechLabelToValue } from "@/views/settings.vue";
 import { useStore } from '@/store/index';
 
 export default {
@@ -31,6 +31,7 @@ export default {
             msg: new SpeechSynthesisUtterance(),
             synth: window.speechSynthesis,
             isSpeaking: false,
+            store: useStore()
         }
     },
     mounted() {
@@ -47,7 +48,6 @@ export default {
         };
     },
     methods: {
-        ...mapActions(useStore, ['setTotalVoices', 'setVoiceObject']),
         getSettingsSpeech() {
             let settings_Speech = localStorage.getItem("settings_speech");
             if (!settings_Speech) {
@@ -69,17 +69,12 @@ export default {
             this.msg.rate = this.speechSettings.rate;
             this.msg.pitch = this.speechSettings.pitch;
             // get voice
-            if (this.speechSettings.voice) {
-                if (!this.useStore.getVoiceObject()) {
-                    // find voice from voices
-                    if (!this.useStore.getTotalVoices()) {
-
-                    }
-                }
+            if (this.store.getVoiceObject) {
+                this.msg.voice = this.store.getVoiceObject;
             }
             // speech.lang
             this.msg.lang = speechLabelToValue(this.speechSettings.lang);
-            
+
 
             this.synth.speak(this.msg);
         },
