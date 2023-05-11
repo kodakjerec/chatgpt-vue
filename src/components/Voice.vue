@@ -4,6 +4,9 @@
 </template>
 <script lang="ts">
 import { VoiceOne } from "@icon-park/vue-next";
+import { languages, speechLabelToValue } from "@/views/settings.vue";
+import { mapActions } from 'pinia';
+import { useStore } from '@/store/index';
 
 export default {
     name: 'voice',
@@ -22,8 +25,8 @@ export default {
                 volume: 1, // sound, 0~1, default:1
                 rate: 1, // speed, 0.1~10, default:1
                 pitch: 2, // pitch, 0~2, default:1
-                voice: 'Google 國語（臺灣）', // voice,
-                lang: 'zh-TW', // language example:"en-US"、 "fr-FR", "es-ES","ja-JP"
+                voice: '', // voice,
+                lang: 'zh', // language example:"en-US"、 "fr-FR", "es-ES","ja-JP"
             },
             msg: new SpeechSynthesisUtterance(),
             synth: window.speechSynthesis,
@@ -44,6 +47,7 @@ export default {
         };
     },
     methods: {
+        ...mapActions(useStore, ['setTotalVoices', 'setVoiceObject']),
         getSettingsSpeech() {
             let settings_Speech = localStorage.getItem("settings_speech");
             if (!settings_Speech) {
@@ -51,8 +55,8 @@ export default {
                     volume: 1, // sound, 0~1, default:1
                     rate: 1, // speed, 0.1~10, default:1
                     pitch: 2, // pitch, 0~2, default:1
-                    voice: 'Google 國語（臺灣）', // voice,
-                    lang: 'zh-TW', // language example:"en-US"、 "fr-FR", "es-ES","ja-JP"
+                    voice: '', // voice,
+                    lang: 'zh', // language example:"en-US"、 "fr-FR", "es-ES","ja-JP"
                 };
             }
 
@@ -64,8 +68,18 @@ export default {
             this.msg.volume = this.speechSettings.volume;
             this.msg.rate = this.speechSettings.rate;
             this.msg.pitch = this.speechSettings.pitch;
-            // this.msg.voice = this.speechSettings.voice;
-            this.msg.lang = this.speechSettings.lang;
+            // get voice
+            if (this.speechSettings.voice) {
+                if (!this.useStore.getVoiceObject()) {
+                    // find voice from voices
+                    if (!this.useStore.getTotalVoices()) {
+
+                    }
+                }
+            }
+            // speech.lang
+            this.msg.lang = speechLabelToValue(this.speechSettings.lang);
+            
 
             this.synth.speak(this.msg);
         },

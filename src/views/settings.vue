@@ -142,11 +142,11 @@
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">language</span>
                         <select v-model="speech.lang" class="input"
-                            @change="$event => contentValueChange($event, 'settings_speech')"
+                            @change="$event => {contentValueChange($event, 'settings_speech');speechLangChange()}"
                             @focus="showTooltip('language', 'settings_speech')">
-                            <option value="en-US">en-US English 英文</option>
-                            <option value="zh-TW">zh-TW Chinese 中文</option>
-                            <option value="ja-JP">ja-JP Japan 日文</option>
+                            <option value="en">en-US English 英文</option>
+                            <option value="zh">zh-TW Chinese 中文</option>
+                            <option value="ja">ja-JP Japan 日文</option>
                         </select>
                     </label>
                 </div>
@@ -154,10 +154,10 @@
                     <label for="voice" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">voice</span>
                         <select v-model="speech.voice" class="input"
-                            @change="$event => contentValueChange($event, 'settings_speech', 'voice')"
+                            @change="$event => contentValueChange($event, 'settings_speech')"
                             @focus="showTooltip('voice', 'settings_speech')">
-                            <option v-for="(voice, index) of   speechVoiceList " :key="index" :value="voice.name">
-                                {{ voice.name }}
+                            <option v-for="(voice, index) of   speechVoiceList " :key="index" :value="voice.index">
+                                {{ voice.index.toString()+' '+voice.name }}
                             </option>
                         </select>
                     </label>
@@ -169,22 +169,26 @@
 
 <script lang="ts">
 import cryptoJS from "crypto-js";
+import { mapActions, mapState } from 'pinia';
+import { useStore } from '@/store/index';
 
 interface MyObject {
     [key: string]: any;
 }
 
-const synth = window.speechSynthesis;
-function setVoices() {
-    return new Promise((resolve, reject) => {
-        let timer;
-        timer = setInterval(() => {
-            if (synth.getVoices().length !== 0) {
-                resolve(synth.getVoices());
-                clearInterval(timer);
-            }
-        }, 10);
-    })
+// speech lang compare
+export const languages = [
+    { value: "en-US", speechLabel: 'en'},
+    { value: "zh-TW", speechLabel: 'zh'},
+    { value: "ja-JP", speechLabel: 'ja'}
+]
+// speech label to value
+export function speechLabelToValue(label: string) {
+    for(let lang of languages) {
+        if (lang.speechLabel===label) {
+            return lang;
+        }
+    }
 }
 
 export default {
@@ -211,7 +215,7 @@ export default {
                 pitch: 2, // pitch, 0~2, default:1
                 voice: '', // voice,
                 voiceObject: '',
-                lang: 'zh-TW', // language example:"en-US"、 "fr-FR", "es-ES","ja-JP"
+                lang: 'zh', // language
             },
             totalVoices: [] as any[],
             speechVoiceList: [] as any[],
@@ -219,19 +223,20 @@ export default {
             tooltipTextTw: ""
         }
     },
+    computed: {
+        ...mapState(useStore, ['getTotalVoices']),
+    },
     mounted() {
         this.messageContent = this.getAPIKey();
-
-        setVoices().then(voices => {
-            this.totalVoices = voices;
-            this.speechVoiceList = this.totalVoices.filter(voice => {
-                if (voice.lang === this.speech.lang)
-                    return voice
-            });
-        });
         this.getSettings();
+
+        // voices
+        console.log(this.getTotalVoices)
+        this.totalVoices = this.getTotalVoices();
+        this.speechLangChange();
     },
     methods: {
+        ...mapActions(useStore, ['setTotalVoices', 'setVoiceObject']),
         sendOrSave() {
             this.saveAPIKey(this.messageContent.trim())
         },
@@ -268,14 +273,22 @@ export default {
             const settings_Chat = localStorage.getItem("settings_chat");
             if (!settings_Chat) {
                 this.resetValue("settings_chat");
+            } else {
+                this.chat = JSON.parse(settings_Chat);
             }
+
             const settings_Trans = localStorage.getItem("settings_trans");
             if (!settings_Trans) {
                 this.resetValue("settings_trans");
+            } else {
+                this.trans = JSON.parse(settings_Trans);
             }
+
             const settings_Speech = localStorage.getItem("settings_speech");
             if (!settings_Speech) {
                 this.resetValue("settings_speech");
+            } else {
+                this.speech = JSON.parse(settings_Speech);
             }
         },
         /**
@@ -309,7 +322,7 @@ export default {
                         pitch: 2, // pitch, 0~2, default:1
                         voice: '', // voice,
                         voiceObject: '',
-                        lang: 'zh-TW', // language example:"en-US"、 "fr-FR", "es-ES","ja-JP"
+                        lang: 'zh', // language
                     };
                     break;
             }
@@ -319,7 +332,9 @@ export default {
         /**
          * adjust settings
          */
-        contentValueChange(event: any, myObjectName: string, specialPurpose?: string) {
+        contentValueChange(event: any, myObjectName: string) {
+            const target = event.target as HTMLInputElement;
+
             let myObject: MyObject = {};
             switch (myObjectName) {
                 case "settings_chat":
@@ -329,7 +344,6 @@ export default {
                 case "settings_speech":
                     myObject = this.speech; break;
             }
-            const target = event.target as HTMLInputElement;
 
             if (target.type === 'number') {
                 if (target.value < target.min) {
@@ -343,13 +357,14 @@ export default {
                 }
             }
 
-            // speech -> voice
-            if (specialPurpose && specialPurpose === 'voice') {
-                let voiceObject: SpeechSynthesisVoice = this.speechVoiceList[event.target.selectedIndex];
-                myObject['voiceObject'] = voiceObject;
-            }
-
             localStorage.setItem(myObjectName, JSON.stringify(myObject));
+        },
+        /**
+         * filter totalVoices to speechVoiceList
+         */
+        speechLangChange() {
+            let lang = speechLabelToValue(this.speech.lang);
+            this.speechVoiceList = this.totalVoices.filter(voice => voice.lang === lang.value);
         },
         /**
          * show chat tooltip

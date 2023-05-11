@@ -86,7 +86,7 @@ export default {
       decoder: new TextDecoder("utf-8"),
       roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
       messageList: [] as Array<any>,
-      maxTokens: 3584,
+      maxTokens: 3072,
       enc: null // log size
     }
   },
@@ -179,7 +179,7 @@ export default {
         this.appendLastMessageContent(error);
       } finally {
         this.isTalking = false;
-        this.setChatLog(this.fromLogName);
+        this.setChatLog();
         this.totalTokens = this.calAllTiktoken(this.messageList);
       }
     },
@@ -247,14 +247,14 @@ export default {
         this.messageList = JSON.parse(chatLog);
       } else {
         this.resetChatLog();
-        this.setChatLog(logName);
+        this.setChatLog();
       }
       this.totalTokens = this.calAllTiktoken(this.messageList);
     },
     // save log to localStorage
-    setChatLog(logName: string) {
+    setChatLog() {
       let saveItem = JSON.stringify(this.messageList);
-      localStorage.setItem(logName, saveItem);
+      localStorage.setItem(this.fromLogName, saveItem);
     },
     // reset log
     resetChatLog() {
