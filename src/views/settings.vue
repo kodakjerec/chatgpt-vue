@@ -1,5 +1,8 @@
 <template>
     <div class="w-full overflow-y-auto max-h-screen">
+        <div class="sticky w-full text-right mt-2" v-show="tooltipText">
+            <p class="text-justify text-yellow-700">{{ tooltipText }}<br>{{ tooltipTextTw }}</p>
+        </div>
         <div class="h-full w-full">
             <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100"></div>
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="0">
@@ -9,9 +12,6 @@
                 <div class="mb-2 text-sm text-gray-500">Input API Key：</div>
                 <input class="input" type="password" paceholder="sk - xxxxxxxxxx" v-model="messageContent">
                 <button class="btn" @click="sendOrSave()">Save</button>
-            </div>
-            <div class="w-full text-right mt-2" v-show="tooltipText">
-                <p class="text-justify text-yellow-700">{{ tooltipText }}<br>{{ tooltipTextTw }}</p>
             </div>
             <!-- Chat -->
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1" @focus="showTooltip('', 'settings_chat')">

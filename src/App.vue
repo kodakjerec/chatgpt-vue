@@ -53,7 +53,7 @@
       </ul>
     </div>
     <!-- shadow -->
-    <div v-if="sidebarActive" class="absolute w-full h-full bg-slate-100 opacity-60 z-10"></div>
+    <div v-if="sidebarActive" class="absolute w-full h-screen bg-slate-100 opacity-60 z-10"></div>
     <!-- Content -->
     <div class="w-full">
       <router-view v-if="nowPath === 'home'" name="home" @fromClick="nowPath = 'settings'" />
