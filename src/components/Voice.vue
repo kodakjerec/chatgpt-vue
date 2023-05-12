@@ -1,10 +1,12 @@
 <template>
-    <div @click="speak()" v-if="!isSpeaking">
-        <voice-one theme="outline" size="24" fill="#333" class="hover:cursor-pointer" />
-    </div>
-    <div class="loading hover:cursor-pointer" @click="cancel()" v-else>
-        <voice-one theme="multi-color" size="24" :fill="['#2F88FF', '#FFF', '#2F88FF', '#43CCF8']"/>
-        <voice-one theme="multi-color" size="24" :fill="['#9013fe' ,'#FFF' ,'#bd10e0' ,'#43CCF8']" :strokeWidth="2"/>
+    <div class="mx-2 w-6">
+        <div class="pt-1" @click="speak()" v-if="!isSpeaking">
+            <voice-one theme="outline" size="24" fill="#333" class="hover:cursor-pointer" />
+        </div>
+        <div class="loading pt-1 hover:cursor-pointer" @click="cancel()" v-else>
+            <voice-one theme="multi-color" size="24" :fill="['#2F88FF', '#FFF', '#2F88FF', '#43CCF8']"/>
+            <voice-one theme="multi-color" size="24" :fill="['#9013fe' ,'#FFF' ,'#bd10e0' ,'#43CCF8']" :strokeWidth="2"/>
+        </div>
     </div>
 </template>
 <script lang="ts">

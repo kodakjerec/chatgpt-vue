@@ -1,18 +1,16 @@
 <template>
   <div class="flex">
-    <div class="flex items-center cursor-pointer" @click="deleteItem()" ref="delete">
+    <div class="flex items-center cursor-pointer mx-2" @click="deleteItem()" ref="delete">
       <delete :theme="btnConfig.theme" :size="btnConfig.size" :fill="btnConfig.fill" />
-      <span class="text-xs text-gray-500 leading-none mr-4">Delete</span>
+      <!-- <span class="text-xs text-gray-500 leading-none mr-4">Delete</span> -->
     </div>
-    <div class="flex items-center cursor-pointer" @click="copyToClipboard()" ref="copy">
+    <div class="flex items-center cursor-pointer mx-2" @click="copyToClipboard()" ref="copy">
       <copy v-show="btnStatus === 'copy'" :theme="btnConfig.theme" :size="btnConfig.size" :fill="btnConfig.fill" />
       <loading class="rotate" v-show="btnStatus === 'loading'" :theme="btnConfig.theme" :size="btnConfig.size"
         :fill="btnConfig.fill" />
       <check-one v-show="btnStatus === 'success'" :theme="btnConfig.theme" :size="btnConfig.size" :fill="btnConfig.fill" />
       <close-one v-show="btnStatus === 'error'" :theme="btnConfig.theme" :size="btnConfig.size" :fill="btnConfig.fill" />
-      <span class="text-xs ml-0.5 text-gray-500 leading-none">{{
-        btnTips[btnStatus]
-      }}</span>
+      <!-- <span class="text-xs ml-0.5 text-gray-500 leading-none">{{ btnTips[btnStatus] }}</span> -->
     </div>
   </div>
 </template>
@@ -38,8 +36,8 @@ export default {
   data() {
     return {
       btnConfig: {
-        size: 14,
-        fill: "#999",
+        size: 20,
+        fill: "#000",
         theme: 'outline',
       } as { [key: string]: any },
       btnTips: {

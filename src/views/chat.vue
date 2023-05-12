@@ -17,10 +17,11 @@
           <div class="flex justify-between items-center">
             <div class="font-bold flex">
               <span>{{ roleAlias[item.role] }}：</span>
+            </div>
+            <div class=" group-hover:visible w-30 flex">
+              <CopyContent class="invisible group-hover:visible w-30" :content="item.content" @deleteItem="deleteItem" :index="index" v-show="!isTalking" />
               <voice :content="item.content" v-show="!isTalking" />
             </div>
-            <CopyContent class="invisible group-hover:visible w-30" v-show="!isTalking" :content="item.content"
-              :index="index" @deleteItem="deleteItem" />
           </div>
           <!-- chatGPT -->
           <template v-if="item.role !== 'user'">
