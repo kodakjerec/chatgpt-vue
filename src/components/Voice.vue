@@ -92,8 +92,6 @@ export default {
 </script>
 
 <style scoped>
-
-
 .loading > span {
   width: 0px;
   animation-name: ball-grid-beat;
