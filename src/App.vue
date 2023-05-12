@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-gray-100 flex h-screen">
+  <div class="bg-gray-100 flex h-screen overflow-x-hidden">
     <!-- Sidebar -->
-    <div class="sidebar-toggle" @click="toggleSidebar">Menu</div>
+    <div v-if="!sidebarActive" class="fixed top-3 right-3 w-12 h-8 cursor-pointer z-1000 bg-gray-100" @click="toggleSidebar">Menu</div>
     <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0"
       @blur="closeSidebar">
       <ul class="mt-8 flex flex-col justify-between cursor-pointer">
@@ -52,10 +52,10 @@
         </li>
       </ul>
     </div>
+    <!-- shadow -->
+    <div v-if="sidebarActive" class="absolute w-full h-full bg-slate-100 opacity-60 z-10"></div>
     <!-- Content -->
-    <div class="blockContent" v-if="sidebarActive"></div>
-    <div>
-      <div v-if="sidebarActive" class="absolute w-full h-full bg-slate-100 opacity-60 z-10"></div>
+    <div class="w-full">
       <router-view v-if="nowPath === 'home'" name="home" @fromClick="nowPath = 'settings'" />
       <router-view v-if="nowPath.slice(0, 4) === 'chat'" name="chat" :sendLogName="selectLog" @updateLogName="updateLogName" />
       <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
@@ -239,24 +239,9 @@ body,
   transform: translateX(-150px);
 }
 
-/* sidebar icon */
-.sidebar-toggle {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 40px;
-  height: 24px;
-  cursor: pointer;
-  z-index: 1000;
-}
 
 /* sidebar active */
 .sidebar.active {
   transform: translateX(150px);
-}
-
-.blockContent {
-  width: 150px;
-  flex-shrink: 0;
 }
 </style>

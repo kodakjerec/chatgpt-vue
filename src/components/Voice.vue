@@ -1,7 +1,11 @@
 <template>
-    <voice-one theme="outline" size="24" fill="#333" class="hover:cursor-pointer" @click="speak()" v-if="!isSpeaking" />
-    <voice-one theme="multi-color" size="24" :fill="['#2F88FF', '#FFF', '#2F88FF', '#43CCF8']" @click="cancel()"
-        class="cursor-progress" v-else />
+    <div @click="speak()" v-if="!isSpeaking">
+        <voice-one theme="outline" size="24" fill="#333" class="hover:cursor-pointer" />
+    </div>
+    <div class="loading hover:cursor-pointer" @click="cancel()" v-else>
+        <voice-one theme="multi-color" size="24" :fill="['#2F88FF', '#FFF', '#2F88FF', '#43CCF8']"/>
+        <voice-one theme="multi-color" size="24" :fill="['#9013fe' ,'#FFF' ,'#bd10e0' ,'#43CCF8']" :strokeWidth="2"/>
+    </div>
 </template>
 <script lang="ts">
 import { VoiceOne } from "@icon-park/vue-next";
@@ -84,3 +88,37 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+
+
+.loading > span {
+  width: 0px;
+  animation-name: ball-grid-beat;
+  animation-iteration-count: infinite;
+}
+
+.loading > span:nth-child(1) {
+  animation-duration: 1.3s;
+  animation-delay: 0.06s;
+}
+
+.loading > span:nth-child(2) {
+  animation-duration: 2.04s;
+  animation-delay: 0.18s;
+}
+
+@keyframes ball-grid-beat {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.35;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+</style>

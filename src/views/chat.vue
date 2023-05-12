@@ -1,5 +1,5 @@
 <template>
-  <div class="w-screen overflow-y-auto max-h-screen" ref="chatListDom">
+  <div class="w-full overflow-y-auto max-h-screen" ref="chatListDom">
     <div class="min-h-screen w-full">
       <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100">
         <div class="text-2xl font-bold" v-if="!editing">{{ fromLogName }}
@@ -12,14 +12,14 @@
           @blur="updateLogName" v-model="newLogName" ref="editingLogName">
       </div>
       <div class="flex-1 mx-2 mt-20 mb-2">
-        <div class="group flex flex-col px-2 py-1 hover:bg-slate-100 rounded-lg" v-for="(item, index) of messageListView"
+        <div class="group flex flex-col px-2 py-2 hover:bg-slate-200 rounded-lg" v-for="(item, index) of messageListView"
           :key="index">
           <div class="flex justify-between items-center">
             <div class="font-bold flex">
               <span>{{ roleAlias[item.role] }}：</span>
               <voice :content="item.content" v-show="!isTalking" />
             </div>
-            <CopyContent class="invisible group-hover:visible w-30 h-10" v-show="!isTalking" :content="item.content"
+            <CopyContent class="invisible group-hover:visible w-30" v-show="!isTalking" :content="item.content"
               :index="index" @deleteItem="deleteItem" />
           </div>
           <!-- chatGPT -->
@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <div class="sticky bottom-0 w-full p-2 bg-gray-100">
+    <div class="sticky bottom-0 w-full p-2">
       <div>
         <div class="flex">
           <textarea class="input" placeholder="Please input something" v-model="messageContent"
