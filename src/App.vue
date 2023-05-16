@@ -24,10 +24,10 @@
         </div>
         <li>==========</li>
         <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
-          @click="gotoPath('createOneImage')">
-          <div class="flex items-center line-through">
-            <photograph theme="outline" size="24" fill="#fff"/>
-            Image
+          @click="gotoPath('transcription')">
+          <div class="flex items-center">
+            <translate theme="outline" size="24" fill="#fff"/>
+            transcription
           </div>
         </li>
         <li>==========</li>
@@ -39,16 +39,16 @@
           </div>
         </li>
         <li>==========</li>
-        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
-          @click="gotoPath('transcription')">
-          <div class="flex items-center">
-            <translate theme="outline" size="24" fill="#fff"/>
-            transcription
-          </div>
-        </li>
-        <li>==========</li>
         <li class="mt-auto py-2 border-t border-b border-gray-700 hover:bg-slate-700 hover:rounded" @click="gotoPath('settings')">
           <span>Settings</span>
+        </li>
+        <li>==========</li>
+        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
+          @click="gotoPath('createOneImage')">
+          <div class="flex items-center line-through">
+            <photograph theme="outline" size="24" fill="#fff"/>
+            Image
+          </div>
         </li>
       </ul>
     </div>
@@ -66,7 +66,6 @@
   </div>
 </template>
 <script lang="ts">
-import { faker } from '@faker-js/faker';
 import { Photograph, Translate, Plus, Delete } from "@icon-park/vue-next";
 
 export default {
@@ -130,7 +129,7 @@ export default {
 
       while (isDuplicate) {
         // 生成一個隨機6個字符的字符串
-        generatedString = faker.word.adjective(6);
+        generatedString = 'chat'+(Math.round(Math.random()*1000)).toString();
 
         // 檢查新字符串是否已經存在於列表中
         if (!this.logList.includes(generatedString)) {

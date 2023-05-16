@@ -11,7 +11,6 @@
 </template>
 <script lang="ts">
 import { VoiceOne } from "@icon-park/vue-next";
-import { speechLabelToValue } from "@/views/settings.vue";
 import { useStore } from '@/store/index';
 
 export default {
@@ -79,7 +78,7 @@ export default {
                 this.msg.voice = this.store.getVoiceObject;
             }
             // speech.lang
-            this.msg.lang = speechLabelToValue(this.speechSettings.lang);
+            this.msg.lang = this.speechSettings.lang;
 
 
             this.synth.speak(this.msg);

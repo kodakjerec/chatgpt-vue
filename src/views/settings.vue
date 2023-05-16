@@ -91,13 +91,11 @@
                 </div>
                 <div class="w-full md:w-1/3 grow">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
-                        <span class="w-1/2">language</span>
-                        <select v-model="trans.language" class="input"
+                        <span class="w-1/4">language</span>
+                        <select v-model="trans.language" class="input w-3/4"
                             @change="$event => contentSelectChange($event, 'settings_trans')"
                             @focus="showTooltip('language', 'settings_trans')">
-                            <option value="en">en English 英文</option>
-                            <option value="zh">zh Chinese 中文</option>
-                            <option value="ja">ja Japan 日文</option>
+                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{key+' '+value.nativeName}}</option>
                         </select>
                     </label>
                 </div>
@@ -144,20 +142,18 @@
                         <select v-model="speech.lang" class="input"
                             @change="$event => { contentSelectChange($event, 'settings_speech'); speechLangChange() }"
                             @focus="showTooltip('language', 'settings_speech')">
-                            <option value="en">en-US English 英文</option>
-                            <option value="zh">zh-TW Chinese 中文</option>
-                            <option value="ja">ja-JP Japan 日文</option>
+                            <option v-for="(value, key) of speechLangList" :key="key" :value="key">{{ key }}</option>
                         </select>
                     </label>
                 </div>
                 <div class="w-full md:w-1/4 grow">
                     <label for="voice" class="text-gray-700 mb2 flex items-center">
-                        <span class="w-1/2">voice</span>
-                        <select v-model="speech.voice" class="input" name="speechVoice"
+                        <span class="w-1/4">voice</span>
+                        <select v-model="speech.voice" class="input w-3/4" name="speechVoice"
                             @change="$event => contentSelectChange($event, 'settings_speech')"
                             @focus="showTooltip('voice', 'settings_speech')">
                             <option value="">Default</option>
-                            <option v-for="(voice, index) of   speechVoiceList " :key="index" :value="voice.index">
+                            <option v-for="(voice, index) of speechVoiceList" :key="index" :value="voice.index">
                                 {{ voice.index.toString() + ' ' + voice.name }}
                             </option>
                         </select>
@@ -172,24 +168,10 @@
 import cryptoJS from "crypto-js";
 import { mapActions, mapState } from 'pinia';
 import { useStore } from '@/store/index';
+import * as list from '@/assets/ISO639_1.json';
 
 interface MyObject {
     [key: string]: any;
-}
-
-// speech lang compare
-export const languages = [
-    { value: "en-US", speechLabel: 'en' },
-    { value: "zh-TW", speechLabel: 'zh' },
-    { value: "ja-JP", speechLabel: 'ja' }
-]
-// speech label to value
-export function speechLabelToValue(label: string): any {
-    for (let lang of languages) {
-        if (lang.speechLabel === label) {
-            return lang;
-        }
-    }
 }
 
 export default {
@@ -205,19 +187,24 @@ export default {
                 presence_penalty: 0,
                 frequency_penalty: 0
             },
+
             trans: {
                 model: 'whisper-1',
                 temperature: 0,
                 language: 'en',
+                fromLanguage: 'zh'
             },
+            languageList: list,
+
             speech: {
                 volume: 1, // sound, 0~1, default:1
                 rate: 1, // speed, 0.1~10, default:1
                 pitch: 2, // pitch, 0~2, default:1
                 voice: '', // voice,
-                lang: 'zh', // language
+                lang: 'zh-TW', // language
             },
             totalVoices: [] as any[],
+            speechLangList: [] as any[],
             speechVoiceList: [] as any[],
             tooltipText: "",
             tooltipTextTw: "",
@@ -231,6 +218,14 @@ export default {
         // voices
         await this.setTotalVoices();
         this.totalVoices = this.store.getTotalVoices;
+        this.speechLangList = this.totalVoices.reduce((acc, cur) => {
+            const { lang } = cur;
+            if (!acc[lang]) acc[lang] = { sub: [cur] };
+            else acc[lang].sub.push(cur);
+            
+            return acc;
+        }, {});
+        
         this.speechLangChange();
     },
     methods: {
@@ -309,7 +304,8 @@ export default {
                     myObject = {
                         model: 'whisper-1',
                         temperature: 0,
-                        language: 'en'
+                        language: 'en',
+                        fromLanguage: 'zh'
                     };
                     break;
                 case "settings_speech":
@@ -319,7 +315,7 @@ export default {
                         rate: 1, // speed, 0.1~10, default:1
                         pitch: 2, // pitch, 0~2, default:1
                         voice: '', // voice,
-                        lang: 'zh', // language
+                        lang: 'zh-TW', // language
                     };
                     break;
             }
@@ -353,7 +349,6 @@ export default {
                     }
                 }
             }
-
             localStorage.setItem(myObjectName, JSON.stringify(myObject));
         },
         contentSelectChange(event: any, myObjectName: string) {
@@ -376,15 +371,13 @@ export default {
                     }
                     break;
             }
-
             localStorage.setItem(myObjectName, JSON.stringify(myObject));
         },
         /**
          * filter totalVoices to speechVoiceList
          */
         speechLangChange() {
-            let lang = speechLabelToValue(this.speech.lang);
-            this.speechVoiceList = this.totalVoices.filter(voice => voice.lang === lang.value);
+            this.speechVoiceList = this.speechLangList[this.speech.lang].sub;
         },
         /**
          * show chat tooltip

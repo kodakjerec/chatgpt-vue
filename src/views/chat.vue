@@ -20,7 +20,7 @@
             </div>
             <div class=" group-hover:visible w-30 flex">
               <CopyContent class="invisible group-hover:visible w-30" :content="item.content" @deleteItem="deleteItem" :index="index" v-show="!isTalking" />
-              <voice :content="item.content" v-show="!isTalking" />
+              <voice-sound :content="item.content" v-show="!isTalking" />
             </div>
           </div>
           <!-- chatGPT -->
@@ -60,7 +60,7 @@ import cryptoJS from "crypto-js";
 import { chat, abortChat } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
 import CopyContent from "@/components/Copy.vue";
-import Voice from "@/components/Voice.vue";
+import VoiceSound from "@/components/VoiceSound.vue";
 import { md } from "@/libs/markdown";
 import { encoding_for_model, Tiktoken } from '@dqbd/tiktoken';
 import { Edit, Delete } from "@icon-park/vue-next";
@@ -68,7 +68,7 @@ import { Edit, Delete } from "@icon-park/vue-next";
 export default {
   name: 'chat',
   components: {
-    Loding, CopyContent, Voice,
+    Loding, CopyContent, VoiceSound,
     Edit, Delete
   },
   props: {

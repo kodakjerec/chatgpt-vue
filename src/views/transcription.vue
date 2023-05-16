@@ -1,38 +1,58 @@
 <template>
     <div class="w-full overflow-y-auto max-h-screen">
-        <div class="h-full w-full">
+        <div class="h-screen w-full">
             <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100"></div>
             <!-- Text -->
-            <div class="w-full flex flex-col justify-center">
-                <textarea :disabled="isLoading" v-model="resultMy" class="input w-full text-justify" rows="9"
+            <div class="w-full flex flex-col justify-center h-3/4">
+                <div class="w-full md:w-1/3">
+                    <label for="language" class="text-gray-700 mb2 flex items-center">
+                        <span class="w-1/4">language</span>
+                        <select v-model="transcriptionSettings.fromLanguage" class="input w-3/4"
+                            @change="$event => contentSelectChange($event, 'settings_trans')">
+                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{key+' '+value.nativeName}}</option>
+                        </select>
+                        <voice-sound :content="resultMy" v-show="!isLoading" />
+                    </label>
+                </div>
+                <textarea disabled v-model="resultMy" class="input w-full text-justify whitespace-pre-line"
                     placeholder="My"></textarea>
-                <p class="flex">
+                <p class="flex justify-center">
                     <sort-two theme="outline" size="24" fill="#333"/>
                     <Loding class="mt-1" v-if="isLoading" />
                 </p>
-                <textarea :disabled="isLoading" v-model="resultForeign" class="input w-full text-justify" rows="9"
+                <div class="w-full md:w-1/3">
+                    <label for="language" class="text-gray-700 mb2 flex items-center">
+                        <span class="w-1/4">language</span>
+                        <select v-model="transcriptionSettings.language" class="input w-3/4"
+                            @change="$event => contentSelectChange($event, 'settings_trans')">
+                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{key+' '+value.nativeName}}</option>
+                        </select>
+                        <voice-sound :content="resultForeign" v-show="!isLoading" />
+                    </label>
+                </div>
+                <textarea disabled v-model="resultForeign" class="input w-full text-justify whitespace-pre-line"
                     placeholder="Foreign"></textarea>
             </div>
             <!-- upload -->
             <div class="w-full">
                 <div class="flex flex-row">
-                    <div>
-                        <input type="file" ref="fileInput" @change="handleFileSelect" :disabled="isLoading || isRecording">
+                    <div class="w-3/4">
+                        <input type="file" acept="audio/*" ref="fileInput" @change="handleFileSelect" :disabled="isLoading || isRecording">
                         <div class="border border-dashed border-blue-500 text-center" @dragover.prevent @drop="handleDrop"
                             @dragenter="isDragging = true" @dragleave="isDragging = false" :class="{ 'dragging': isDragging }">
                             <p>Drag and drop files here</p>
-                            <p>The audio file to transcribe to <span class="text-red-500 font-bold">{{transcriptionSettings.language}}</span>, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.</p>
-                            <p class="text-red-500">Caution! “m4a” has a few errors.</p>
+                            <p class="text-xs">mp3, mp4, mpeg, mpga, m4a, wav, or webm.</p>
+                            <p class="text-xs text-red-500">Caution! “m4a” has a few errors.</p>
                         </div>
                     </div>
-                    <div>
-                        <div @click="startRecording()" >
-                            <voice theme="outline" size="72" fill="#333" class="hover:cursor-pointer"/>
+                    <div class="w-1/4">
+                        <div @click="startRecording()" v-if="!isRecording">
+                            <voice theme="outline" size="100" fill="#333" class="hover:cursor-pointer"/>
                         </div>
-                        <div class="loading" @click="stopRecording()" >
-                            <rectangle theme="multi-color" size="72" :fill="['#f5a623' ,'#000000' ,'#ffffff' ,'#417505']"/>
-                            <rectangle theme="multi-color" size="72" :fill="['#ffffff' ,'#000000' ,'#ffffff' ,'#417505']"/>
-                            <rectangle theme="multi-color" size="72" :fill="['#bd10e0' ,'#000000' ,'#ffffff' ,'#417505']"/>
+                        <div class="loading" @click="stopRecording()" v-else>
+                            <rectangle theme="multi-color" size="100" :fill="['#f5a623' ,'#000000' ,'#ffffff' ,'#417505']"/>
+                            <rectangle theme="multi-color" size="100" :fill="['#ffffff' ,'#000000' ,'#ffffff' ,'#417505']"/>
+                            <rectangle theme="multi-color" size="100" :fill="['#bd10e0' ,'#000000' ,'#ffffff' ,'#417505']"/>
                         </div>
                     </div>
                 </div>
@@ -47,9 +67,11 @@
 </template>
 
 <script lang="ts">
-import { audioTranscriptions } from "@/libs/gpt";
+import { audioTranscriptions, audioTranscriptionsTW } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
+import VoiceSound from "@/components/VoiceSound.vue";
 import { Voice, Rectangle, SortTwo } from "@icon-park/vue-next";
+import * as list from '@/assets/ISO639_1.json';
 
 interface fileDetail {
     id: string,
@@ -73,18 +95,20 @@ export default {
             transcriptionSettings: {} as any,
             // recorder
             mediaRecorder: null,
-            chunks: []
+            chunks: [],
+            languageList: list
         }
     },
     components: {
         Loding,
-        Voice, Rectangle, SortTwo
+        Voice, Rectangle, SortTwo,
+        VoiceSound
     },
     mounted() {
         this.transcriptionSettings = this.getSettingsTrans();
     },
     methods: {
-        handleFileSelect(event: Event) {
+        async handleFileSelect(event: Event) {
             if (!event.target) return;
             this.isLoading = true;
             this.resultMy = "";
@@ -92,10 +116,12 @@ export default {
             const files = (event.target as HTMLInputElement).files;
             if (!files) return;
             const file = files[0];
-            this.uploadFile(file);
+            if (file) {
+                await Promise.all[this.uploadFile(file), this.uploadFileTW(file)];
+            }
             (event.target as HTMLInputElement).value = "";
         },
-        handleDrop(event: DragEvent) {
+        async handleDrop(event: DragEvent) {
             event.preventDefault();
             if (this.isLoading) return;
             this.isLoading = true;
@@ -105,7 +131,7 @@ export default {
 
             const file = (event.dataTransfer as DataTransfer).files[0];
             if (file) {
-                this.uploadFile(file);
+                await Promise.all[this.uploadFile(file), this.uploadFileTW(file)];
             }
         },
         async uploadFile(file: File) {
@@ -113,12 +139,24 @@ export default {
                 const { body, status } = await audioTranscriptions(file, this.prompt);
                 if (body) {
                     const reader = body.getReader();
-                    await this.readStream(reader, status);
+                    this.resultForeign = await this.readStream(reader, status);
                 }
             } catch (error: any) {
                 this.resultForeign = error;
             } finally {
                 this.isLoading = false;
+            }
+        },
+        async uploadFileTW(file: File) {
+            try {
+                const { body, status } = await audioTranscriptionsTW(file, this.prompt);
+                if (body) {
+                    const reader = body.getReader();
+                    this.resultMy = await this.readStream(reader, status);
+                }
+            } catch (error: any) {
+                this.resultMy = error;
+            } finally {
             }
         },
         /**
@@ -130,7 +168,7 @@ export default {
             reader: ReadableStreamDefaultReader<Uint8Array>,
             status: number
         ) {
-            let partialLine = "";
+            let returnResult = "";
 
             while (true) {
                 // eslint-disable-next-line no-await-in-loop
@@ -147,8 +185,10 @@ export default {
 
                 // return
                 let response = JSON.parse(decodedText);
-                this.result = response.text;
+                returnResult = response.text;
             }
+
+            return returnResult;
         },
         /**
          * get trans settings
@@ -157,9 +197,10 @@ export default {
             let settings_Trans = localStorage.getItem("settings_trans");
             if (!settings_Trans) {
                 return {
-                    model: 'gpt-3.5-turbo',
-                    temperature: 1,
-                    language: 'en'
+                    model: 'whisper-1',
+                    temperature: 0,
+                    language: 'en',
+                    fromLanguage: 'zh'
                 };
             }
             
@@ -200,7 +241,13 @@ export default {
             const blob = new Blob(this.chunks, { type: 'audio/wav' });
             let file = new File([blob], 'sound01.wav', { type: 'audio/wav' });
             this.uploadFile(file);
-        }
+        },
+        /**
+         * simple content select change
+         */
+        contentSelectChange(event: any, myObjectName: string) {
+            localStorage.setItem(myObjectName, JSON.stringify(this.transcriptionSettings));
+        },
     }
 
 }
