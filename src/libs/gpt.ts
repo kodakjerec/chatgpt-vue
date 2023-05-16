@@ -56,7 +56,7 @@ function getSettingsTrans() {
 }
 
 // send chat message
-export async function chat(messageList: ChatMessage[]) {
+export async function chat(messageList: ChatMessage[], fromStream = true) {
   if (!apiKey) { getAPIKey() };
   chatSettings = getSettingsChat();
 
@@ -70,7 +70,7 @@ export async function chat(messageList: ChatMessage[]) {
       },
       body: JSON.stringify({
         model: chatSettings.model,
-        stream: true,
+        stream: fromStream,
         messages: messageList,
         temperature: chatSettings.temperature,
         presence_penalty: chatSettings.presence_penalty,
@@ -161,32 +161,6 @@ export async function audioTranscriptions(file:File, prompt:string) {
   formData.append('model', transcriptionSettings.model);
   formData.append('temperature', transcriptionSettings.temperature);
   formData.append('language', transcriptionSettings.language);
-  if (prompt)
-  formData.append('prompt', prompt);
-
-  try {
-    const result = await fetch("https://api.openai.com/v1/audio/transcriptions", {
-      method: "post",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: formData
-    });
-    return result;
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function audioTranscriptionsTW(file:File, prompt:string) {
-  if (!apiKey) { getAPIKey() };
-  transcriptionSettings = getSettingsTrans();
-
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('model', transcriptionSettings.model);
-  formData.append('temperature', transcriptionSettings.temperature);
-  formData.append('language', transcriptionSettings.fromLanguage);
   if (prompt)
   formData.append('prompt', prompt);
 

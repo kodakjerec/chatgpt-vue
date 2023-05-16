@@ -7,13 +7,14 @@
                 <div class="w-full md:w-1/3">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">language</span>
-                        <select v-model="transcriptionSettings.fromLanguage" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
+                        <select v-model="transcriptionSettings.language" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
                             <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.nativeName }}</option>
                         </select>
                         <voice-sound :content="resultMy" v-show="!isLoading" />
                     </label>
                 </div>
-                <textarea disabled v-model="resultMy" class="input w-full text-justify whitespace-pre-line" placeholder="My"></textarea>
+                <textarea disabled v-model="resultMy" class="input w-full text-justify whitespace-pre-line" placeholder="Audio Content"></textarea>
+
                 <p class="flex justify-center">
                     <sort-two theme="outline" size="24" fill="#333" />
                     <Loding class="mt-1" v-if="isLoading" />
@@ -21,18 +22,19 @@
                 <div class="w-full md:w-1/3">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">language</span>
-                        <select v-model="transcriptionSettings.language" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
+                        <select v-model="transcriptionSettings.toLanguage" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
                             <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.nativeName }}</option>
                         </select>
                         <voice-sound :content="resultForeign" v-show="!isLoading" />
                     </label>
                 </div>
-                <textarea disabled v-model="resultForeign" class="input w-full text-justify whitespace-pre-line" placeholder="Foreign"></textarea>
+                <textarea disabled v-model="resultForeign" class="input w-full text-justify whitespace-pre-line" placeholder="Translate Content"></textarea>
+
             </div>
             <!-- upload -->
             <div class="w-full">
-                <div class="flex flex-row">
-                    <div class="w-3/4">
+                <div class="flex flex-row justify-center">
+                    <div class="w-3/4 hidden sm:block">
                         <input type="file" acept="audio/*" ref="fileInput" @change="handleFileSelect" :disabled="isLoading || isRecording">
                         <div class="border border-dashed border-blue-500 text-center" @dragover.prevent @drop="handleDrop" @dragenter="isDragging = true" @dragleave="isDragging = false" :class="{ 'dragging': isDragging }">
                             <p>Drag and drop files here</p>
@@ -62,7 +64,7 @@
 </template>
 
 <script lang="ts">
-import { audioTranscriptions, audioTranscriptionsTW } from "@/libs/gpt";
+import { audioTranscriptions, chat } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
 import VoiceSound from "@/components/VoiceSound.vue";
 import { Voice, Rectangle, SortTwo } from "@icon-park/vue-next";
@@ -85,8 +87,8 @@ export default {
             isDragging: false as boolean,
             isRecording: false as boolean,
             decoder: new TextDecoder("utf-8"),
-            resultMy: "" as string,
             resultForeign: "" as string,
+            resultMy: "" as string,
             transcriptionSettings: {} as any,
             // recorder
             mediaRecorder: null,
@@ -106,8 +108,8 @@ export default {
         async handleFileSelect(event: Event) {
             if (!event.target) return;
             this.isLoading = true;
-            this.resultMy = "";
             this.resultForeign = "";
+            this.resultMy = "";
             const files = (event.target as HTMLInputElement).files;
             if (!files) return;
             const file = files[0];
@@ -119,8 +121,8 @@ export default {
             if (this.isLoading) return;
             this.isLoading = true;
             this.isDragging = false;
-            this.resultMy = "";
             this.resultForeign = "";
+            this.resultMy = "";
 
             const file = (event.dataTransfer as DataTransfer).files[0];
             this.beforeUploading(file);
@@ -130,29 +132,19 @@ export default {
                 const { body, status } = await audioTranscriptions(file, this.prompt);
                 if (body) {
                     const reader = body.getReader();
-                    this.resultForeign = await this.readStream(reader, status);
-                }
-            } catch (error: any) {
-                this.resultForeign = error;
-            } finally {
-                this.isLoading = false;
-            }
-        },
-        async beforeUploading(file: File) {
-            if (file) {
-                await Promise.all[this.uploadFile(file), this.uploadFileTW(file)];
-            }
-        },
-        async uploadFileTW(file: File) {
-            try {
-                const { body, status } = await audioTranscriptionsTW(file, this.prompt);
-                if (body) {
-                    const reader = body.getReader();
-                    this.resultMy = await this.readStream(reader, status);
+                    let result = await this.readStream(reader, status);
+                    this.resultMy = result.text;
                 }
             } catch (error: any) {
                 this.resultMy = error;
             } finally {
+            }
+        },
+        async beforeUploading(file: File) {
+            if (file) {
+                await this.uploadFile(file);
+                await this.translate();
+                this.isLoading = false;
             }
         },
         /**
@@ -160,10 +152,7 @@ export default {
          * @param reader 格式
          * @param status response
          */
-        async readStream(
-            reader: ReadableStreamDefaultReader<Uint8Array>,
-            status: number
-        ) {
+        async readStream(reader: ReadableStreamDefaultReader<Uint8Array>, status: number) {
             let returnResult = "";
 
             while (true) {
@@ -180,8 +169,7 @@ export default {
                 }
 
                 // return
-                let response = JSON.parse(decodedText);
-                returnResult = response.text;
+                returnResult = JSON.parse(decodedText);
             }
 
             return returnResult;
@@ -196,7 +184,7 @@ export default {
                     model: 'whisper-1',
                     temperature: 0,
                     language: 'en',
-                    fromLanguage: 'zh'
+                    toLanguage: 'zh'
                 };
             }
 
@@ -240,6 +228,28 @@ export default {
         contentSelectChange(event: any, myObjectName: string) {
             localStorage.setItem(myObjectName, JSON.stringify(this.transcriptionSettings));
         },
+        /**
+         * translate to wanted language
+         */
+        async translate() {
+            if (this.resultMy === "") return;
+
+            let sendMessageList = [] as Array<any>;
+            sendMessageList.push({
+                role: "user",
+                content: "Translate to " + this.transcriptionSettings.toLanguage,
+            });
+            sendMessageList.push({
+                role: "user",
+                content: this.resultMy
+            });
+            const { body, status } = await chat(sendMessageList, false);
+            if (body) {
+                const reader = body.getReader();
+                let result = await this.readStream(reader, status);
+                this.resultForeign = result.choices[0].message.content;
+            }
+        }
     }
 }
 </script>
