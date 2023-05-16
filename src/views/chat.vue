@@ -151,8 +151,10 @@ export default {
       try {
         this.isTalking = true;
         // first time use
-        if (this.messageList[0].role === "system") {
-          this.messageList = [];
+        if (this.messageList.length > 0){
+          if (this.messageList[0].role === "system") {
+            this.messageList = [];
+          }
         }
 
         this.messageList.push({ role: "user", content });
