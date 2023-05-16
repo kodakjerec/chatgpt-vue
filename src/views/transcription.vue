@@ -7,39 +7,34 @@
                 <div class="w-full md:w-1/3">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">language</span>
-                        <select v-model="transcriptionSettings.fromLanguage" class="input w-3/4"
-                            @change="$event => contentSelectChange($event, 'settings_trans')">
-                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{key+' '+value.nativeName}}</option>
+                        <select v-model="transcriptionSettings.fromLanguage" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
+                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.nativeName }}</option>
                         </select>
                         <voice-sound :content="resultMy" v-show="!isLoading" />
                     </label>
                 </div>
-                <textarea disabled v-model="resultMy" class="input w-full text-justify whitespace-pre-line"
-                    placeholder="My"></textarea>
+                <textarea disabled v-model="resultMy" class="input w-full text-justify whitespace-pre-line" placeholder="My"></textarea>
                 <p class="flex justify-center">
-                    <sort-two theme="outline" size="24" fill="#333"/>
+                    <sort-two theme="outline" size="24" fill="#333" />
                     <Loding class="mt-1" v-if="isLoading" />
                 </p>
                 <div class="w-full md:w-1/3">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">language</span>
-                        <select v-model="transcriptionSettings.language" class="input w-3/4"
-                            @change="$event => contentSelectChange($event, 'settings_trans')">
-                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{key+' '+value.nativeName}}</option>
+                        <select v-model="transcriptionSettings.language" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
+                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.nativeName }}</option>
                         </select>
                         <voice-sound :content="resultForeign" v-show="!isLoading" />
                     </label>
                 </div>
-                <textarea disabled v-model="resultForeign" class="input w-full text-justify whitespace-pre-line"
-                    placeholder="Foreign"></textarea>
+                <textarea disabled v-model="resultForeign" class="input w-full text-justify whitespace-pre-line" placeholder="Foreign"></textarea>
             </div>
             <!-- upload -->
             <div class="w-full">
                 <div class="flex flex-row">
                     <div class="w-3/4">
                         <input type="file" acept="audio/*" ref="fileInput" @change="handleFileSelect" :disabled="isLoading || isRecording">
-                        <div class="border border-dashed border-blue-500 text-center" @dragover.prevent @drop="handleDrop"
-                            @dragenter="isDragging = true" @dragleave="isDragging = false" :class="{ 'dragging': isDragging }">
+                        <div class="border border-dashed border-blue-500 text-center" @dragover.prevent @drop="handleDrop" @dragenter="isDragging = true" @dragleave="isDragging = false" :class="{ 'dragging': isDragging }">
                             <p>Drag and drop files here</p>
                             <p class="text-xs">mp3, mp4, mpeg, mpga, m4a, wav, or webm.</p>
                             <p class="text-xs text-red-500">Caution! “m4a” has a few errors.</p>
@@ -47,12 +42,12 @@
                     </div>
                     <div class="w-1/4">
                         <div @click="startRecording()" v-if="!isRecording">
-                            <voice theme="outline" size="100" fill="#333" class="hover:cursor-pointer"/>
+                            <voice theme="outline" size="100" fill="#333" class="hover:cursor-pointer" />
                         </div>
                         <div class="loading" @click="stopRecording()" v-else>
-                            <rectangle theme="multi-color" size="100" :fill="['#f5a623' ,'#000000' ,'#ffffff' ,'#417505']"/>
-                            <rectangle theme="multi-color" size="100" :fill="['#ffffff' ,'#000000' ,'#ffffff' ,'#417505']"/>
-                            <rectangle theme="multi-color" size="100" :fill="['#bd10e0' ,'#000000' ,'#ffffff' ,'#417505']"/>
+                            <rectangle theme="multi-color" size="100" :fill="['#f5a623', '#000000', '#ffffff', '#417505']" />
+                            <rectangle theme="multi-color" size="100" :fill="['#ffffff', '#000000', '#ffffff', '#417505']" />
+                            <rectangle theme="multi-color" size="100" :fill="['#bd10e0', '#000000', '#ffffff', '#417505']" />
                         </div>
                     </div>
                 </div>
@@ -116,10 +111,8 @@ export default {
             const files = (event.target as HTMLInputElement).files;
             if (!files) return;
             const file = files[0];
-            if (file) {
-                await Promise.all[this.uploadFile(file), this.uploadFileTW(file)];
-            }
             (event.target as HTMLInputElement).value = "";
+            this.beforeUploading(file);
         },
         async handleDrop(event: DragEvent) {
             event.preventDefault();
@@ -130,9 +123,7 @@ export default {
             this.resultForeign = "";
 
             const file = (event.dataTransfer as DataTransfer).files[0];
-            if (file) {
-                await Promise.all[this.uploadFile(file), this.uploadFileTW(file)];
-            }
+            this.beforeUploading(file);
         },
         async uploadFile(file: File) {
             try {
@@ -145,6 +136,11 @@ export default {
                 this.resultForeign = error;
             } finally {
                 this.isLoading = false;
+            }
+        },
+        async beforeUploading(file: File) {
+            if (file) {
+                await Promise.all[this.uploadFile(file), this.uploadFileTW(file)];
             }
         },
         async uploadFileTW(file: File) {
@@ -203,44 +199,40 @@ export default {
                     fromLanguage: 'zh'
                 };
             }
-            
+
             return JSON.parse(settings_Trans);
         },
         async startRecording() {
-            let stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+            let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             if (stream) {
                 this.isRecording = true;
                 this.chunks = [];
 
                 // create MediaRecorder
-                this.mediaRecorder = new MediaRecorder(stream, { mimeType:'audio/wav' });
-
-                this.mediaRecorder.addEventListener('dataavailable', event => {
-                    if (event.data.size >0) {
-                        this.chunks.push(event.data);
-                    }
-                });
+                this.mediaRecorder = new MediaRecorder(stream);
 
                 // start recording
                 this.mediaRecorder.start();
+                this.mediaRecorder.addEventListener('dataavailable', event => {
+                    if (event.data.size > 0) {
+                        const blob = event.data;
+                        let file = new File([blob], 'sound01.wav', { type: 'audio/wav' });
+                        this.beforeUploading(file);
+                    }
+                });
+
             }
         },
         stopRecording() {
             try {
-                if ( this.mediaRecorder && this.mediaRecorder.state === "recording" ) {
+                if (this.mediaRecorder && this.mediaRecorder.state === "recording") {
                     this.mediaRecorder.stop();
                 }
-            } catch(e) {
+            } catch (e) {
                 console.log("stopRecording error", e);
             } finally {
                 this.isRecording = false;
-                if (this.chunks.length===0) {
-                    return;
-                }
             }
-            const blob = new Blob(this.chunks, { type: 'audio/wav' });
-            let file = new File([blob], 'sound01.wav', { type: 'audio/wav' });
-            this.uploadFile(file);
         },
         /**
          * simple content select change
@@ -249,7 +241,6 @@ export default {
             localStorage.setItem(myObjectName, JSON.stringify(this.transcriptionSettings));
         },
     }
-
 }
 </script>
 
@@ -260,37 +251,38 @@ export default {
 </style>
 
 <style scoped>
-.loading > span {
-  width: 0px;
-  animation-name: ball-grid-beat;
-  animation-iteration-count: infinite;
+.loading>span {
+    width: 0px;
+    animation-name: ball-grid-beat;
+    animation-iteration-count: infinite;
 }
 
-.loading > span:nth-child(1) {
-  animation-duration: 1.3s;
-  animation-delay: 0.06s;
+.loading>span:nth-child(1) {
+    animation-duration: 1.3s;
+    animation-delay: 0.06s;
 }
 
-.loading > span:nth-child(2) {
-  animation-duration: 2.04s;
-  animation-delay: 0.18s;
+.loading>span:nth-child(2) {
+    animation-duration: 2.04s;
+    animation-delay: 0.18s;
 }
-.loading > span:nth-child(3) {
-  animation-duration: 1.3s;
-  animation-delay: 0.06s;
+
+.loading>span:nth-child(3) {
+    animation-duration: 1.3s;
+    animation-delay: 0.06s;
 }
 
 @keyframes ball-grid-beat {
-  0% {
-    opacity: 1;
-  }
+    0% {
+        opacity: 1;
+    }
 
-  50% {
-    opacity: 0.35;
-  }
+    50% {
+        opacity: 0.35;
+    }
 
-  100% {
-    opacity: 1;
-  }
+    100% {
+        opacity: 1;
+    }
 }
 </style>
