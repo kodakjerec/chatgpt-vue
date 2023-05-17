@@ -25,9 +25,7 @@
                 <div class="w-full md:w-1/4 grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">model</span>
-                        <select v-model="chat.model" class="input"
-                            @change="$event => contentSelectChange($event, 'settings_chat')"
-                            @focus="showTooltip('model', 'settings_chat')">
+                        <select v-model="chat.model" class="input" @change="$event => contentSelectChange($event, 'settings_chat')" @focus="showTooltip('model', 'settings_chat')">
                             <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
                             <option value="gpt-4">gpt-4</option>
                         </select>
@@ -36,28 +34,19 @@
                 <div class="w-full md:w-1/4 grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Temperature</span>
-                        <input v-model.number.trim.lazy="chat.temperature" class="input" type="number" step=".1"
-                            placeholder="0 to 2" required :min="0" :max="2"
-                            @change="$event => contentInputChange($event, 'settings_chat')"
-                            @focus="showTooltip('temperature', 'settings_chat')" />
+                        <input v-model.number.trim.lazy="chat.temperature" class="input" type="number" step=".1" placeholder="0 to 2" required :min="0" :max="2" @change="$event => contentInputChange($event, 'settings_chat')" @focus="showTooltip('temperature', 'settings_chat')" />
                     </label>
                 </div>
                 <div class="w-full md:w-1/4 grow">
                     <label for="presence_penalty" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Presence_penalty</span>
-                        <input v-model.number.trim.lazy="chat.presence_penalty" class="input" type="number" step=".1"
-                            placeholder="-2 to 2" required :min="-2" :max="2"
-                            @change="$event => contentInputChange($event, 'settings_chat')"
-                            @focus="showTooltip('presence_penalty', 'settings_chat')" />
+                        <input v-model.number.trim.lazy="chat.presence_penalty" class="input" type="number" step=".1" placeholder="-2 to 2" required :min="-2" :max="2" @change="$event => contentInputChange($event, 'settings_chat')" @focus="showTooltip('presence_penalty', 'settings_chat')" />
                     </label>
                 </div>
                 <div class="w-full md:w-1/4 grow">
                     <label for="frequency_penalty" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Frequency_penalty</span>
-                        <input v-model.number.trim.lazy="chat.frequency_penalty" class="input" type="number" step=".1"
-                            placeholder="-2 to 2" required :min="-2" :max="2"
-                            @change="$event => contentInputChange($event, 'settings_chat')"
-                            @focus="showTooltip('frequency_penalty', 'settings_chat')" />
+                        <input v-model.number.trim.lazy="chat.frequency_penalty" class="input" type="number" step=".1" placeholder="-2 to 2" required :min="-2" :max="2" @change="$event => contentInputChange($event, 'settings_chat')" @focus="showTooltip('frequency_penalty', 'settings_chat')" />
                     </label>
                 </div>
             </div>
@@ -73,9 +62,7 @@
                 <div class="w-full md:w-1/3 grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">model</span>
-                        <select v-model="trans.model" class="input"
-                            @change="$event => contentSelectChange($event, 'settings_trans')"
-                            @focus="showTooltip('model', 'settings_trans')">
+                        <select v-model="trans.model" class="input" @change="$event => contentSelectChange($event, 'settings_trans')" @focus="showTooltip('model', 'settings_trans')">
                             <option value="whisper-1">whisper-1</option>
                         </select>
                     </label>
@@ -83,19 +70,14 @@
                 <div class="w-full md:w-1/3 grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Temperature</span>
-                        <input v-model.number.trim.lazy="trans.temperature" class="input" type="number" step=".1"
-                            placeholder="0 to 2" required :min="0" :max="2"
-                            @change="$event => contentInputChange($event, 'settings_trans')"
-                            @focus="showTooltip('temperature', 'settings_trans')" />
+                        <input v-model.number.trim.lazy="trans.temperature" class="input" type="number" step=".1" placeholder="0 to 2" required :min="0" :max="2" @change="$event => contentInputChange($event, 'settings_trans')" @focus="showTooltip('temperature', 'settings_trans')" />
                     </label>
                 </div>
                 <div class="w-full md:w-1/3 grow">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">language</span>
-                        <select v-model="trans.language" class="input w-3/4"
-                            @change="$event => contentSelectChange($event, 'settings_trans')"
-                            @focus="showTooltip('language', 'settings_trans')">
-                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{key+' '+value.nativeName}}</option>
+                        <select v-model="trans.language" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')" @focus="showTooltip('language', 'settings_trans')">
+                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.nativeName }}</option>
                         </select>
                     </label>
                 </div>
@@ -112,36 +94,25 @@
                 <div class="w-full md:w-1/4 grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Volume</span>
-                        <input v-model.number.trim.lazy="speech.volume" class="input" type="number" step=".1"
-                            placeholder="0 to 1" required :min="0" :max="1"
-                            @change="$event => contentInputChange($event, 'settings_speech')"
-                            @focus="showTooltip('volume', 'settings_speech')" />
+                        <input v-model.number.trim.lazy="speech.volume" class="input" type="number" step=".1" placeholder="0 to 1" required :min="0" :max="1" @change="$event => contentInputChange($event, 'settings_speech')" @focus="showTooltip('volume', 'settings_speech')" />
                     </label>
                 </div>
                 <div class="w-full md:w-1/4 grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Rate</span>
-                        <input v-model.number.trim.lazy="speech.rate" class="input" type="number" step=".1"
-                            placeholder="0 to 10" required :min="0" :max="10"
-                            @change="$event => contentInputChange($event, 'settings_speech')"
-                            @focus="showTooltip('rate', 'settings_speech')" />
+                        <input v-model.number.trim.lazy="speech.rate" class="input" type="number" step=".1" placeholder="0 to 10" required :min="0" :max="10" @change="$event => contentInputChange($event, 'settings_speech')" @focus="showTooltip('rate', 'settings_speech')" />
                     </label>
                 </div>
                 <div class="w-full md:w-1/4 grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Pitch</span>
-                        <input v-model.number.trim.lazy="speech.pitch" class="input" type="number" step=".1"
-                            placeholder="0 to 2" required :min="0" :max="2"
-                            @change="$event => contentInputChange($event, 'settings_speech')"
-                            @focus="showTooltip('pitch', 'settings_speech')" />
+                        <input v-model.number.trim.lazy="speech.pitch" class="input" type="number" step=".1" placeholder="0 to 2" required :min="0" :max="2" @change="$event => contentInputChange($event, 'settings_speech')" @focus="showTooltip('pitch', 'settings_speech')" />
                     </label>
                 </div>
                 <div class="w-full md:w-1/4 grow">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">language</span>
-                        <select v-model="speech.lang" class="input"
-                            @change="$event => { contentSelectChange($event, 'settings_speech'); speechLangChange() }"
-                            @focus="showTooltip('language', 'settings_speech')">
+                        <select v-model="speech.lang" class="input" @change="$event => { contentSelectChange($event, 'settings_speech'); speechLangChange() }" @focus="showTooltip('language', 'settings_speech')">
                             <option v-for="(value, key) of speechLangList" :key="key" :value="key">{{ key }}</option>
                         </select>
                     </label>
@@ -149,9 +120,7 @@
                 <div class="w-full md:w-1/4 grow">
                     <label for="voice" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">voice</span>
-                        <select v-model="speech.voice" class="input w-3/4" name="speechVoice"
-                            @change="$event => contentSelectChange($event, 'settings_speech')"
-                            @focus="showTooltip('voice', 'settings_speech')">
+                        <select v-model="speech.voice" class="input w-3/4" name="speechVoice" @change="$event => contentSelectChange($event, 'settings_speech')" @focus="showTooltip('voice', 'settings_speech')">
                             <option value="">Default</option>
                             <option v-for="(voice, index) of speechVoiceList" :key="index" :value="voice.index">
                                 {{ voice.index.toString() + ' ' + voice.name }}
@@ -192,7 +161,7 @@ export default {
                 model: 'whisper-1',
                 temperature: 0,
                 language: 'en',
-                fromLanguage: 'zh'
+                toLanguage: 'zh'
             },
             languageList: list,
 
@@ -222,10 +191,10 @@ export default {
             const { lang } = cur;
             if (!acc[lang]) acc[lang] = { sub: [cur] };
             else acc[lang].sub.push(cur);
-            
+
             return acc;
         }, {});
-        
+
         this.speechLangChange();
     },
     methods: {
@@ -305,7 +274,7 @@ export default {
                         model: 'whisper-1',
                         temperature: 0,
                         language: 'en',
-                        fromLanguage: 'zh'
+                        toLanguage: 'zh'
                     };
                     break;
                 case "settings_speech":

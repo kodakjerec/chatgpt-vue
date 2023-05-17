@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full overflow-y-auto max-h-screen" ref="chatListDom">
+  <div class="w-full overflow-y-auto h-screen" ref="chatListDom">
     <div class="min-h-screen w-full">
       <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100">
         <div class="text-2xl font-bold" v-if="!editing">{{ fromLogName }}
@@ -8,12 +8,10 @@
           </div>
           <span class="text-xs text-gray-500" title="tokens">{{ totalTokens }}</span>
         </div>
-        <input type="text" class="px-4 py-2 text-gray-700 bg-white border rounded-md mr-2 text-black bg-slate-400" v-else
-          @blur="updateLogName" v-model="newLogName" ref="editingLogName">
+        <input type="text" class="px-4 py-2 text-gray-700 bg-white border rounded-md mr-2 text-black bg-slate-400" v-else @blur="updateLogName" v-model="newLogName" ref="editingLogName">
       </div>
       <div class="flex-1 mx-2 mt-20 mb-2">
-        <div class="group flex flex-col px-2 py-2 hover:bg-slate-200 rounded-lg" v-for="(item, index) of messageListView"
-          :key="index">
+        <div class="group flex flex-col px-2 py-2 hover:bg-slate-200 rounded-lg" v-for="(item, index) of messageListView" :key="index">
           <div class="flex justify-between items-center">
             <div class="font-bold flex">
               <span>{{ roleAlias[item.role] }}：</span>
@@ -34,8 +32,7 @@
           <template v-else>
             <div>
               <div class="pyramid ml-2"></div>
-              <div class="prose max-w-full text-sm text-slate-600 leading-relaxed bg-green-300 rounded"
-                v-html="mdRender(item.content)"></div>
+              <div class="prose max-w-full text-sm text-slate-600 leading-relaxed bg-green-300 rounded" v-html="mdRender(item.content)"></div>
               <Loding v-if="!item.content && isTalking" />
             </div>
           </template>
@@ -45,8 +42,7 @@
     <div class="sticky bottom-0 w-full p-2">
       <div>
         <div class="flex">
-          <textarea class="input" placeholder="Please input something" v-model="messageContent"
-            @keydown="keydownEvent"></textarea>
+          <textarea class="input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
           <button class="redBtn" v-if="isTalking" @click="callAbortChat()">Stop</button>
           <button class="btn" v-else @click="sendChatMessage()">Send</button>
         </div>
@@ -151,11 +147,10 @@ export default {
       try {
         this.isTalking = true;
         // first time use
-        if (this.messageList.length > 0){
+        if (this.messageList.length > 0)
           if (this.messageList[0].role === "system") {
             this.messageList = [];
           }
-        }
 
         this.messageList.push({ role: "user", content });
         this.clearMessageContent();
@@ -186,6 +181,11 @@ export default {
         this.isTalking = false;
         this.setChatLog();
         this.totalTokens = this.calAllTiktoken(this.messageList);
+
+        // after received, scroll to bottom
+        this.$nextTick(() => {
+          this.scrollToBottom();
+        });
       }
     },
     /**
@@ -193,10 +193,7 @@ export default {
      * @param reader 格式
      * @param status response status
      */
-    async readStream(
-      reader: ReadableStreamDefaultReader<Uint8Array>,
-      status: number
-    ) {
+    async readStream(reader: ReadableStreamDefaultReader<Uint8Array>, status: number) {
       let partialLine = "";
 
       while (true) {
