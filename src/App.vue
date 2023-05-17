@@ -1,7 +1,9 @@
 <template>
   <div class="bg-gray-100 flex h-screen overflow-x-hidden">
     <!-- Sidebar -->
-    <div v-if="!sidebarActive" class="fixed top-3 right-3 w-12 h-8 cursor-pointer z-1000 bg-gray-100" @click="toggleSidebar">Menu</div>
+    <div v-if="!sidebarActive" class="fixed top-1 right-1 w-8 h-8 cursor-pointer z-1000 bg-gray-100 rounded" @click="toggleSidebar">
+      <menu-unfold theme="outline" size="24" fill="#333"/>
+    </div>
     <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0"
       @blur="closeSidebar">
       <ul class="mt-8 flex flex-col justify-between cursor-pointer">
@@ -56,7 +58,7 @@
     <div v-if="sidebarActive" class="absolute w-full h-screen bg-slate-100 opacity-60 z-10"></div>
     <!-- Content -->
     <div class="w-full">
-      <router-view v-if="nowPath === 'home'" name="home" @fromClick="nowPath = 'settings'" />
+      <router-view v-if="nowPath === 'home'" name="home" @fromClick="(path)=> nowPath = path" />
       <router-view v-if="nowPath.slice(0, 4) === 'chat'" name="chat" :sendLogName="selectLog" @updateLogName="updateLogName" />
       <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
       <router-view v-if="nowPath === 'translation'" name="translation" />
@@ -66,12 +68,12 @@
   </div>
 </template>
 <script lang="ts">
-import { Photograph, Translate, Plus, Delete } from "@icon-park/vue-next";
+import { Photograph, Translate, Plus, Delete, MenuUnfold } from "@icon-park/vue-next";
 
 export default {
   name: 'App',
   components: {
-    Photograph, Translate, Plus, Delete
+    Photograph, Translate, Plus, Delete, MenuUnfold
   },
   data(): {
     nowPath: string,
@@ -108,9 +110,11 @@ export default {
       let lastPath = localStorage.getItem('lastPath');
       if (lastPath) {
         this.nowPath = lastPath;
-        if (this.nowPath.slice(0, 4) === 'chat') {
-          this.selectLog = this.nowPath.substring(5, this.nowPath.length);
-        }
+      } else {
+        this.nowPath = "settings";
+      }
+      if (this.nowPath.slice(0, 4) === 'chat') {
+        this.selectLog = this.nowPath.substring(5, this.nowPath.length);
       }
     },
     /**

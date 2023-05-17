@@ -1,10 +1,9 @@
 <template>
     <div class="w-full overflow-y-auto max-h-screen">
-        <div class="sticky w-full text-right mt-2" v-show="tooltipText">
-            <p class="text-justify text-yellow-700">{{ tooltipText }}<br>{{ tooltipTextTw }}</p>
+        <div class="fixed w-full bg-gray-100 z-1000" v-show="tooltipText">
+            <p class="text-justify text-sm text-yellow-700">{{ tooltipText }}<br>{{ tooltipTextTw }}</p>
         </div>
         <div class="h-full w-full">
-            <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100"></div>
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="0">
                 <div class="w-full text-center my-1">
                     <label class="text-gray-700 font-bold text-xl">API Key</label>
@@ -160,8 +159,8 @@ export default {
             trans: {
                 model: 'whisper-1',
                 temperature: 0,
-                language: 'en',
-                toLanguage: 'zh'
+                language: 'zh',
+                toLanguage: 'en'
             },
             languageList: list,
 
@@ -273,8 +272,8 @@ export default {
                     myObject = {
                         model: 'whisper-1',
                         temperature: 0,
-                        language: 'en',
-                        toLanguage: 'zh'
+                        language: 'zh',
+                        toLanguage: 'en'
                     };
                     break;
                 case "settings_speech":

@@ -13,10 +13,11 @@
                         <voice-sound :content="resultMy" v-show="!isLoading" />
                     </label>
                 </div>
-                <textarea disabled v-model="resultMy" class="input w-full text-justify whitespace-pre-line" placeholder="Audio Content"></textarea>
+                <textarea v-model="resultMy" class="input w-full text-justify whitespace-pre-line" placeholder="Audio Content"></textarea>
 
                 <p class="flex justify-center">
-                    <sort-two theme="outline" size="24" fill="#333" />
+                    <translation class="w-10" theme="outline" size="24" fill="#333" @click="startTranslation()" />
+                    <sort-two class="w-10" theme="outline" size="24" fill="#333" />
                     <Loding class="mt-1" v-if="isLoading" />
                 </p>
                 <div class="w-full md:w-1/3">
@@ -67,7 +68,7 @@
 import { audioTranscriptions, chat } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
 import VoiceSound from "@/components/VoiceSound.vue";
-import { Voice, Rectangle, SortTwo } from "@icon-park/vue-next";
+import { Voice, Rectangle, SortTwo, Translation } from "@icon-park/vue-next";
 import * as list from '@/assets/ISO639_1.json';
 
 interface fileDetail {
@@ -98,7 +99,7 @@ export default {
     },
     components: {
         Loding,
-        Voice, Rectangle, SortTwo,
+        Voice, Rectangle, SortTwo, Translation,
         VoiceSound
     },
     mounted() {
@@ -183,8 +184,8 @@ export default {
                 return {
                     model: 'whisper-1',
                     temperature: 0,
-                    language: 'en',
-                    toLanguage: 'zh'
+                    language: 'zh',
+                    toLanguage: 'en'
                 };
             }
 
@@ -221,6 +222,13 @@ export default {
             } finally {
                 this.isRecording = false;
             }
+        },
+        async startTranslation() {
+            this.isLoading = true;
+            await this.translate();
+            this.$nextTick(() => {
+                this.isLoading = false;
+            });
         },
         /**
          * simple content select change
