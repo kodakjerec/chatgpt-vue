@@ -84,7 +84,13 @@ export default {
                 const { body, status } = await audioTranslations(file, this.prompt);
                 if (body) {
                     const reader = body.getReader();
-                    await this.readStream(reader, status);
+                    let result = await this.readStream(reader, status);
+                    
+                    if (status===200) {
+                        this.result = result.text;
+                    } else {
+                        this.result = result
+                    }
                 }
             } catch (error: any) {
                 this.result = error;
@@ -112,13 +118,12 @@ export default {
                 if (status !== 200) {
                     const json = JSON.parse(decodedText); // start with "data: "
                     const content = json.error.message ?? decodedText;
-                    this.appendLastMessageContent(content);
-                    return;
+                    return content;
                 }
 
                 // return
                 let response = JSON.parse(decodedText);
-                this.result = response.text;
+                return response;
             }
         },
     }

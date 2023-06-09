@@ -16,9 +16,8 @@
                 <textarea v-model="resultMy" class="input w-full text-justify whitespace-pre-line" placeholder="Audio Content"></textarea>
 
                 <p class="flex justify-center">
-                    <translation class="w-10" theme="outline" size="24" fill="#333" @click="startTranslation()" />
-                    <sort-two class="w-10" theme="outline" size="24" fill="#333" />
                     <Loding class="mt-1" v-if="isLoading" />
+                    <translation class="w-10" theme="outline" size="24" fill="#333" @click="startTranslation()" v-else />
                 </p>
                 <div class="w-full md:w-1/3">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
@@ -48,9 +47,9 @@
                             <voice theme="outline" size="100" fill="#333" class="hover:cursor-pointer" />
                         </div>
                         <div class="loading" @click="stopRecording()" v-else>
-                            <rectangle theme="multi-color" size="100" :fill="['#f5a623', '#000000', '#ffffff', '#417505']" />
-                            <rectangle theme="multi-color" size="100" :fill="['#ffffff', '#000000', '#ffffff', '#417505']" />
-                            <rectangle theme="multi-color" size="100" :fill="['#bd10e0', '#000000', '#ffffff', '#417505']" />
+                            <round theme="multi-color" size="100" :fill="['#f5a623', '#ff0000', '#ffffff', '#417505']" />
+                            <round theme="multi-color" size="100" :fill="['#ffffff', '#ff0000', '#ffffff', '#417505']" />
+                            <round theme="multi-color" size="100" :fill="['#bd10e0', '#ff0000', '#ffffff', '#417505']" />
                         </div>
                     </div>
                 </div>
@@ -68,7 +67,7 @@
 import { audioTranscriptions, chat } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
 import VoiceSound from "@/components/VoiceSound.vue";
-import { Voice, Rectangle, SortTwo, Translation } from "@icon-park/vue-next";
+import { Voice, Round, SortTwo, Translation } from "@icon-park/vue-next";
 import * as list from '@/assets/ISO639_1.json';
 
 interface fileDetail {
@@ -99,7 +98,7 @@ export default {
     },
     components: {
         Loding,
-        Voice, Rectangle, SortTwo, Translation,
+        Voice, Round, SortTwo, Translation,
         VoiceSound
     },
     mounted() {
@@ -134,7 +133,12 @@ export default {
                 if (body) {
                     const reader = body.getReader();
                     let result = await this.readStream(reader, status);
-                    this.resultMy = result.text;
+                    if (status===200) {
+                        this.resultMy = result.text;
+                    } else {
+                        this.resultMy = result;
+                        this.$toast.error(`Fail`, { position:"top", duration:1000 });
+                    }
                 }
             } catch (error: any) {
                 this.resultMy = error;
@@ -165,8 +169,7 @@ export default {
                 if (status !== 200) {
                     const json = JSON.parse(decodedText); // start with "data: "
                     const content = json.error.message ?? decodedText;
-                    this.appendLastMessageContent(content);
-                    return;
+                    return content;
                 }
 
                 // return
@@ -255,7 +258,12 @@ export default {
             if (body) {
                 const reader = body.getReader();
                 let result = await this.readStream(reader, status);
-                this.resultForeign = result.choices[0].message.content;
+                if (status===200) {
+                    this.resultForeign = result.choices[0].message.content;
+                } else {
+                    this.resultForeign = result;
+                    this.$toast.error(`Fail`, { position:"top", duration:1000 });
+                }
             }
         }
     }

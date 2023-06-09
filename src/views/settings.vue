@@ -199,7 +199,8 @@ export default {
     methods: {
         ...mapActions(useStore, ['setTotalVoices', 'setVoiceObject']),
         sendOrSave() {
-            this.saveAPIKey(this.messageContent.trim())
+            this.saveAPIKey(this.messageContent.trim());
+            this.$toast.success(`Success`, { position:"top", duration:2000 });
         },
         /**
          * save apiKey
