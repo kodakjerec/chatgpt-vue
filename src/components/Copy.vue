@@ -42,7 +42,7 @@ export default {
       } as { [key: string]: any },
       btnTips: {
         copy: "Copy All",
-        loading: "",
+        loading: '',
         success: "Copy to clipboard",
         error: "Copy failed",
       } as { [key: string]: any },

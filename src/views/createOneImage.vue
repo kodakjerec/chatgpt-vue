@@ -2,7 +2,7 @@
   <div class="w-full overflow-y-auto max-h-screen">
     <div class="min-h-screen w-full">
     <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100"></div>
-      <div class="">
+      <div class=''>
         <label class="block font-medium text-black" for="prompt">Prompt</label>
         <textarea class="block w-full mt-1 rounded-md border-red-300 shadow-sm input" rows="3" placeholder="請輸入 Prompt"
           v-model="inputPrompt"></textarea>
@@ -95,7 +95,7 @@ export default {
       reader: ReadableStreamDefaultReader<Uint8Array>,
       status: number
     ) {
-      let partialLine = "";
+      let partialLine = '';
 
       while (true) {
         // eslint-disable-next-line no-await-in-loop

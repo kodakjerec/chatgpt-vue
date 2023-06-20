@@ -11,7 +11,7 @@
 </template>
 <script lang="ts">
 import { VoiceOne } from "@icon-park/vue-next";
-import { useStore } from '@/store/index';
+import { storeSettings, storeVoice } from '@/store/index';
 
 export default {
     name: 'voice',
@@ -36,7 +36,7 @@ export default {
             msg: new SpeechSynthesisUtterance(),
             synth: window.speechSynthesis,
             isSpeaking: false,
-            store: useStore()
+            store: storeVoice()
         }
     },
     mounted() {
@@ -54,7 +54,7 @@ export default {
     },
     methods: {
         getSettingsSpeech() {
-            let settings_Speech = localStorage.getItem("settings_speech");
+            const settings_Speech = storeSettings().getSettings("settings_speech");
             if (!settings_Speech) {
                 return {
                     volume: 1, // sound, 0~1, default:1
@@ -65,7 +65,7 @@ export default {
                 };
             }
 
-            return JSON.parse(settings_Speech);
+            return settings_Speech;
         },
         speak() {
             this.isSpeaking = true;

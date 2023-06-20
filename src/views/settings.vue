@@ -120,7 +120,7 @@
                     <label for="voice" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">voice</span>
                         <select v-model="speech.voice" class="input w-3/4" name="speechVoice" @change="$event => contentSelectChange($event, 'settings_speech')" @focus="showTooltip('voice', 'settings_speech')">
-                            <option value="">Default</option>
+                            <option value=''>Default</option>
                             <option v-for="(voice, index) of speechVoiceList" :key="index" :value="voice.index">
                                 {{ voice.index.toString() + ' ' + voice.name }}
                             </option>
@@ -129,13 +129,12 @@
                 </div>
             </div>
         </div>
+        <GoogleLogin :callback="callback"/>
     </div>
 </template>
 
 <script lang="ts">
-import cryptoJS from "crypto-js";
-import { mapActions, mapState } from 'pinia';
-import { useStore } from '@/store/index';
+import { storeVoice, storeSettings } from '@/store/index';
 import * as list from '@/assets/ISO639_1.json';
 
 interface MyObject {
@@ -146,9 +145,9 @@ export default {
     name: 'settings',
     data() {
         return {
-            apiKey: "",
-            getSecretKey: "lianginx",
-            messageContent: "",
+            apiKey: '',
+            getSecretKey: '',
+            messageContent: '',
             chat: {
                 model: 'gpt-3.5-turbo',
                 temperature: 1,
@@ -174,18 +173,18 @@ export default {
             totalVoices: [] as any[],
             speechLangList: [] as any[],
             speechVoiceList: [] as any[],
-            tooltipText: "",
-            tooltipTextTw: "",
-            store: useStore()
+            tooltipText: '',
+            tooltipTextTw: ''
         }
     },
     async mounted() {
+        this.getSecretKey = storeSettings().getSecretKey;
         this.messageContent = this.getAPIKey();
         this.getSettings();
 
         // voices
-        await this.setTotalVoices();
-        this.totalVoices = this.store.getTotalVoices;
+        await storeVoice().setTotalVoices();
+        this.totalVoices = storeVoice().getTotalVoices;
         this.speechLangList = this.totalVoices.reduce((acc, cur) => {
             const { lang } = cur;
             if (!acc[lang]) acc[lang] = { sub: [cur] };
@@ -197,7 +196,6 @@ export default {
         this.speechLangChange();
     },
     methods: {
-        ...mapActions(useStore, ['setTotalVoices', 'setVoiceObject']),
         sendOrSave() {
             this.saveAPIKey(this.messageContent.trim());
             this.$toast.success(`Success`, { position:"top", duration:2000 });
@@ -211,8 +209,7 @@ export default {
                 alert("API Key error, please check and re-enter!");
                 return false;
             }
-            const aesAPIKey = cryptoJS.AES.encrypt(apiKey, this.getSecretKey).toString();
-            localStorage.setItem("apiKey", aesAPIKey);
+            storeSettings().setApiKey(apiKey);
             return true;
         },
         /**
@@ -221,10 +218,7 @@ export default {
          */
         getAPIKey() {
             if (this.apiKey) return this.apiKey;
-            const aesAPIKey = localStorage.getItem("apiKey") ?? "";
-            this.apiKey = cryptoJS.AES.decrypt(aesAPIKey, this.getSecretKey).toString(
-                cryptoJS.enc.Utf8
-            );
+            this.apiKey = storeSettings().getApiKey;
             return this.apiKey;
         },
         /**
@@ -232,25 +226,25 @@ export default {
          * @return speech settings
          */
         getSettings() {
-            const settings_Chat = localStorage.getItem("settings_chat");
+            const settings_Chat = storeSettings().getSettings("settings_chat");
             if (!settings_Chat) {
                 this.resetValue("settings_chat");
             } else {
-                this.chat = JSON.parse(settings_Chat);
+                this.chat = settings_Chat;
             }
 
-            const settings_Trans = localStorage.getItem("settings_trans");
+            const settings_Trans = storeSettings().getSettings("settings_trans");
             if (!settings_Trans) {
                 this.resetValue("settings_trans");
             } else {
-                this.trans = JSON.parse(settings_Trans);
+                this.trans = settings_Trans;
             }
 
-            const settings_Speech = localStorage.getItem("settings_speech");
+            const settings_Speech = storeSettings().getSettings("settings_speech");
             if (!settings_Speech) {
                 this.resetValue("settings_speech");
             } else {
-                this.speech = JSON.parse(settings_Speech);
+                this.speech = settings_Speech;
             }
         },
         /**
@@ -289,7 +283,7 @@ export default {
                     break;
             }
 
-            localStorage.setItem(myObjectName, JSON.stringify(myObject));
+            storeSettings().setSettings(myObjectName, myObject);
         },
         /**
          * adjust settings
@@ -318,7 +312,8 @@ export default {
                     }
                 }
             }
-            localStorage.setItem(myObjectName, JSON.stringify(myObject));
+
+            storeSettings().setSettings(myObjectName, myObject);
         },
         contentSelectChange(event: any, myObjectName: string) {
             const target = event.target as HTMLSelectElement;
@@ -333,14 +328,15 @@ export default {
                     myObject = this.speech;
                     if (target.name === "speechVoice") {
                         if (target.value) {
-                            this.setVoiceObject(this.totalVoices[target.value]);
+                            storeVoice().setVoiceObject(this.totalVoices[target.value]);
                         } else {
-                            this.setVoiceObject("");
+                            storeVoice().setVoiceObject('');
                         }
                     }
                     break;
             }
-            localStorage.setItem(myObjectName, JSON.stringify(myObject));
+            
+            storeSettings().setSettings(myObjectName, myObject);
         },
         /**
          * filter totalVoices to speechVoiceList
@@ -372,8 +368,8 @@ export default {
                             this.tooltipTextTw = "數字介於-2.0和2.0之間。正值會根據文本中現有詞彙的頻率對新令牌進行處罰，減少模型重複原話的可能性。";
                             break;
                         default:
-                            this.tooltipText = "";
-                            this.tooltipTextTw = "";
+                            this.tooltipText = '';
+                            this.tooltipTextTw = '';
                             break;
                     }
                     break;
@@ -392,8 +388,8 @@ export default {
                             this.tooltipTextTw = "輸入音頻的語言。以ISO-639-1格式提供輸入語言將提高準確性和延遲時間。";
                             break;
                         default:
-                            this.tooltipText = "";
-                            this.tooltipTextTw = "";
+                            this.tooltipText = '';
+                            this.tooltipTextTw = '';
                             break;
                     }
                     break;
@@ -416,12 +412,19 @@ export default {
                             this.tooltipTextTw = "朗讀語音的聲音。如果沒有聲音試著調回Default";
                             break;
                         default:
-                            this.tooltipText = "";
-                            this.tooltipTextTw = "";
+                            this.tooltipText = '';
+                            this.tooltipTextTw = '';
                             break;
                     }
                     break;
             }
+        },
+        /**
+         * google signin
+         * @param response 
+         */
+        callback(response) {
+            console.log(response)
         }
     }
 }

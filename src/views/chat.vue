@@ -60,6 +60,8 @@ import VoiceSound from "@/components/VoiceSound.vue";
 import { md } from "@/libs/markdown";
 import { encoding_for_model, Tiktoken } from '@dqbd/tiktoken';
 import { Edit, Delete } from "@icon-park/vue-next";
+import { storeSettings } from '@/store';
+import { mapState, mapActions } from 'pinia';
 
 export default {
   name: 'chat',
@@ -78,9 +80,9 @@ export default {
       md: md,
       editing: '',
       newLogName: '',
-      fromLogName: "",
+      fromLogName: '',
       isTalking: false,
-      messageContent: "",
+      messageContent: '',
       totalTokens: 0,
       decoder: new TextDecoder("utf-8"),
       roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
@@ -92,7 +94,7 @@ export default {
   computed: {
     messageListView(): any[] {
       return this.messageList.filter((v) => v.role !== 'system');
-    }
+    },
   },
   watch: {
     // vue: under the same path, and change different chat-log
@@ -169,7 +171,7 @@ export default {
         }
 
         sendMessageList = sendMessageList.reverse(); // newest message on top level
-        this.messageList.push({ role: "assistant", content: "" }); // waiting for ai answer
+        this.messageList.push({ role: "assistant", content: '' }); // waiting for ai answer
         const { body, status } = await chat(sendMessageList);
         if (body) {
           const reader = body.getReader();
@@ -194,7 +196,7 @@ export default {
      * @param status response status
      */
     async readStream(reader: ReadableStreamDefaultReader<Uint8Array>, status: number) {
-      let partialLine = "";
+      let partialLine = '';
 
       while (true) {
         // eslint-disable-next-line no-await-in-loop
@@ -212,7 +214,7 @@ export default {
         const chunk = partialLine + decodedText;
         const newLines = chunk.split(/\r?\n/);
 
-        partialLine = newLines.pop() ?? "";
+        partialLine = newLines.pop() ?? '';
 
         for (const line of newLines) {
           if (line.length === 0) continue; // ignore empty message
@@ -222,7 +224,7 @@ export default {
           const json = JSON.parse(line.substring(6)); // start with "data: "
           const content =
             status === 200
-              ? json.choices[0].delta.content ?? ""
+              ? json.choices[0].delta.content ?? ''
               : json.error.message;
           this.appendLastMessageContent(content);
         }
@@ -244,19 +246,19 @@ export default {
      * get saved chat-log
      *  */
     getChatLog(logName: string) {
-      let chatLog = localStorage.getItem(logName);
+      const chatLog = storeSettings().getLogName(logName);
+      
       if (chatLog) {
-        this.messageList = JSON.parse(chatLog);
+        this.messageList = chatLog;
       } else {
         this.resetChatLog();
         this.setChatLog();
       }
       this.totalTokens = this.calAllTiktoken(this.messageList);
     },
-    // save log to localStorage
+    // save log
     setChatLog() {
-      let saveItem = JSON.stringify(this.messageList);
-      localStorage.setItem(this.fromLogName, saveItem);
+      storeSettings().setLogName(this.fromLogName, this.messageList);
     },
     // reset log
     resetChatLog() {
@@ -279,7 +281,7 @@ Please let me know what kind of help you need, and I will provide relevant infor
     },
     // clean message content
     clearMessageContent() {
-      this.messageContent = ""
+      this.messageContent = ''
     },
     // scroll to screen bottom
     scrollToBottom() {

@@ -69,19 +69,14 @@
 </template>
 <script lang="ts">
 import { Photograph, Translate, Plus, Delete, MenuUnfold } from "@icon-park/vue-next";
+import { storeSettings } from '@/store/index';
 
 export default {
   name: 'App',
   components: {
     Photograph, Translate, Plus, Delete, MenuUnfold
   },
-  data(): {
-    nowPath: string,
-    selectLog: string,
-    logList: Array<string>,
-    messageList: Array<any>,
-    sidebarActive: boolean
-  } {
+  data() {
     return {
       nowPath: 'home',
       selectLog: '',
@@ -92,7 +87,7 @@ export default {
   },
   mounted() {
     window.addEventListener('focus', this.handlePageFocus);
-    this.getLogList();
+    this.bringlogList();
   },
   beforeDestroy() {
     window.removeEventListener('focus', this.handlePageFocus)
@@ -101,11 +96,8 @@ export default {
     /**
      * get all log list
      */
-    getLogList() {
-      let logList = localStorage.getItem('logList');
-      if (logList) {
-        Object.assign(this.logList, JSON.parse(logList));
-      }
+     bringlogList() {
+      this.logList = storeSettings().getLogList;
 
       let lastPath = localStorage.getItem('lastPath');
       if (lastPath) {
@@ -121,13 +113,13 @@ export default {
      * save log list
      */
     setLogList() {
-      localStorage.setItem('logList', JSON.stringify(this.logList));
+      storeSettings().setLogList(this.logList);
     },
     /**
      * add new chat block
      */
     newChatLog() {
-      let generatedString: string = ""
+      let generatedString: string = ''
       const stringLength: number = 6
       let isDuplicate: boolean = true
 
@@ -139,7 +131,7 @@ export default {
         if (!this.logList.includes(generatedString)) {
           isDuplicate = false
         } else {
-          generatedString = ""
+          generatedString = ''
         }
       }
       this.logList.push(generatedString);
@@ -150,7 +142,7 @@ export default {
      * delete one chat block
      */
     delChatLog(logName: string) {
-      localStorage.removeItem(logName);
+      storeSettings().delLogName(logName);
       let findIndex = this.logList.findIndex(element => element === logName);
       if (findIndex > -1) {
         this.logList.splice(findIndex, 1);
@@ -168,7 +160,7 @@ export default {
     updateLogName(fromObject: { newLogName: string, oldName: string }) {
       let newLogName = fromObject.newLogName;
       let oldName = fromObject.oldName;
-      console.log(newLogName, oldName);
+      
       let index = this.logList.findIndex(item => item === oldName);
 
       if (newLogName) {
@@ -177,9 +169,9 @@ export default {
         this.logList[index] = newLogName;
         this.setLogList();
         // change chatLog
-        let chatLog = localStorage.getItem(oldName) ?? "";
-        localStorage.setItem(newLogName, chatLog);
-        localStorage.removeItem(oldName);
+        const chatLog = storeSettings().getLogName(oldName);
+        storeSettings().setLogName(newLogName, chatLog);
+        storeSettings().delLogName(oldName);
         this.clickLogName(newLogName);
       }
     },

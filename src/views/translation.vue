@@ -47,11 +47,11 @@ export default {
     name: 'translation',
     data() {
         return {
-            prompt: "" as string,
+            prompt: '' as string,
             isLoading: false as boolean,
             isDragging: false as boolean,
             decoder: new TextDecoder("utf-8"),
-            result: "" as string
+            result: '' as string
         }
     },
     components: {
@@ -60,19 +60,19 @@ export default {
     methods: {
         handleFileSelect(event: Event) {
             this.isLoading = true;
-            this.result = "";
+            this.result = '';
             const files = (event.target as HTMLInputElement).files;
             if (!files) return;
             const file = files[0];
             this.uploadFile(file);
-            (event.target as HTMLInputElement).value = "";
+            (event.target as HTMLInputElement).value = '';
         },
         handleDrop(event: DragEvent) {
             event.preventDefault();
             if (this.isLoading) return;
             this.isLoading = true;
             this.isDragging = false;
-            this.result = "";
+            this.result = '';
 
             const file = event.dataTransfer?.files[0];
             if (file) {
@@ -107,7 +107,7 @@ export default {
             reader: ReadableStreamDefaultReader<Uint8Array>,
             status: number
         ) {
-            let partialLine = "";
+            let partialLine = '';
 
             while (true) {
                 // eslint-disable-next-line no-await-in-loop

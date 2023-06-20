@@ -82,13 +82,13 @@ export default {
     name: 'transcription',
     data() {
         return {
-            prompt: "" as string,
+            prompt: '' as string,
             isLoading: false as boolean,
             isDragging: false as boolean,
             isRecording: false as boolean,
             decoder: new TextDecoder("utf-8"),
-            resultForeign: "" as string,
-            resultMy: "" as string,
+            resultForeign: '' as string,
+            resultMy: '' as string,
             transcriptionSettings: {} as any,
             // recorder
             mediaRecorder: null,
@@ -108,12 +108,12 @@ export default {
         async handleFileSelect(event: Event) {
             if (!event.target) return;
             this.isLoading = true;
-            this.resultForeign = "";
-            this.resultMy = "";
+            this.resultForeign = '';
+            this.resultMy = '';
             const files = (event.target as HTMLInputElement).files;
             if (!files) return;
             const file = files[0];
-            (event.target as HTMLInputElement).value = "";
+            (event.target as HTMLInputElement).value = '';
             this.beforeUploading(file);
         },
         async handleDrop(event: DragEvent) {
@@ -121,8 +121,8 @@ export default {
             if (this.isLoading) return;
             this.isLoading = true;
             this.isDragging = false;
-            this.resultForeign = "";
-            this.resultMy = "";
+            this.resultForeign = '';
+            this.resultMy = '';
 
             const file = (event.dataTransfer as DataTransfer).files[0];
             this.beforeUploading(file);
@@ -158,7 +158,7 @@ export default {
          * @param status response
          */
         async readStream(reader: ReadableStreamDefaultReader<Uint8Array>, status: number) {
-            let returnResult = "";
+            let returnResult = '';
 
             while (true) {
                 // eslint-disable-next-line no-await-in-loop
@@ -243,7 +243,7 @@ export default {
          * translate to wanted language
          */
         async translate() {
-            if (this.resultMy === "") return;
+            if (this.resultMy === '') return;
 
             let sendMessageList = [] as Array<any>;
             sendMessageList.push({

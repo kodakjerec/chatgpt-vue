@@ -1,10 +1,9 @@
 import type { ChatMessage } from "@/types";
-import cryptoJS from "crypto-js";
+import { storeSettings } from '@/store/index';
 
 let controller = new AbortController();
 let signal = controller.signal;
-const getSecretKey:string = "lianginx";
-let apiKey:string = "";
+let apiKey:string = '';
 let chatSettings:any = {};
 let translationSettings:any = {};
 let transcriptionSettings:any = {};
@@ -15,10 +14,9 @@ let transcriptionSettings:any = {};
    */
 function getAPIKey() {
   if (apiKey) return apiKey;
-  const aesAPIKey = localStorage.getItem("apiKey") ?? "";
-  apiKey = cryptoJS.AES.decrypt(aesAPIKey, getSecretKey).toString(
-    cryptoJS.enc.Utf8
-  );
+
+  apiKey = storeSettings().getApiKey;
+  
   return apiKey;
 }
 /**
@@ -26,7 +24,7 @@ function getAPIKey() {
  * @return chat settings
  */
 function getSettingsChat() {
-  let settings_Chat = localStorage.getItem("settings_chat");
+  let settings_Chat = storeSettings().getSettings("settings_chat");
   if (!settings_Chat) {
       return {
           model: 'gpt-3.5-turbo',
@@ -43,7 +41,7 @@ function getSettingsChat() {
  * @return trans settings
  */
 function getSettingsTrans() {
-  let settings_Trans = localStorage.getItem("settings_trans");
+  let settings_Trans = storeSettings().getSettings("settings_trans");
   if (!settings_Trans) {
       return {
           model: 'gpt-3.5-turbo',
