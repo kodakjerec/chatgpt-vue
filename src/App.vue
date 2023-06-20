@@ -82,7 +82,8 @@ export default {
       selectLog: '',
       logList: [],
       messageList: [],
-      sidebarActive: false
+      sidebarActive: false,
+      lastActiveTime: null
     }
   },
   mounted() {
@@ -99,7 +100,7 @@ export default {
      bringlogList() {
       this.logList = storeSettings().getLogList;
 
-      let lastPath = localStorage.getItem('lastPath');
+      let lastPath = storeSettings().getLastPath;
       if (lastPath) {
         this.nowPath = lastPath;
       } else {
@@ -177,7 +178,7 @@ export default {
     },
     gotoPath(path:string) {
       this.nowPath = path;
-      localStorage.setItem('lastPath', this.nowPath);
+      storeSettings().setLastPath(this.nowPath);
     },
     /**
      * click sidebar
@@ -199,10 +200,10 @@ export default {
      * Refresh the screen after being idle for a long time
      */
     handlePageFocus() {
-      let lastActiveTime: number = Number(localStorage.getItem('lastActiveTime') ?? new Date().getTime());
+      let lastActiveTime: number = Number(this.lastActiveTime ?? new Date().getTime());
       let currentTime: number = new Date().getTime();
       let timeDiff: number = currentTime - lastActiveTime;
-      localStorage.setItem('lastActiveTime', currentTime.toString());
+      this.lastActiveTime = currentTime;
       // 如果背景中放置的時間超過指定時間，就重新載入頁面
       if (timeDiff > 60 * 60 * 1000) { // 60 分鐘
         location.reload();

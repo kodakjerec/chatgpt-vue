@@ -54,6 +54,7 @@ export const storeSettings  = defineStore({
         apiKey: "",
         logList: [],
         logName: {},
+        lastPath: "",
         settings:{}
     }),
     getters: {
@@ -82,6 +83,12 @@ export const storeSettings  = defineStore({
             }
             return (name) => state.logName[name];
         },
+        getLastPath(state) {
+            if (!state.lastPath) {
+                state.lastPath = localStorage.getItem('lastPath')??"";
+            }
+            return state.lastPath;
+        },
         getSettings(state) {
             if (Object.keys(state.settings).length===0) {
                 state.settings = JSON.parse(localStorage.getItem('settings')??'{}');
@@ -106,6 +113,10 @@ export const storeSettings  = defineStore({
       delLogName(name: string) {
         delete this.logName[name];
         localStorage.setItem('logData', JSON.stringify(this.logName));
+      },
+      setLastPath(path: string) {
+        this.lastPath = path;
+        localStorage.setItem('lastPath', this.lastPath);
       },
       setSettings(name: string, content: {}) {
         this.settings[name] = content;

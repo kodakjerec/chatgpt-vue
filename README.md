@@ -42,7 +42,7 @@ VITE v3.2.5  ready in 294 ms
 # Features
 
 1. This system uses the gpt-3.5-turbo model.  
-2. All logs are stored locally in localStorage.  
+2. All logs are stored locally in localStorage. If you connected with Google-account, we will remove localStorage.
 3. Conversation logs are limited to a maximum of 4096 tokens. If exceeded, chatGPT will display a prompt and you’ll need to create a new conversation.
 
 ## License

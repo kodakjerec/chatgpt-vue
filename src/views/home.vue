@@ -21,7 +21,7 @@
         <p class="text-2xl font-bold mt-10">Features</p>
         <ul class="ml-4" style="list-style-type: disc;">
             <li>This system uses the gpt-3.5-turbo model.</li>
-            <li>All logs are stored locally in localStorage.</li>
+            <li>All logs are stored locally in localStorage. If you connected with Google-account, we will remove localStorage.</li>
             <li>Chat logs are limited to a maximum of 4096 tokens. If exceeded, chatGPT will display a prompt and you’ll need to create a new chat.</li>
             <li>Transcription uses openAI's "whisper-1" to recording and translate your text.</li>
         </ul>

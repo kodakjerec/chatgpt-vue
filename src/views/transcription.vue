@@ -69,6 +69,7 @@ import Loding from "@/components/Loding.vue";
 import VoiceSound from "@/components/VoiceSound.vue";
 import { Voice, Round, SortTwo, Translation } from "@icon-park/vue-next";
 import * as list from '@/assets/ISO639_1.json';
+import { storeSettings } from '@/store';
 
 interface fileDetail {
     id: string,
@@ -182,7 +183,7 @@ export default {
          * get trans settings
          */
         getSettingsTrans() {
-            let settings_Trans = localStorage.getItem("settings_trans");
+            let settings_Trans = storeSettings().getSettings("settings_trans");
             if (!settings_Trans) {
                 return {
                     model: 'whisper-1',
@@ -237,7 +238,7 @@ export default {
          * simple content select change
          */
         contentSelectChange(event: any, myObjectName: string) {
-            localStorage.setItem(myObjectName, JSON.stringify(this.transcriptionSettings));
+            storeSettings().setSettings(myObjectName, JSON.stringify(this.transcriptionSettings));
         },
         /**
          * translate to wanted language
