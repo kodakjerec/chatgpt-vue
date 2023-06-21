@@ -2,7 +2,7 @@
   <div class="w-full overflow-y-auto h-screen" ref="chatListDom">
     <div class="min-h-screen w-full">
       <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100">
-        <div class="text-2xl font-bold" v-if="!editing">{{ fromLogName }}
+        <div class="text-2xl font-bold" v-if="!editing">{{ sendLogName }}
           <div class="inline-flex cursor-pointer" @click="editLogName">
             <edit theme="outline" size="24" fill="#000" />
           </div>
@@ -52,7 +52,6 @@
 </template>
 
 <script lang="ts">
-import cryptoJS from "crypto-js";
 import { chat, abortChat } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
 import CopyContent from "@/components/Copy.vue";
@@ -61,7 +60,7 @@ import { md } from "@/libs/markdown";
 import { encoding_for_model, Tiktoken } from '@dqbd/tiktoken';
 import { Edit, Delete } from "@icon-park/vue-next";
 import { storeSettings } from '@/store';
-import { mapState, mapActions } from 'pinia';
+import type { ChatMessage } from '@/types';
 
 export default {
   name: 'chat',
@@ -80,13 +79,12 @@ export default {
       md: md,
       editing: '',
       newLogName: '',
-      fromLogName: '',
       isTalking: false,
       messageContent: '',
       totalTokens: 0,
       decoder: new TextDecoder("utf-8"),
       roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
-      messageList: [] as Array<any>,
+      messageList: [],
       maxTokens: 3072,
       enc: null // log size
     }
@@ -99,8 +97,7 @@ export default {
   watch: {
     // vue: under the same path, and change different chat-log
     sendLogName() {
-      this.fromLogName = this.sendLogName;
-      this.getChatLog(this.fromLogName);
+      this.getChatLog(this.sendLogName);
     },
     'messageList.length'() {
       this.$nextTick(() => {
@@ -110,8 +107,7 @@ export default {
   },
   mounted() {
     this.enc = encoding_for_model("gpt-3.5-turbo");
-    this.fromLogName = this.sendLogName;
-    this.getChatLog(this.fromLogName);
+    this.getChatLog(this.sendLogName);
     this.$nextTick(() => this.scrollToBottom());
   },
   beforeDestroy() {
@@ -144,8 +140,8 @@ export default {
      */
     async sendChatMessage() {
       if (!this.messageContent.length) return;
-
-      let content: string = this.messageContent
+      
+      const content: string = this.messageContent
       try {
         this.isTalking = true;
         // first time use
@@ -158,7 +154,7 @@ export default {
         this.clearMessageContent();
 
         let calTokens: number = 0;
-        let sendMessageList: Array<any> = [];
+        let sendMessageList: Array<ChatMessage> = [];
         for (let i = this.messageList.length - 1; i >= 0; i--) {
           let newTokens = this.calTiktoken(this.messageList[i].content);
 
@@ -172,6 +168,7 @@ export default {
 
         sendMessageList = sendMessageList.reverse(); // newest message on top level
         this.messageList.push({ role: "assistant", content: '' }); // waiting for ai answer
+
         const { body, status } = await chat(sendMessageList);
         if (body) {
           const reader = body.getReader();
@@ -248,17 +245,17 @@ export default {
     getChatLog(logName: string) {
       const chatLog = storeSettings().getLogName(logName);
       
-      if (chatLog) {
-        this.messageList = chatLog;
-      } else {
+      this.messageList = JSON.parse(JSON.stringify(chatLog));
+      if (this.messageList.length===0) {
         this.resetChatLog();
         this.setChatLog();
       }
+
       this.totalTokens = this.calAllTiktoken(this.messageList);
     },
     // save log
     setChatLog() {
-      storeSettings().setLogName(this.fromLogName, this.messageList);
+      storeSettings().setLogName(this.sendLogName, this.messageList);
     },
     // reset log
     resetChatLog() {
@@ -293,7 +290,7 @@ Please let me know what kind of help you need, and I will provide relevant infor
      * calculate one block tokens
      */
     calTiktoken(text: string) {
-      let tokenArray = this.enc.encode_ordinary(text);
+      const tokenArray = this.enc.encode_ordinary(text);
       // If there is Chinese, the calculation of token will be inaccurate, probably 1.5~2 times more tokens
       let isChinese = false;
       for (let i = 0; i < text.length; i++) {
@@ -313,8 +310,8 @@ Please let me know what kind of help you need, and I will provide relevant infor
       return tokens;
     },
     editLogName() {
-      this.editing = this.fromLogName;
-      this.newLogName = this.fromLogName;
+      this.editing = this.sendLogName;
+      this.newLogName = this.sendLogName;
       this.$nextTick(() => {
         if (this.$refs.editingLogName) {
           const refInput = (this.$refs.editingLogName as HTMLInputElement);

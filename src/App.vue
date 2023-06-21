@@ -100,7 +100,7 @@ export default {
      bringlogList() {
       this.logList = storeSettings().getLogList;
 
-      let lastPath = storeSettings().getLastPath;
+      const lastPath = storeSettings().getLastPath;
       if (lastPath) {
         this.nowPath = lastPath;
       } else {
@@ -144,7 +144,7 @@ export default {
      */
     delChatLog(logName: string) {
       storeSettings().delLogName(logName);
-      let findIndex = this.logList.findIndex(element => element === logName);
+      const findIndex = this.logList.findIndex(element => element === logName);
       if (findIndex > -1) {
         this.logList.splice(findIndex, 1);
         this.clickLogName(this.logList[0]);
@@ -159,10 +159,10 @@ export default {
       this.gotoPath('chat/' + this.selectLog);
     },
     updateLogName(fromObject: { newLogName: string, oldName: string }) {
-      let newLogName = fromObject.newLogName;
-      let oldName = fromObject.oldName;
+      const newLogName = fromObject.newLogName;
+      const oldName = fromObject.oldName;
       
-      let index = this.logList.findIndex(item => item === oldName);
+      const index = this.logList.findIndex(item => item === oldName);
 
       if (newLogName) {
         const oldName = this.logList[index];
@@ -200,9 +200,9 @@ export default {
      * Refresh the screen after being idle for a long time
      */
     handlePageFocus() {
-      let lastActiveTime: number = Number(this.lastActiveTime ?? new Date().getTime());
-      let currentTime: number = new Date().getTime();
-      let timeDiff: number = currentTime - lastActiveTime;
+      const lastActiveTime: number = Number(this.lastActiveTime ?? new Date().getTime());
+      const currentTime: number = new Date().getTime();
+      const timeDiff: number = currentTime - lastActiveTime;
       this.lastActiveTime = currentTime;
       // 如果背景中放置的時間超過指定時間，就重新載入頁面
       if (timeDiff > 60 * 60 * 1000) { // 60 分鐘

@@ -31,19 +31,21 @@ VITE v3.2.5  ready in 294 ms
 
 # Starting Guide
 
-1. Enter Settings and import an API key.
+1. Enter __Settings__ and import an API key.
+2. Create a new chat and start chatting.
+3. __Transcription__ can record your voice and translate it into the desired language.
 
-2. Create a new conversation and start chatting.
 
-# Conversation Log
+# Chat Log
 
-* Single click: View conversation contents.  
-* Trash can: Clear the conversation.
+* Single click: View chat contents.  
+* Trash can: Clear the chat.
 # Features
 
 1. This system uses the gpt-3.5-turbo model.  
-2. All logs are stored locally in localStorage. If you connected with Google-account, we will remove localStorage.
-3. Conversation logs are limited to a maximum of 4096 tokens. If exceeded, chatGPT will display a prompt and you’ll need to create a new conversation.
+2. All logs are stored locally in local-Storage.  
+If you have connected with Google-account, you can easily synchronize your logs across different devices.
+3. chat logs are limited to a maximum of 4096 tokens. If exceeded, chatGPT will display a prompt and you’ll need to create a new chat.
 
 ## License
 

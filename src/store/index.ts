@@ -16,6 +16,15 @@ export function setVoices() {
     })
 }
 
+// unify storage method.
+function storageSet(key, value):void {
+    localStorage.setItem(key, value);
+}
+function storageGet(key):any {
+    return localStorage.getItem(key);
+}
+
+
 export const storeVoice  = defineStore({
   id: 'voice',
   state: () => ({
@@ -55,7 +64,8 @@ export const storeSettings  = defineStore({
         logList: [],
         logName: {},
         lastPath: "",
-        settings:{}
+        settings:{},
+        googleOAuth2token: ""
     }),
     getters: {
         getSecretKey(state) {
@@ -63,7 +73,7 @@ export const storeSettings  = defineStore({
         },
         getApiKey(state) {
             if (!state.apiKey) {
-                let aesAPIKey = localStorage.getItem("apiKey") ?? '';
+                let aesAPIKey = storageGet("apiKey") ?? '';
                 state.apiKey = cryptoJS.AES.decrypt(aesAPIKey, state.secretKey).toString(
                     cryptoJS.enc.Utf8
                 );
@@ -73,55 +83,109 @@ export const storeSettings  = defineStore({
         },
         getLogList(state) {
             if (state.logList.length===0) {
-                state.logList = JSON.parse(localStorage.getItem('logList')??'[]');
+                state.logList = JSON.parse(storageGet('logList')??'[]');
             }
             return state.logList;
         },
-        getLogName(state) {
+        /**
+         * 
+         * @param state 
+         * @returns array
+         */
+        getLogName(state): any {
             if (Object.keys(state.logName).length===0) {
-                state.logName = JSON.parse(localStorage.getItem('logData')??'{}');
+                state.logName = JSON.parse(storageGet('logData')??'{}');
             }
-            return (name) => state.logName[name];
+            return (name) => {
+                let findData = state.logName[name];
+                if (findData) {
+                    findData = JSON.parse(JSON.stringify(findData));
+                } else {
+                    findData = [];
+                }
+                return findData;
+            };
         },
         getLastPath(state) {
             if (!state.lastPath) {
-                state.lastPath = localStorage.getItem('lastPath')??"";
+                state.lastPath = storageGet('lastPath')??"";
             }
             return state.lastPath;
         },
         getSettings(state) {
             if (Object.keys(state.settings).length===0) {
-                state.settings = JSON.parse(localStorage.getItem('settings')??'{}');
+                state.settings = JSON.parse(storageGet('settings')??'{}');
             }
-            return (name) => state.settings[name];
+            return (name) => {
+                let findData = state.settings[name];
+                if (findData) {
+                    findData = JSON.parse(JSON.stringify(findData));
+                } else {
+                    findData = this.resetSettings(name);
+                }
+                return findData;
+            };
+        },
+        getGDriveToken(state) {
+            return state.googleOAuth2token;
         }
     },
     actions: {
         setApiKey(key: string) {
             this.apiKey = key;
             const aesAPIKey = cryptoJS.AES.encrypt(this.apiKey, this.getSecretKey).toString();
-            localStorage.setItem("apiKey", aesAPIKey);
+            storageSet("apiKey", aesAPIKey);
         },
       setLogList(list: any) {
           this.logList = list
-          localStorage.setItem('logList', JSON.stringify(this.logList));
+          storageSet('logList', JSON.stringify(this.logList));
       },
       setLogName(name: string, content:Array<ChatMessage>) {
         this.logName[name] = content;
-        localStorage.setItem('logData', JSON.stringify(this.logName));
+        storageSet('logData', JSON.stringify(this.logName));
       },
       delLogName(name: string) {
         delete this.logName[name];
-        localStorage.setItem('logData', JSON.stringify(this.logName));
+        storageSet('logData', JSON.stringify(this.logName));
       },
       setLastPath(path: string) {
         this.lastPath = path;
-        localStorage.setItem('lastPath', this.lastPath);
+        storageSet('lastPath', this.lastPath);
       },
       setSettings(name: string, content: {}) {
         this.settings[name] = content;
-        localStorage.setItem('settings', JSON.stringify(this.settings));
-
+        storageSet('settings', JSON.stringify(this.settings));
+      },
+      resetSettings(name: string) {
+        let findData = {};
+        switch(name) {
+            case "settings_chat":
+                findData = {
+                    model: 'gpt-3.5-turbo',
+                    temperature: 1,
+                    presence_penalty: 0,
+                    frequency_penalty: 0
+                };break;
+            case "settings_trans":
+                findData = {
+                    model: 'whisper-1',
+                    temperature: 0,
+                    language: 'zh',
+                    toLanguage: 'en'
+                };break;
+            case "settings_speech":
+                findData = {
+                    volume: 1, // sound, 0~1, default:1
+                    rate: 1, // speed, 0.1~10, default:1
+                    pitch: 2, // pitch, 0~2, default:1
+                    voice: '', // voice,
+                    lang: 'zh-TW', // language
+                };break;
+        }
+        return findData;
+      },
+      setGDriveToken(token: string) {
+        this.googleOAuth2token = token;
       }
     },
   })

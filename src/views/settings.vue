@@ -129,13 +129,15 @@
                 </div>
             </div>
         </div>
-        <GoogleLogin :callback="callback"/>
+        <button @click="login">Login Using Google</button>
     </div>
 </template>
 
 <script lang="ts">
 import { storeVoice, storeSettings } from '@/store/index';
 import * as list from '@/assets/ISO639_1.json';
+import { googleSdkLoaded } from 'vue3-google-login'
+import { gDriveSave } from '@/libs/gpt';
 
 interface MyObject {
     [key: string]: any;
@@ -148,28 +150,10 @@ export default {
             apiKey: '',
             getSecretKey: '',
             messageContent: '',
-            chat: {
-                model: 'gpt-3.5-turbo',
-                temperature: 1,
-                presence_penalty: 0,
-                frequency_penalty: 0
-            },
-
-            trans: {
-                model: 'whisper-1',
-                temperature: 0,
-                language: 'zh',
-                toLanguage: 'en'
-            },
+            chat: {} as any,
+            trans: {} as any,
+            speech: {} as any,
             languageList: list,
-
-            speech: {
-                volume: 1, // sound, 0~1, default:1
-                rate: 1, // speed, 0.1~10, default:1
-                pitch: 2, // pitch, 0~2, default:1
-                voice: '', // voice,
-                lang: 'zh-TW', // language
-            },
             totalVoices: [] as any[],
             speechLangList: [] as any[],
             speechVoiceList: [] as any[],
@@ -226,64 +210,30 @@ export default {
          * @return speech settings
          */
         getSettings() {
-            const settings_Chat = storeSettings().getSettings("settings_chat");
-            if (!settings_Chat) {
-                this.resetValue("settings_chat");
-            } else {
-                this.chat = settings_Chat;
-            }
+            this.chat = storeSettings().getSettings("settings_chat");
 
-            const settings_Trans = storeSettings().getSettings("settings_trans");
-            if (!settings_Trans) {
-                this.resetValue("settings_trans");
-            } else {
-                this.trans = settings_Trans;
-            }
+            this.trans = storeSettings().getSettings("settings_trans");
 
-            const settings_Speech = storeSettings().getSettings("settings_speech");
-            if (!settings_Speech) {
-                this.resetValue("settings_speech");
-            } else {
-                this.speech = settings_Speech;
-            }
+            this.speech = storeSettings().getSettings("settings_speech");
         },
         /**
          * reset chat settings
          */
-        resetValue(myObjectName: string) {
-            let myObject: MyObject = {};
+         resetValue(myObjectName: string) {
             switch (myObjectName) {
                 case "settings_chat":
-                    myObject = this.chat;
-                    myObject = {
-                        model: 'gpt-3.5-turbo',
-                        temperature: 1,
-                        presence_penalty: 0,
-                        frequency_penalty: 0
-                    };
+                    this.chat = storeSettings().resetSettings(myObjectName);
+                    storeSettings().setSettings(myObjectName, this.chat);
                     break;
                 case "settings_trans":
-                    myObject = this.trans;
-                    myObject = {
-                        model: 'whisper-1',
-                        temperature: 0,
-                        language: 'zh',
-                        toLanguage: 'en'
-                    };
+                    this.trans = storeSettings().resetSettings(myObjectName);
+                    storeSettings().setSettings(myObjectName, this.trans);
                     break;
                 case "settings_speech":
-                    myObject = this.speech;
-                    myObject = {
-                        volume: 1, // sound, 0~1, default:1
-                        rate: 1, // speed, 0.1~10, default:1
-                        pitch: 2, // pitch, 0~2, default:1
-                        voice: '', // voice,
-                        lang: 'zh-TW', // language
-                    };
+                    this.speech = storeSettings().resetSettings(myObjectName);
+                    storeSettings().setSettings(myObjectName, this.speech);
                     break;
             }
-
-            storeSettings().setSettings(myObjectName, myObject);
         },
         /**
          * adjust settings
@@ -423,8 +373,27 @@ export default {
          * google signin
          * @param response 
          */
-        callback(response) {
-            console.log(response)
+        login() {
+            if (!storeSettings().getGDriveToken) {
+                googleSdkLoaded((google)=>{
+                    google.accounts.oauth2.initTokenClient({
+                        client_id: "929956701294-bvbtd8uh85cnb8gbf1fi5sboa9ue1f5r.apps.googleusercontent.com",
+                        scope: "https://www.googleapis.com/auth/drive.file",
+                        callback: (response) => {
+                            storeSettings().setGDriveToken(response.access_token);
+                            
+                            this.uploadFile();
+                        }
+                    }).requestAccessToken();
+                })
+            } else {
+                this.uploadFile()
+            }
+        },
+        uploadFile() {
+            // localstorage to file
+            const textToSave = JSON.stringify(localStorage);
+            gDriveSave([textToSave]);
         }
     }
 }

@@ -183,17 +183,9 @@ export default {
          * get trans settings
          */
         getSettingsTrans() {
-            let settings_Trans = storeSettings().getSettings("settings_trans");
-            if (!settings_Trans) {
-                return {
-                    model: 'whisper-1',
-                    temperature: 0,
-                    language: 'zh',
-                    toLanguage: 'en'
-                };
-            }
+            const settings_Trans = storeSettings().getSettings("settings_trans");
 
-            return JSON.parse(settings_Trans);
+            return settings_Trans;
         },
         async startRecording() {
             let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
