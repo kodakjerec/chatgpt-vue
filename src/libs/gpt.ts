@@ -173,11 +173,8 @@ export async function gDriveSave(blob:BlobPart[]) {
         if (status !== 200) {
           const json = JSON.parse(decodedText); // start with "data: "
           const content = json.error.message ?? decodedText;
-          console.log(content);
           return;
         }
-    
-        console.log(decodedText)
       }
     }
   } catch(e:any) {
@@ -195,16 +192,14 @@ async function readStream(reader: any, status: number) {
   while (true) {
     // eslint-disable-next-line no-await-in-loop
     const { done, value } = await reader.read();
+    const decoder = new TextDecoder("utf-8");
     if (done) break;
 
     const decodedText = decoder.decode(value, { stream: true });
     if (status !== 200) {
       const json = JSON.parse(decodedText); // start with "data: "
       const content = json.error.message ?? decodedText;
-      console.log(content);
       return;
     }
-
-    console.log(decodedText)
   }
 }
