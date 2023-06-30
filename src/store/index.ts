@@ -1,7 +1,8 @@
 import type { ChatMessage } from "@/types/gpt";
 import { createPinia, defineStore } from "pinia";
 import cryptoJS from "crypto-js";
-import { gDriveCheck, gDriveLoad, gDrivePatch, gDriveSave } from "@/libs/gpt";
+import { gDriveCheck, gDriveLoad, gDrivePatch, gDriveSave } from "@/libs/gDrive";
+import { googleSdkLoaded } from "vue3-google-login";
 
 // voice settings
 const synth = window.speechSynthesis;
@@ -204,6 +205,25 @@ export const storeGoogleDrive = defineStore({
   state: () => ({}),
   getters: {},
   actions: {
+    /**
+     * get a new token
+     */
+    accessToken() {
+      googleSdkLoaded((google) => {
+        google.accounts.oauth2
+          .initTokenClient({
+            client_id: "929956701294-bvbtd8uh85cnb8gbf1fi5sboa9ue1f5r.apps.googleusercontent.com",
+            scope: "https://www.googleapis.com/auth/drive.file",
+            callback: (response) => {
+              storeSettings().setGDriveToken(response.access_token);
+
+              // signed.restore or backup
+              storeGoogleDrive().localStorageToCloud();
+            },
+          })
+          .requestAccessToken();
+      });
+    },
     /**
      * save localstorage to cloud-data
      * @param data json string

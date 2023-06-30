@@ -71,7 +71,6 @@
 <script lang="ts">
 import { Photograph, Translate, Plus, Delete, MenuUnfold } from "@icon-park/vue-next";
 import { storeSettings, storeGoogleDrive } from '@/store/index';
-import { googleSdkLoaded } from 'vue3-google-login';
 
 export default {
   name: 'App',
@@ -231,18 +230,7 @@ export default {
      */
     googleLogin() {
       if (!storeSettings().getGDriveToken) {
-        googleSdkLoaded((google) => {
-          google.accounts.oauth2.initTokenClient({
-            client_id: "929956701294-bvbtd8uh85cnb8gbf1fi5sboa9ue1f5r.apps.googleusercontent.com",
-            scope: "https://www.googleapis.com/auth/drive.file",
-            callback: (response) => {
-              storeSettings().setGDriveToken(response.access_token);
-
-              // signed.restore or backup
-              storeGoogleDrive().localStorageToCloud();
-            }
-          }).requestAccessToken();
-        })
+        storeGoogleDrive().accessToken();
       } else {
         storeGoogleDrive().localStorageToCloud();
       }
