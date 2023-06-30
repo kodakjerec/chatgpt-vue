@@ -243,7 +243,7 @@ export default {
      * get saved chat-log
      *  */
     getChatLog(logName: string) {
-      const chatLog = storeSettings().getLogName(logName);
+      const chatLog = storeSettings().getLogData(logName);
       
       this.messageList = JSON.parse(JSON.stringify(chatLog));
       if (this.messageList.length===0) {
@@ -255,7 +255,7 @@ export default {
     },
     // save log
     setChatLog() {
-      storeSettings().setLogName(this.sendLogName, this.messageList);
+      storeSettings().setLogData(this.sendLogName, this.messageList);
     },
     // reset log
     resetChatLog() {

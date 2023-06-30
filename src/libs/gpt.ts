@@ -142,20 +142,88 @@ export async function audioTranscriptions(file:File, prompt:string) {
   }
 }
 
-export async function gDriveSave(blob:BlobPart[]) {
-  let fileMetadata = {
-    name : 'yourGPT_localStorage.txt',
+export async function gDriveCheck(fileName:string) {
+  try {
+    const response = await fetch('https://www.googleapis.com/drive/v3/files', {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + storeSettings().getGDriveToken,
+      }
+    })
+    const { body, status } = response;
+    if (body) {
+      const reader = body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      
+      while (true) {
+        // eslint-disable-next-line no-await-in-loop
+        const { done, value } = await reader.read();
+        if (done) break;
+    
+        const decodedText = decoder.decode(value, { stream: true });
+        if (status !== 200) {
+          const json = JSON.parse(decodedText); // start with "data: "
+          const content = json.error.message ?? decodedText;
+          return false;
+        } else {
+          console.log(decodedText)
+          return true;
+        }
+      }
+    }
+  } catch(e:any) {
+    console.log(e)
+  }
+}
+export async function gDrivePatch(fileName:string) {
+  try {
+    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + storeSettings().getGDriveToken,
+      }
+    })
+    const { body, status } = response;
+    if (body) {
+      const reader = body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      
+      while (true) {
+        // eslint-disable-next-line no-await-in-loop
+        const { done, value } = await reader.read();
+        if (done) break;
+    
+        const decodedText = decoder.decode(value, { stream: true });
+        if (status !== 200) {
+          const json = JSON.parse(decodedText); // start with "data: "
+          const content = json.error.message ?? decodedText;
+          return false;
+        } else {
+          
+          return true;
+        }
+      }
+    }
+  } catch(e:any) {
+    console.log(e)
+  }
+}
+export async function gDriveSave(contentString: string, fileName:string) {
+  let metadata = {
+    name : fileName,
+    mimeType: 'text/plain',
     parents : ['root']
   }
   const form = new FormData();
-  form.append('metadata', new Blob([JSON.stringify(fileMetadata)], {type: 'application/json'}));
-  form.append('file',new Blob(blob));
+  const file = new Blob([contentString], { type: 'text/plain'});
+  form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json'}));
+  form.append('file', file);
   
   try {
-    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=media', {
-      method: 'post',
+    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
       headers: {
-        Authorization: 'Bearer ' + storeSettings().getGDriveToken
+        Authorization: 'Bearer ' + storeSettings().getGDriveToken,
       },
       body: form
     })
@@ -173,7 +241,10 @@ export async function gDriveSave(blob:BlobPart[]) {
         if (status !== 200) {
           const json = JSON.parse(decodedText); // start with "data: "
           const content = json.error.message ?? decodedText;
-          return;
+          return false;
+        } else {
+          
+          return true;
         }
       }
     }

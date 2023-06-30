@@ -59,13 +59,13 @@ export const storeVoice  = defineStore({
 export const storeSettings  = defineStore({
     id: 'settings',
     state: () => ({
-        secretKey: "lianginx",
-        apiKey: "",
-        logList: [],
-        logName: {},
-        lastPath: "",
-        settings:{},
-        googleOAuth2token: ""
+        secretKey: "lianginx",  // secret key
+        apiKey: "",             // chatGPT api key
+        logList: [],            // logList, how many logs
+        logData: {},            // logData
+        lastPath: "",           // last view page
+        settings:{},            // chatGPT settings
+        googleOAuth2token: ""   // google OAuth2 token
     }),
     getters: {
         getSecretKey(state) {
@@ -92,12 +92,12 @@ export const storeSettings  = defineStore({
          * @param state 
          * @returns array
          */
-        getLogName(state): any {
-            if (Object.keys(state.logName).length===0) {
-                state.logName = JSON.parse(storageGet('logData')??'{}');
+        getLogData(state): any {
+            if (Object.keys(state.logData).length===0) {
+                state.logData = JSON.parse(storageGet('logData')??'{}');
             }
             return (name) => {
-                let findData = state.logName[name];
+                let findData = state.logData[name];
                 if (findData) {
                     findData = JSON.parse(JSON.stringify(findData));
                 } else {
@@ -140,13 +140,13 @@ export const storeSettings  = defineStore({
           this.logList = list
           storageSet('logList', JSON.stringify(this.logList));
       },
-      setLogName(name: string, content:Array<ChatMessage>) {
-        this.logName[name] = content;
-        storageSet('logData', JSON.stringify(this.logName));
+      setLogData(name: string, content:Array<ChatMessage>) {
+        this.logData[name] = content;
+        storageSet('logData', JSON.stringify(this.logData));
       },
-      delLogName(name: string) {
-        delete this.logName[name];
-        storageSet('logData', JSON.stringify(this.logName));
+      delLogData(name: string) {
+        delete this.logData[name];
+        storageSet('logData', JSON.stringify(this.logData));
       },
       setLastPath(path: string) {
         this.lastPath = path;

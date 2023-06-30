@@ -137,7 +137,7 @@
 import { storeVoice, storeSettings } from '@/store/index';
 import * as list from '@/assets/ISO639_1.json';
 import { googleSdkLoaded } from 'vue3-google-login'
-import { gDriveSave } from '@/libs/gpt';
+import { gDriveCheck, gDrivePatch, gDriveSave } from '@/libs/gpt';
 
 interface MyObject {
     [key: string]: any;
@@ -390,10 +390,22 @@ export default {
                 this.uploadFile()
             }
         },
-        uploadFile() {
+        async uploadFile() {
+            const fileName = "yourGPT_localStorage.txt";
             // localstorage to file
             const textToSave = JSON.stringify(localStorage);
-            gDriveSave([textToSave]);
+
+            // check file exists on google-drive
+            const checkResult = await gDriveCheck(fileName);
+
+            // if (checkResult) {
+            //     const patchResult = await gDrivePatch(fileName);
+            // } else {
+            //     const upResult = await gDriveSave(textToSave, fileName);
+            //     if (upResult) {
+            //         this.$toast.success(`Upload Success. Filename: `+ fileName, { position:"top", duration:2000 });
+            //     }
+            // }
         }
     }
 }

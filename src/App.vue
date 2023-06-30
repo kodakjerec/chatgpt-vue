@@ -143,7 +143,7 @@ export default {
      * delete one chat block
      */
     delChatLog(logName: string) {
-      storeSettings().delLogName(logName);
+      storeSettings().delLogData(logName);
       const findIndex = this.logList.findIndex(element => element === logName);
       if (findIndex > -1) {
         this.logList.splice(findIndex, 1);
@@ -170,9 +170,9 @@ export default {
         this.logList[index] = newLogName;
         this.setLogList();
         // change chatLog
-        const chatLog = storeSettings().getLogName(oldName);
-        storeSettings().setLogName(newLogName, chatLog);
-        storeSettings().delLogName(oldName);
+        const chatLog = storeSettings().getLogData(oldName);
+        storeSettings().setLogData(newLogName, chatLog);
+        storeSettings().delLogData(oldName);
         this.clickLogName(newLogName);
       }
     },
