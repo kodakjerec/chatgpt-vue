@@ -129,15 +129,12 @@
                 </div>
             </div>
         </div>
-        <button @click="login">Login Using Google</button>
     </div>
 </template>
 
 <script lang="ts">
-import { storeVoice, storeSettings } from '@/store/index';
+import { storeVoice, storeSettings, storeGoogleDrive } from '@/store/index';
 import * as list from '@/assets/ISO639_1.json';
-import { googleSdkLoaded } from 'vue3-google-login'
-import { gDriveCheck, gDrivePatch, gDriveSave } from '@/libs/gpt';
 
 interface MyObject {
     [key: string]: any;
@@ -182,7 +179,7 @@ export default {
     methods: {
         sendOrSave() {
             this.saveAPIKey(this.messageContent.trim());
-            this.$toast.success(`Success`, { position:"top", duration:2000 });
+            this.$toast.success(`Success`, { position: "top", duration: 2000 });
         },
         /**
          * save apiKey
@@ -219,7 +216,7 @@ export default {
         /**
          * reset chat settings
          */
-         resetValue(myObjectName: string) {
+        resetValue(myObjectName: string) {
             switch (myObjectName) {
                 case "settings_chat":
                     this.chat = storeSettings().resetSettings(myObjectName);
@@ -285,7 +282,7 @@ export default {
                     }
                     break;
             }
-            
+
             storeSettings().setSettings(myObjectName, myObject);
         },
         /**
@@ -368,44 +365,6 @@ export default {
                     }
                     break;
             }
-        },
-        /**
-         * google signin
-         * @param response 
-         */
-        login() {
-            if (!storeSettings().getGDriveToken) {
-                googleSdkLoaded((google)=>{
-                    google.accounts.oauth2.initTokenClient({
-                        client_id: "929956701294-bvbtd8uh85cnb8gbf1fi5sboa9ue1f5r.apps.googleusercontent.com",
-                        scope: "https://www.googleapis.com/auth/drive.file",
-                        callback: (response) => {
-                            storeSettings().setGDriveToken(response.access_token);
-                            
-                            this.uploadFile();
-                        }
-                    }).requestAccessToken();
-                })
-            } else {
-                this.uploadFile()
-            }
-        },
-        async uploadFile() {
-            const fileName = "yourGPT_localStorage.txt";
-            // localstorage to file
-            const textToSave = JSON.stringify(localStorage);
-
-            // check file exists on google-drive
-            const checkResult = await gDriveCheck(fileName);
-
-            // if (checkResult) {
-            //     const patchResult = await gDrivePatch(fileName);
-            // } else {
-            //     const upResult = await gDriveSave(textToSave, fileName);
-            //     if (upResult) {
-            //         this.$toast.success(`Upload Success. Filename: `+ fileName, { position:"top", duration:2000 });
-            //     }
-            // }
         }
     }
 }

@@ -2,19 +2,17 @@
   <div class="bg-gray-100 flex h-screen overflow-x-hidden">
     <!-- Sidebar -->
     <div v-if="!sidebarActive" class="fixed top-1 right-1 w-8 h-8 cursor-pointer z-1000 bg-gray-100 rounded" @click="toggleSidebar">
-      <menu-unfold theme="outline" size="24" fill="#333"/>
+      <menu-unfold theme="outline" size="24" fill="#333" />
     </div>
-    <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0"
-      @blur="closeSidebar">
+    <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0" @blur="closeSidebar">
       <ul class="mt-8 flex flex-col justify-between cursor-pointer">
         <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="gotoPath('home')">
           <span>Home</span>
         </li>
         <li>==========</li>
-        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
-          @click="newChatLog()">
+        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="newChatLog()">
           <div class="flex items-center">
-            <plus theme="outline" size="24" fill="#fff"/>
+            <plus theme="outline" size="24" fill="#fff" />
             New Chat
           </div>
         </li>
@@ -22,21 +20,19 @@
           <li class="py-2 border-t flex-auto border-gray-700 items-center hover:bg-slate-700 hover:rounded">
             <div :class="{ 'text-yellow-300': selectLog === item }" @click="clickLogName(item)">{{ item }}</div>
           </li>
-            <delete theme="outline" size="20" fill="#fff" class="mt-3" v-show="logList.length > 1" @click="delChatLog(item)"/>
+          <delete theme="outline" size="20" fill="#fff" class="mt-3" v-show="logList.length > 1" @click="delChatLog(item)" />
         </div>
         <li>==========</li>
-        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
-          @click="gotoPath('transcription')">
+        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="gotoPath('transcription')">
           <div class="flex items-center">
-            <translate theme="outline" size="24" fill="#fff"/>
+            <translate theme="outline" size="24" fill="#fff" />
             transcription
           </div>
         </li>
         <li>==========</li>
-        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
-          @click="gotoPath('translation')">
+        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="gotoPath('translation')">
           <div class="flex items-center">
-            <translate theme="outline" size="24" fill="#fff"/>
+            <translate theme="outline" size="24" fill="#fff" />
             translation
           </div>
         </li>
@@ -44,13 +40,18 @@
         <li class="mt-auto py-2 border-t border-b border-gray-700 hover:bg-slate-700 hover:rounded" @click="gotoPath('settings')">
           <span>Settings</span>
         </li>
-        <li>==========</li>
-        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded"
-          @click="gotoPath('createOneImage')">
+        <!-- <li>==========</li>
+        <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="gotoPath('createOneImage')">
           <div class="flex items-center line-through">
-            <photograph theme="outline" size="24" fill="#fff"/>
+            <photograph theme="outline" size="24" fill="#fff" />
             Image
           </div>
+        </li> -->
+        <li>==========</li>
+        <li>
+          <button class="btn" v-if="!googleLogined" @click="googleLogin">Login Google</button>
+          <button class="greenBtn" disabled v-else>V Google</button>
+
         </li>
       </ul>
     </div>
@@ -58,7 +59,7 @@
     <div v-if="sidebarActive" class="absolute w-full h-screen bg-slate-100 opacity-60 z-10"></div>
     <!-- Content -->
     <div class="w-full">
-      <router-view v-if="nowPath === 'home'" name="home" @fromClick="(path)=> nowPath = path" />
+      <router-view v-if="nowPath === 'home'" name="home" @fromClick="(path) => nowPath = path" />
       <router-view v-if="nowPath.slice(0, 4) === 'chat'" name="chat" :sendLogName="selectLog" @updateLogName="updateLogName" />
       <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
       <router-view v-if="nowPath === 'translation'" name="translation" />
@@ -69,7 +70,8 @@
 </template>
 <script lang="ts">
 import { Photograph, Translate, Plus, Delete, MenuUnfold } from "@icon-park/vue-next";
-import { storeSettings } from '@/store/index';
+import { storeSettings, storeGoogleDrive } from '@/store/index';
+import { googleSdkLoaded } from 'vue3-google-login';
 
 export default {
   name: 'App',
@@ -86,8 +88,22 @@ export default {
       lastActiveTime: null
     }
   },
-  mounted() {
+  computed: {
+    googleLogined() {
+      if (storeSettings().getGDriveToken) {
+        return true;
+      }
+      return false;
+    }
+  },
+  async mounted() {
     window.addEventListener('focus', this.handlePageFocus);
+
+    const token = storeSettings().getGDriveToken;
+
+    if (token) {
+      storeGoogleDrive().cloundToLocalStorage();
+    }
     this.bringlogList();
   },
   beforeDestroy() {
@@ -97,7 +113,7 @@ export default {
     /**
      * get all log list
      */
-     bringlogList() {
+    bringlogList() {
       this.logList = storeSettings().getLogList;
 
       const lastPath = storeSettings().getLastPath;
@@ -126,7 +142,7 @@ export default {
 
       while (isDuplicate) {
         // 生成一個隨機6個字符的字符串
-        generatedString = 'chat'+(Math.round(Math.random()*1000)).toString();
+        generatedString = 'chat' + (Math.round(Math.random() * 1000)).toString();
 
         // 檢查新字符串是否已經存在於列表中
         if (!this.logList.includes(generatedString)) {
@@ -161,7 +177,7 @@ export default {
     updateLogName(fromObject: { newLogName: string, oldName: string }) {
       const newLogName = fromObject.newLogName;
       const oldName = fromObject.oldName;
-      
+
       const index = this.logList.findIndex(item => item === oldName);
 
       if (newLogName) {
@@ -176,7 +192,7 @@ export default {
         this.clickLogName(newLogName);
       }
     },
-    gotoPath(path:string) {
+    gotoPath(path: string) {
       this.nowPath = path;
       storeSettings().setLastPath(this.nowPath);
     },
@@ -207,6 +223,28 @@ export default {
       // 如果背景中放置的時間超過指定時間，就重新載入頁面
       if (timeDiff > 60 * 60 * 1000) { // 60 分鐘
         location.reload();
+      }
+    },
+    /**
+     * google signin
+     * @param response 
+     */
+    googleLogin() {
+      if (!storeSettings().getGDriveToken) {
+        googleSdkLoaded((google) => {
+          google.accounts.oauth2.initTokenClient({
+            client_id: "929956701294-bvbtd8uh85cnb8gbf1fi5sboa9ue1f5r.apps.googleusercontent.com",
+            scope: "https://www.googleapis.com/auth/drive.file",
+            callback: (response) => {
+              storeSettings().setGDriveToken(response.access_token);
+
+              // signed.restore or backup
+              storeGoogleDrive().localStorageToCloud();
+            }
+          }).requestAccessToken();
+        })
+      } else {
+        storeGoogleDrive().localStorageToCloud();
       }
     }
   }
