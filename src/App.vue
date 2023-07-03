@@ -101,7 +101,7 @@ export default {
     const token = storeSettings().getGDriveToken;
 
     if (token) {
-      storeGoogleDrive().cloundToLocalStorage();
+      await storeGoogleDrive().cloundToLocalStorage();
     }
     this.bringlogList();
   },
