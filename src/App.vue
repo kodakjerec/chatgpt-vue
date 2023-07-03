@@ -232,10 +232,7 @@ export default {
       if (!storeSettings().getGDriveToken) {
         storeGoogleDrive().accessToken();
       } else {
-        const msg = await storeGoogleDrive().localStorageToCloud();
-
-        if (msg)
-          this.$toast.success(msg, { position: "top", duration: 2000 });
+        storeGoogleDrive().cloundToLocalStorage();
       }
     }
   }

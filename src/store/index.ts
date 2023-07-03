@@ -19,8 +19,11 @@ export function setVoices() {
 }
 
 // unify storage method.
-function storageSet(key, value): void {
+function storageSet(key, value, cloundSave: boolean = true): void {
   localStorage.setItem(key, value);
+  if (cloundSave) {
+    storeGoogleDrive().localStorageToCloud();
+  }
 }
 function storageGet(key): any {
   return localStorage.getItem(key);
@@ -267,7 +270,7 @@ export const storeGoogleDrive = defineStore({
           if (fileContent) {
             const cloudData = JSON.parse(fileContent);
             Object.entries(cloudData).map(([key, value]) => {
-              storageSet(key, value);
+              storageSet(key, value, false);
             });
           }
         } else {

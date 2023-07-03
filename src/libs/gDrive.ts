@@ -43,15 +43,7 @@ export async function gDriveCheck(fileName: string) {
   }
 }
 export async function gDrivePatch(contentString: string, fileName: string, fileId: string) {
-  let metadata = {
-    name: fileName,
-    mimeType: "text/plain",
-    parents: ["root"],
-  };
-  const form = new FormData();
   const file = new Blob([contentString], { type: "text/plain" });
-  form.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
-  form.append("file", file);
 
   try {
     const response = await fetch("https://www.googleapis.com/upload/drive/v3/files/" + fileId, {
@@ -59,7 +51,7 @@ export async function gDrivePatch(contentString: string, fileName: string, fileI
       headers: {
         Authorization: "Bearer " + storeSettings().getGDriveToken,
       },
-      body: form,
+      body: file,
     });
     const { body, status } = response;
     if (body) {
