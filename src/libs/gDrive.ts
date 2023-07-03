@@ -39,6 +39,7 @@ export async function gDriveCheck(fileName: string) {
     }
   } catch (e: any) {
     console.log(e);
+    return false;
   }
 }
 export async function gDrivePatch(contentString: string, fileName: string, fileId: string) {
@@ -82,6 +83,7 @@ export async function gDrivePatch(contentString: string, fileName: string, fileI
     }
   } catch (e: any) {
     console.log(e);
+    return false;
   }
 }
 export async function gDriveSave(contentString: string, fileName: string) {
@@ -125,6 +127,7 @@ export async function gDriveSave(contentString: string, fileName: string) {
     }
   } catch (e: any) {
     console.log(e);
+    return false;
   }
 }
 export async function gDriveLoad(fileId: string) {
@@ -156,5 +159,6 @@ export async function gDriveLoad(fileId: string) {
     }
   } catch (e: any) {
     console.log(e);
+    return false;
   }
 }

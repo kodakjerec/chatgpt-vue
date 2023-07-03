@@ -256,7 +256,6 @@ export const storeGoogleDrive = defineStore({
       const token = storeSettings().getGDriveToken;
       if (token) {
         // use google drive
-
         const fileName = storeSettings().googleDriveFileName;
         // check file exists on google-drive
         const filedID = await gDriveCheck(fileName);
@@ -269,6 +268,8 @@ export const storeGoogleDrive = defineStore({
               storageSet(key, value);
             });
           }
+        } else {
+          this.localStorageToCloud();
         }
       }
     },
