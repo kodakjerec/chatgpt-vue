@@ -189,5 +189,10 @@ export async function gDriveLoad(fileId: string) {
  * @param status
  */
 function clearToken(status) {
-  if (status === 401) storeSettings().setGDriveToken("");
+  if (status === 401) {
+    // clean token
+    storeSettings().setGDriveToken("");
+    // refresh
+    this.accessToken();
+  }
 }

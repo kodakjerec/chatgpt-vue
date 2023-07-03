@@ -240,15 +240,11 @@ export default {
      * @param response 
      */
     async googleLogin() {
-      this.nowLoading = true;
-      this.loadingMessage = "Loading cloud data.";
       if (!storeSettings().getGDriveToken) {
-        await accessToken();
+        accessToken();
       } else {
-        await storeGoogleDrive().cloundToLocalStorage();
+        storeGoogleDrive().cloundToLocalStorage();
       }
-      this.nowLoading = false;
-      this.loadingMessage = "";
     }
   }
 }

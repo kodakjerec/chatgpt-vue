@@ -197,7 +197,7 @@ export const storeSettings = defineStore({
     setGDriveToken(token: string) {
       this.googleOAuth2token = token;
       const aesAPIKey = cryptoJS.AES.encrypt(token, this.getSecretKey).toString();
-      storageSet("gToken", aesAPIKey);
+      storageSet("gToken", aesAPIKey, false);
     },
   },
 });
@@ -245,16 +245,20 @@ export const storeGoogleDrive = defineStore({
         // check file exists on google-drive
         const filedID = await gDriveCheck(fileName);
 
+        console.log("get fileID ok", localStorage);
         if (filedID) {
           const fileContent = await gDriveLoad(filedID);
           if (fileContent) {
             const cloudData = JSON.parse(fileContent);
+            const notMapAttr = ["gToken"];
             Object.entries(cloudData).map(([key, value]) => {
-              storageSet(key, value, false);
+              if (!notMapAttr.includes(key)) {
+                storageSet(key, value, false);
+              }
             });
           }
         } else {
-          storeGoogleDrive().localStorageToCloud();
+          await storeGoogleDrive().localStorageToCloud();
         }
       }
     },
