@@ -70,6 +70,7 @@ import VoiceSound from "@/components/VoiceSound.vue";
 import { Voice, Round, SortTwo, Translation } from "@icon-park/vue-next";
 import * as list from '@/assets/ISO639_1.json';
 import { storeSettings } from '@/store';
+import { createToaster } from '@meforma/vue-toaster';
 
 interface fileDetail {
     id: string,
@@ -134,11 +135,11 @@ export default {
                 if (body) {
                     const reader = body.getReader();
                     let result = await this.readStream(reader, status);
-                    if (status===200) {
+                    if (status === 200) {
                         this.resultMy = result.text;
                     } else {
                         this.resultMy = result;
-                        this.$toast.error(`Fail`, { position:"top", duration:1000 });
+                        createToaster().error(`Fail`, { position: "top", duration: 1000 });
                     }
                 }
             } catch (error: any) {
@@ -251,11 +252,11 @@ export default {
             if (body) {
                 const reader = body.getReader();
                 let result = await this.readStream(reader, status);
-                if (status===200) {
+                if (status === 200) {
                     this.resultForeign = result.choices[0].message.content;
                 } else {
                     this.resultForeign = result;
-                    this.$toast.error(`Fail`, { position:"top", duration:1000 });
+                    createToaster().error(`Fail`, { position: "top", duration: 1000 });
                 }
             }
         }

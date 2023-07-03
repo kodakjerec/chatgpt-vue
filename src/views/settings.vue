@@ -133,8 +133,9 @@
 </template>
 
 <script lang="ts">
-import { storeVoice, storeSettings, storeGoogleDrive } from '@/store/index';
+import { storeVoice, storeSettings } from '@/store/index';
 import * as list from '@/assets/ISO639_1.json';
+import { createToaster } from '@meforma/vue-toaster';
 
 interface MyObject {
     [key: string]: any;
@@ -179,7 +180,7 @@ export default {
     methods: {
         sendOrSave() {
             this.saveAPIKey(this.messageContent.trim());
-            this.$toast.success(`Success`, { position: "top", duration: 2000 });
+            createToaster().success(`Success`, { position: "top", duration: 2000 });
         },
         /**
          * save apiKey

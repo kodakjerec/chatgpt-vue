@@ -57,6 +57,10 @@
     </div>
     <!-- shadow -->
     <div v-if="sidebarActive" class="absolute w-full h-screen bg-slate-100 opacity-60 z-10"></div>
+    <!-- nowLoading -->
+    <div v-if="nowLoading" class="absolute w-full h-screen bg-slate-100 opacity-90 z-10">
+      <div class="left-1/3 top-1/2 absolute font-black text-2xl">{{ loadingMessage }}</div>
+    </div>
     <!-- Content -->
     <div class="w-full">
       <router-view v-if="nowPath === 'home'" name="home" @fromClick="(path) => nowPath = path" />
@@ -71,6 +75,7 @@
 <script lang="ts">
 import { Photograph, Translate, Plus, Delete, MenuUnfold } from "@icon-park/vue-next";
 import { storeSettings, storeGoogleDrive } from '@/store/index';
+import { accessToken } from "./libs/gDrive";
 
 export default {
   name: 'App',
@@ -84,6 +89,8 @@ export default {
       logList: [],
       messageList: [],
       sidebarActive: false,
+      nowLoading: false,
+      loadingMessage: "",
       lastActiveTime: null
     }
   },
@@ -101,7 +108,11 @@ export default {
     const token = storeSettings().getGDriveToken;
 
     if (token) {
+      this.nowLoading = true;
+      this.loadingMessage = "Loading cloud data.";
       await storeGoogleDrive().cloundToLocalStorage();
+      this.nowLoading = false;
+      this.loadingMessage = "";
     }
     this.bringlogList();
   },
@@ -229,11 +240,15 @@ export default {
      * @param response 
      */
     async googleLogin() {
+      this.nowLoading = true;
+      this.loadingMessage = "Loading cloud data.";
       if (!storeSettings().getGDriveToken) {
-        storeGoogleDrive().accessToken();
+        await accessToken();
       } else {
-        storeGoogleDrive().cloundToLocalStorage();
+        await storeGoogleDrive().cloundToLocalStorage();
       }
+      this.nowLoading = false;
+      this.loadingMessage = "";
     }
   }
 }

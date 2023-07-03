@@ -1,4 +1,31 @@
-import { storeSettings } from "@/store/index";
+import { storeGoogleDrive, storeSettings } from "@/store/index";
+import { googleSdkLoaded } from "vue3-google-login";
+import { createToaster } from "@meforma/vue-toaster";
+
+/**
+ * get a new token
+ */
+export async function accessToken() {
+  googleSdkLoaded((google) => {
+    google.accounts.oauth2
+      .initTokenClient({
+        client_id: "929956701294-bvbtd8uh85cnb8gbf1fi5sboa9ue1f5r.apps.googleusercontent.com",
+        scope: "https://www.googleapis.com/auth/drive.file",
+        callback: async (response) => {
+          storeSettings().setGDriveToken(response.access_token);
+          createToaster().success("Login success. Checking Cloud Data.", { position: "top" });
+
+          // signed.restore or backup
+          await storeGoogleDrive().cloundToLocalStorage();
+          createToaster().success("The webpage will be refreshed in 2 seconds.", { position: "top" });
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        },
+      })
+      .requestAccessToken();
+  });
+}
 
 export async function gDriveCheck(fileName: string) {
   try {
@@ -27,7 +54,7 @@ export async function gDriveCheck(fileName: string) {
         const json = JSON.parse(decodedText); // start with "data: "
         if (status !== 200) {
           const content = json.error.message ?? decodedText;
-          storeSettings().setGDriveToken("");
+          clearToken(status);
           return false;
         } else {
           if (json.files.length > 0) {
@@ -67,6 +94,7 @@ export async function gDrivePatch(contentString: string, fileName: string, fileI
         if (status !== 200) {
           const json = JSON.parse(decodedText); // start with "data: "
           const content = json.error.message ?? decodedText;
+          clearToken(status);
           return false;
         } else {
           return true;
@@ -111,6 +139,7 @@ export async function gDriveSave(contentString: string, fileName: string) {
         if (status !== 200) {
           const json = JSON.parse(decodedText); // start with "data: "
           const content = json.error.message ?? decodedText;
+          clearToken(status);
           return false;
         } else {
           return true;
@@ -143,6 +172,7 @@ export async function gDriveLoad(fileId: string) {
         if (status !== 200) {
           const json = JSON.parse(decodedText); // start with "data: "
           const content = json.error.message ?? decodedText;
+          clearToken(status);
           return false;
         } else {
           return decodedText;
@@ -153,4 +183,11 @@ export async function gDriveLoad(fileId: string) {
     console.log(e);
     return false;
   }
+}
+/**
+ * clean localStorage token
+ * @param status
+ */
+function clearToken(status) {
+  if (status === 401) storeSettings().setGDriveToken("");
 }
