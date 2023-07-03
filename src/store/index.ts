@@ -245,7 +245,6 @@ export const storeGoogleDrive = defineStore({
         // check file exists on google-drive
         const filedID = await gDriveCheck(fileName);
 
-        console.log("get fileID ok", localStorage);
         if (filedID) {
           const fileContent = await gDriveLoad(filedID);
           if (fileContent) {
@@ -257,8 +256,6 @@ export const storeGoogleDrive = defineStore({
               }
             });
           }
-        } else {
-          await storeGoogleDrive().localStorageToCloud();
         }
       }
     },
