@@ -238,15 +238,17 @@ export const storeGoogleDrive = defineStore({
         const patchResult = await gDrivePatch(saveData, fileName, filedID);
 
         if (patchResult) {
-          this.$toast.success(`Patched. Filename: ` + fileName, { position: "top", duration: 2000 });
+          return `Patched Filename: ` + fileName;
         }
       } else {
         const upResult = await gDriveSave(saveData, fileName);
 
         if (upResult) {
-          this.$toast.success(`Uploaded. Filename: ` + fileName, { position: "top", duration: 2000 });
+          return `Uploaded. Filename: ` + fileName;
         }
       }
+
+      return "";
     },
     /**
      * restore localstorage to cloud-data
@@ -269,7 +271,8 @@ export const storeGoogleDrive = defineStore({
             });
           }
         } else {
-          this.localStorageToCloud();
+          // no need toast.success()
+          storeGoogleDrive().localStorageToCloud();
         }
       }
     },

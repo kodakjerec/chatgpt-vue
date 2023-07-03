@@ -228,11 +228,14 @@ export default {
      * google signin
      * @param response 
      */
-    googleLogin() {
+    async googleLogin() {
       if (!storeSettings().getGDriveToken) {
         storeGoogleDrive().accessToken();
       } else {
-        storeGoogleDrive().localStorageToCloud();
+        const msg = await storeGoogleDrive().localStorageToCloud();
+
+        if (msg)
+          this.$toast.success(msg, { position: "top", duration: 2000 });
       }
     }
   }
