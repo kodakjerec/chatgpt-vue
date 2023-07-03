@@ -212,25 +212,27 @@ export const storeGoogleDrive = defineStore({
      * @param data json string
      */
     async localStorageToCloud() {
-      const saveData = JSON.stringify(localStorage);
-      const fileName = storeSettings().googleDriveFileName;
-      // check file exists on google-drive
-      const filedID = await gDriveCheck(fileName);
+      const token = storeSettings().getGDriveToken;
+      if (token) {
+        const saveData = JSON.stringify(localStorage);
+        const fileName = storeSettings().googleDriveFileName;
+        // check file exists on google-drive
+        const filedID = await gDriveCheck(fileName);
 
-      if (filedID) {
-        const patchResult = await gDrivePatch(saveData, fileName, filedID);
+        if (filedID) {
+          const patchResult = await gDrivePatch(saveData, fileName, filedID);
 
-        if (patchResult) {
-          return `Patched Filename: ` + fileName;
-        }
-      } else {
-        const upResult = await gDriveSave(saveData, fileName);
+          if (patchResult) {
+            return `Patched Filename: ` + fileName;
+          }
+        } else {
+          const upResult = await gDriveSave(saveData, fileName);
 
-        if (upResult) {
-          return `Uploaded. Filename: ` + fileName;
+          if (upResult) {
+            return `Uploaded. Filename: ` + fileName;
+          }
         }
       }
-
       return "";
     },
     /**
