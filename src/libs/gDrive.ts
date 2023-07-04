@@ -112,6 +112,7 @@ export async function gDrivePatch(contentString: string, fileName: string, fileI
     }
   } catch (e: any) {
     console.log(e);
+    createToaster().error("Failed to patch data", { position: "top" });
     return false;
   }
 }
@@ -157,6 +158,7 @@ export async function gDriveSave(contentString: string, fileName: string) {
     }
   } catch (e: any) {
     console.log(e);
+    createToaster().error("Failed to save data", { position: "top" });
     return false;
   }
 }
@@ -190,6 +192,7 @@ export async function gDriveLoad(fileId: string) {
     }
   } catch (e: any) {
     console.log(e);
+    createToaster().error("Failed to load data", { position: "top" });
     return false;
   }
 }
