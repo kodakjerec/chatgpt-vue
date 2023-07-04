@@ -6,6 +6,13 @@
         <div class="h-full w-full">
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="0">
                 <div class="w-full text-center my-1">
+                    <label class="text-gray-700 font-bold text-xl">Accounts Link</label>
+                </div>
+                <button class="btn" v-if="!googleLogined" @click="showEvents()">Google LogIn</button>
+                <button class="redBtn" v-else @click="revokeToken()">Google LogOut</button>
+            </div>
+            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1">
+                <div class="w-full text-center my-1">
                     <label class="text-gray-700 font-bold text-xl">API Key</label>
                 </div>
                 <div class="mb-2 text-sm text-gray-500">Input API Key：</div>
@@ -13,7 +20,7 @@
                 <button class="btn" @click="sendOrSave()">Save</button>
             </div>
             <!-- Chat -->
-            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1" @focus="showTooltip('', 'settings_chat')">
+            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="2" @focus="showTooltip('', 'settings_chat')">
                 <div class="w-full text-center my-1 flex">
                     <div class="w-1/3"></div>
                     <label class="text-gray-700 font-bold text-xl w-1/3">Chat</label>
@@ -50,7 +57,7 @@
                 </div>
             </div>
             <!-- Transcription -->
-            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="2" @focus="showTooltip('', 'settings_trans')">
+            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="3" @focus="showTooltip('', 'settings_trans')">
                 <div class="w-full text-center my-1 flex">
                     <div class="w-1/3"></div>
                     <label class="text-gray-700 font-bold text-xl w-1/3">Transcription</label>
@@ -82,7 +89,7 @@
                 </div>
             </div>
             <!-- Speech -->
-            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="2" @focus="showTooltip('', 'settings_speech')">
+            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="4" @focus="showTooltip('', 'settings_speech')">
                 <div class="w-full text-center my-1 flex">
                     <div class="w-1/3"></div>
                     <label class="text-gray-700 font-bold text-xl w-1/3">Speech</label>
@@ -133,9 +140,10 @@
 </template>
 
 <script lang="ts">
-import { storeVoice, storeSettings } from '@/store/index';
+import { storeVoice, storeSettings, storeGoogleDrive } from '@/store/index';
 import * as list from '@/assets/ISO639_1.json';
 import { createToaster } from '@meforma/vue-toaster';
+import { accessToken, revokeToken } from '@/libs/gDrive';
 
 interface MyObject {
     [key: string]: any;
@@ -157,6 +165,14 @@ export default {
             speechVoiceList: [] as any[],
             tooltipText: '',
             tooltipTextTw: ''
+        }
+    },
+    computed: {
+        googleLogined() {
+            if (storeSettings().getGDriveToken) {
+                return true;
+            }
+            return false;
         }
     },
     async mounted() {
@@ -366,6 +382,17 @@ export default {
                     }
                     break;
             }
+        },
+        showEvents() {
+            if (!storeSettings().getGDriveToken) {
+                accessToken();
+            } else {
+                storeGoogleDrive().cloundToLocalStorage();
+            }
+        },
+        revokeToken() {
+            revokeToken();
+            createToaster().success(`Log Out!`, { position: "top", duration: 2000 });
         }
     }
 }

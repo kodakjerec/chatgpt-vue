@@ -212,25 +212,29 @@ export const storeGoogleDrive = defineStore({
      * @param data json string
      */
     async localStorageToCloud() {
-      const saveData = JSON.stringify(localStorage);
-      const fileName = storeSettings().googleDriveFileName;
-      // check file exists on google-drive
-      const filedID = await gDriveCheck(fileName);
+      const token = storeSettings().getGDriveToken;
+      if (token) {
+        const saveData = JSON.stringify(localStorage);
+        const fileName = storeSettings().googleDriveFileName;
+        // check file exists on google-drive
+        const fileId = await gDriveCheck(fileName);
 
-      if (filedID) {
-        const patchResult = await gDrivePatch(saveData, fileName, filedID);
+        if (fileId !== "error") {
+          if (fileId) {
+            const patchResult = await gDrivePatch(saveData, fileName, fileId);
 
-        if (patchResult) {
-          return `Patched Filename: ` + fileName;
-        }
-      } else {
-        const upResult = await gDriveSave(saveData, fileName);
+            if (patchResult) {
+              return `Patched Filename: ` + fileName;
+            }
+          } else {
+            const upResult = await gDriveSave(saveData, fileName);
 
-        if (upResult) {
-          return `Uploaded. Filename: ` + fileName;
+            if (upResult) {
+              return `Uploaded. Filename: ` + fileName;
+            }
+          }
         }
       }
-
       return "";
     },
     /**
@@ -243,10 +247,10 @@ export const storeGoogleDrive = defineStore({
         // use google drive
         const fileName = storeSettings().googleDriveFileName;
         // check file exists on google-drive
-        const filedID = await gDriveCheck(fileName);
+        const fileId = await gDriveCheck(fileName);
 
-        if (filedID) {
-          const fileContent = await gDriveLoad(filedID);
+        if (fileId && fileId !== "error") {
+          const fileContent = await gDriveLoad(fileId);
           if (fileContent) {
             const cloudData = JSON.parse(fileContent);
             const notMapAttr = ["gToken"];

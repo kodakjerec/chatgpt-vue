@@ -47,12 +47,6 @@
             Image
           </div>
         </li> -->
-        <li>==========</li>
-        <li>
-          <button class="btn" v-if="!googleLogined" @click="googleLogin">Login Google</button>
-          <button class="greenBtn" disabled v-else>V Google</button>
-
-        </li>
       </ul>
     </div>
     <!-- shadow -->
@@ -75,7 +69,6 @@
 <script lang="ts">
 import { Photograph, Translate, Plus, Delete, MenuUnfold } from "@icon-park/vue-next";
 import { storeSettings, storeGoogleDrive } from '@/store/index';
-import { accessToken } from "./libs/gDrive";
 
 export default {
   name: 'App',
@@ -92,14 +85,6 @@ export default {
       nowLoading: false,
       loadingMessage: "",
       lastActiveTime: null
-    }
-  },
-  computed: {
-    googleLogined() {
-      if (storeSettings().getGDriveToken) {
-        return true;
-      }
-      return false;
     }
   },
   async mounted() {
@@ -234,17 +219,6 @@ export default {
       if (timeDiff > 60 * 60 * 1000) { // 60 分鐘
         location.reload();
       }
-    },
-    /**
-     * google signin
-     * @param response 
-     */
-    async googleLogin() {
-      if (!storeSettings().getGDriveToken) {
-        accessToken();
-      } else {
-        storeGoogleDrive().cloundToLocalStorage();
-      }
     }
   }
 }
@@ -258,23 +232,23 @@ body,
 
 /* Default sidebar styles */
 .sidebar {
-  width: 150px;
+  width: 200px;
   height: 100%;
   position: fixed;
   top: 0;
-  left: -150px;
+  left: -200px;
   z-index: 999;
   transition: transform 0.3s ease-in-out;
 }
 
 /* Default sidebar hide */
 .sidebar-toggle+.sidebar {
-  transform: translateX(-150px);
+  transform: translateX(-200px);
 }
 
 
 /* sidebar active */
 .sidebar.active {
-  transform: translateX(150px);
+  transform: translateX(200px);
 }
 </style>

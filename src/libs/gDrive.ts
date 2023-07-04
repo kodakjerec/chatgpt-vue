@@ -2,6 +2,8 @@ import { storeGoogleDrive, storeSettings } from "@/store/index";
 import { googleSdkLoaded } from "vue3-google-login";
 import { createToaster } from "@meforma/vue-toaster";
 
+const gDriveId: string = "929956701294-bvbtd8uh85cnb8gbf1fi5sboa9ue1f5r.apps.googleusercontent.com";
+
 /**
  * get a new token
  */
@@ -9,7 +11,7 @@ export async function accessToken() {
   googleSdkLoaded((google) => {
     google.accounts.oauth2
       .initTokenClient({
-        client_id: "929956701294-bvbtd8uh85cnb8gbf1fi5sboa9ue1f5r.apps.googleusercontent.com",
+        client_id: gDriveId,
         scope: "https://www.googleapis.com/auth/drive.file",
         callback: async (response) => {
           storeSettings().setGDriveToken(response.access_token);
@@ -24,6 +26,13 @@ export async function accessToken() {
         },
       })
       .requestAccessToken();
+  });
+}
+export function revokeToken() {
+  googleSdkLoaded((google) => {
+    google.accounts.oauth2.revoke(storeSettings().getGDriveToken, () => {
+      clearToken(0);
+    });
   });
 }
 
@@ -55,18 +64,18 @@ export async function gDriveCheck(fileName: string) {
         if (status !== 200) {
           const content = json.error.message ?? decodedText;
           clearToken(status);
-          return false;
+          return "";
         } else {
           if (json.files.length > 0) {
             return json.files[0].id;
           }
-          return false;
+          return "";
         }
       }
     }
   } catch (e: any) {
     console.log(e);
-    return false;
+    return "error";
   }
 }
 export async function gDrivePatch(contentString: string, fileName: string, fileId: string) {
@@ -189,10 +198,11 @@ export async function gDriveLoad(fileId: string) {
  * @param status
  */
 function clearToken(status) {
+  // clean token
+  storeSettings().setGDriveToken("");
+
   if (status === 401) {
-    // clean token
-    storeSettings().setGDriveToken("");
     // refresh
-    this.accessToken();
+    accessToken();
   }
 }
