@@ -12,10 +12,12 @@ export async function accessToken() {
     google.accounts.oauth2
       .initTokenClient({
         client_id: gDriveId,
-        scope: "https://www.googleapis.com/auth/drive.file",
+        scope: "https://www.googleapis.com/auth/drive.file profile",
         callback: async (response) => {
           storeSettings().setGDriveToken(response.access_token);
           createToaster().success("Login success. Checking Cloud Data.", { position: "top" });
+
+          // getUserInfo();
 
           // signed.restore or backup
           await storeGoogleDrive().cloundToLocalStorage();
@@ -34,6 +36,42 @@ export function revokeToken() {
       clearToken(0);
     });
   });
+}
+/**
+ * 詢問GAPIS, userinfo
+ * @returns 使用者id
+ */
+async function getUserInfo() {
+  const response = await fetch(
+    'https://www.googleapis.com/oauth2/v3/tokeninfo',
+    {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + storeSettings().getGDriveToken,
+      },
+    }
+  );
+  const { body, status } = response;
+    if (body) {
+      const reader = body.getReader();
+      const decoder = new TextDecoder("utf-8");
+
+      while (true) {
+        // eslint-disable-next-line no-await-in-loop
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const decodedText = decoder.decode(value, { stream: true });
+        const json = JSON.parse(decodedText); // start with "data: "
+        if (status !== 200) {
+          const content = json.error.message ?? decodedText;
+          clearToken(status);
+          return "";
+        } else {
+          return decodedText.sub;
+        }
+      }
+    }
 }
 
 export async function gDriveCheck(fileName: string) {
