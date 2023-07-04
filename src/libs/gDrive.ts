@@ -75,6 +75,7 @@ export async function gDriveCheck(fileName: string) {
     }
   } catch (e: any) {
     console.log(e);
+    createToaster().error("Failed to check data list", { position: "top" });
     return "error";
   }
 }

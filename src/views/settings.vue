@@ -9,7 +9,7 @@
                     <label class="text-gray-700 font-bold text-xl">Accounts Link</label>
                 </div>
                 <button class="btn" v-if="!googleLogined" @click="showEvents()">Google LogIn</button>
-                <button class="redBtn" v-else @click="revokeToken()">Google LogOut</button>
+                <button class="greenBtn" v-else @click="revokeToken()">Google LogOut</button>
             </div>
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1">
                 <div class="w-full text-center my-1">

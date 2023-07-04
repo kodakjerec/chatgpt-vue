@@ -53,7 +53,7 @@
     <div v-if="sidebarActive" class="absolute w-full h-screen bg-slate-100 opacity-60 z-10"></div>
     <!-- nowLoading -->
     <div v-if="nowLoading" class="absolute w-full h-screen bg-slate-100 opacity-90 z-10">
-      <div class="left-1/3 top-1/2 absolute font-black text-2xl">{{ loadingMessage }}</div>
+      <div class="inset-x-20 top-1/2 absolute font-black text-2xl">{{ loadingMessage }}</div>
     </div>
     <!-- Content -->
     <div class="w-full">
