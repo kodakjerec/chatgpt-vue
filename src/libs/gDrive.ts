@@ -2,7 +2,7 @@ import { storeGoogleDrive, storeSettings } from "@/store/index";
 import { googleSdkLoaded } from "vue3-google-login";
 import { createToaster } from "@meforma/vue-toaster";
 
-const gDriveId: string = "929956701294-bvbtd8uh85cnb8gbf1fi5sboa9ue1f5r.apps.googleusercontent.com";
+export const gDriveId: string = "929956701294-bvbtd8uh85cnb8gbf1fi5sboa9ue1f5r.apps.googleusercontent.com";
 
 /**
  * get a new token
