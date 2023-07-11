@@ -32,8 +32,7 @@
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">model</span>
                         <select v-model="chat.model" class="input" @change="$event => contentSelectChange($event, 'settings_chat')" @focus="showTooltip('model', 'settings_chat')">
-                            <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-                            <option value="gpt-4">gpt-4</option>
+                            <option v-for="(value, key) of modelList" :key="key" :value="value.key">{{ value.key }}</option>
                         </select>
                     </label>
                 </div>
@@ -164,7 +163,13 @@ export default {
             speechLangList: [] as any[],
             speechVoiceList: [] as any[],
             tooltipText: '',
-            tooltipTextTw: ''
+            tooltipTextTw: '',
+            modelList:[
+                { key: 'gpt-3.5-turbo', tokens: 4096 },
+                { key: 'gpt-3.5-turbo-16k', tokens: 16384 },
+                { key: 'gpt-4', tokens: 8192 },
+                { key: 'gpt-4-32k', tokens: 32768 },
+            ]
         }
     },
     computed: {
@@ -285,6 +290,10 @@ export default {
             let myObject: MyObject = {};
             switch (myObjectName) {
                 case "settings_chat":
+                    let findObject = this.modelList.find(model=>model.key===event.target.value);
+                    if (findObject) {
+                        storeSettings().maxTokens = Math.round(findObject.tokens*0.8);
+                    }
                     myObject = this.chat; break;
                 case "settings_trans":
                     myObject = this.trans; break;

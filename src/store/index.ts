@@ -18,7 +18,7 @@ export function setVoices() {
 }
 
 // unify storage method.
-function storageSet(key, value, cloundSave: boolean = true): void {
+function storageSet(key, value, cloundSave: boolean = false): void {
   localStorage.setItem(key, value);
   if (cloundSave) {
     storeGoogleDrive().localStorageToCloud();
@@ -70,6 +70,7 @@ export const storeSettings = defineStore({
     settings: {}, // chatGPT settings
     googleOAuth2token: "", // google OAuth2 token
     googleDriveFileName: "yourGPT_localStorage.txt",
+    maxTokens: Math.round(4096*0.8)
   }),
   getters: {
     getSecretKey(state) {
@@ -141,19 +142,19 @@ export const storeSettings = defineStore({
     setApiKey(key: string) {
       this.apiKey = key;
       const aesAPIKey = cryptoJS.AES.encrypt(this.apiKey, this.getSecretKey).toString();
-      storageSet("apiKey", aesAPIKey);
+      storageSet("apiKey", aesAPIKey, true);
     },
     setLogList(list: any) {
       this.logList = list;
-      storageSet("logList", JSON.stringify(this.logList));
+      storageSet("logList", JSON.stringify(this.logList), true);
     },
     setLogData(name: string, content: Array<ChatMessage>) {
       this.logData[name] = content;
-      storageSet("logData", JSON.stringify(this.logData));
+      storageSet("logData", JSON.stringify(this.logData), true);
     },
     delLogData(name: string) {
       delete this.logData[name];
-      storageSet("logData", JSON.stringify(this.logData));
+      storageSet("logData", JSON.stringify(this.logData), true);
     },
     setLastPath(path: string) {
       this.lastPath = path;
@@ -161,7 +162,7 @@ export const storeSettings = defineStore({
     },
     setSettings(name: string, content: {}) {
       this.settings[name] = content;
-      storageSet("settings", JSON.stringify(this.settings));
+      storageSet("settings", JSON.stringify(this.settings), true);
     },
     resetSettings(name: string) {
       let findData = {};
@@ -197,7 +198,7 @@ export const storeSettings = defineStore({
     setGDriveToken(token: string) {
       this.googleOAuth2token = token;
       const aesAPIKey = cryptoJS.AES.encrypt(token, this.getSecretKey).toString();
-      storageSet("gToken", aesAPIKey, false);
+      storageSet("gToken", aesAPIKey);
     },
   },
 });
@@ -256,7 +257,7 @@ export const storeGoogleDrive = defineStore({
             const notMapAttr = ["gToken"];
             Object.entries(cloudData).map(([key, value]) => {
               if (!notMapAttr.includes(key)) {
-                storageSet(key, value, false);
+                storageSet(key, value);
               }
             });
           }
