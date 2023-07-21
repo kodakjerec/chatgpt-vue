@@ -40,13 +40,13 @@
         <li class="mt-auto py-2 border-t border-b border-gray-700 hover:bg-slate-700 hover:rounded" @click="gotoPath('settings')">
           <span>Settings</span>
         </li>
-        <!-- <li>==========</li>
+        <li>==========</li>
         <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="gotoPath('createOneImage')">
-          <div class="flex items-center line-through">
+          <div class="flex items-center">
             <photograph theme="outline" size="24" fill="#fff" />
             Image
           </div>
-        </li> -->
+        </li>
       </ul>
     </div>
     <!-- shadow -->
@@ -63,6 +63,7 @@
       <router-view v-if="nowPath === 'translation'" name="translation" />
       <router-view v-if="nowPath === 'transcription'" name="transcription" />
       <router-view v-if="nowPath === 'settings'" name="settings" />
+      <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
     </div>
   </div>
 </template>

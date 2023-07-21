@@ -2,7 +2,7 @@
 [https://github.com/lianginx/chatgpt-vue](https://github.com/lianginx/chatgpt-vue)
 # chatgpt-vue
 
-A simple chat dialogue using Vue3 + Typescript + Tailwind CSS framework, utilizing OpenAI’s gpt-3.5-turbo model API, supporting continuous dialogue(maximum 3072 tokens).
+A simple chat dialogue using Vue3 + Typescript + Tailwind CSS framework, utilizing OpenAI’s gpt-4 model API, supporting continuous dialogue.
 
 <img src="img/preview.jpg" width="300">
 
@@ -42,10 +42,9 @@ VITE v3.2.5  ready in 294 ms
 * Trash can: Clear the chat.
 # Features
 
-1. This system uses the gpt-3.5-turbo model.  
+1. This system uses the gpt-4 model.  
 2. All logs are stored locally in local-Storage.  
 If you have connected with Google-account, you can easily synchronize your logs across different devices.
-3. chat logs are limited to a maximum of 4096 tokens. If exceeded, chatGPT will display a prompt and you’ll need to create a new chat.
 
 ## License
 

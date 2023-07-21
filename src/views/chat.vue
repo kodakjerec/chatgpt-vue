@@ -85,7 +85,7 @@ export default {
       decoder: new TextDecoder("utf-8"),
       roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
       messageList: [],
-      maxTokens: 3072,
+      maxTokens: Math.round(storeSettings().maxTokens*0.8),
       enc: null // log size
     }
   },
