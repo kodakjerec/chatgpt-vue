@@ -10,7 +10,7 @@
         </div>
         <input type="text" class="px-4 py-2 text-gray-700 bg-white border rounded-md mr-2 text-black bg-slate-400" v-else @blur="updateLogName" v-model="newLogName" ref="editingLogName">
       </div>
-      <div class="flex-1 mx-2 mt-20 mb-2">
+      <div class="flex-1 mx-2 mb-2">
         <div class="group flex flex-col px-2 py-2 hover:bg-slate-200 rounded-lg" v-for="(item, index) of messageListView" :key="index">
           <div class="flex justify-between items-center">
             <div class="font-bold flex">
@@ -140,7 +140,7 @@ export default {
      */
     async sendChatMessage() {
       if (!this.messageContent.length) return;
-      
+
       const content: string = this.messageContent
       try {
         this.isTalking = true;
@@ -244,9 +244,9 @@ export default {
      *  */
     getChatLog(logName: string) {
       const chatLog = storeSettings().getLogData(logName);
-      
+
       this.messageList = JSON.parse(JSON.stringify(chatLog));
-      if (this.messageList.length===0) {
+      if (this.messageList.length === 0) {
         this.resetChatLog();
         this.setChatLog();
       }

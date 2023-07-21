@@ -1,6 +1,6 @@
 <template>
     <div class="w-full overflow-y-auto max-h-screen">
-        <div class="fixed w-full bg-gray-100 z-1000" v-show="tooltipText">
+        <div class="sticky w-full bg-gray-100 z-1000" v-show="tooltipText" @click="showTooltip('', '')">
             <p class="text-justify text-sm text-yellow-700">{{ tooltipText }}<br>{{ tooltipTextTw }}</p>
         </div>
         <div class="h-full w-full">
@@ -381,7 +381,16 @@ export default {
                             break;
                     }
                     break;
+                default:
+                    this.tooltipText = '';
+                    this.tooltipTextTw = '';
+                    break;
             }
+
+            setTimeout(() => {
+                this.tooltipText = '';
+                this.tooltipTextTw = '';
+            }, 10000)
         },
         showEvents() {
             if (!storeSettings().getGDriveToken) {
