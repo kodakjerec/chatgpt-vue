@@ -8,7 +8,7 @@ const router = createRouter({
       redirect: { name: "home" },
     },
     {
-      path: "/yourGPT/",
+      path: "/yourChatGPT/",
       name: "home",
       components: {
         home: () => import("@/views/home.vue"),
