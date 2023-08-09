@@ -3,8 +3,9 @@
         <div id="shadow" class="fixed left-0 top-0 z-1000 w-full h-full overflow-x-hidden overflow-y-auto bg-slate-100 opacity-90" @click="clickWhiteSpace($event)">
             <div id="content" class="relative top-10 z-2 w-full text-center px-6">
                 <div class="p-2 rounded border border-black appBgColor overflow-y-auto hide-scroll-bar" :class="{ 'shockWindow': shockWindow }">
-                    <div id="model_header" class="relative justify-center">
-                        <p class="text-2xl font-bold mt-2 text-center">{{ myTitle }}</p>
+                    <div id="model_header" class="relative">
+                        <span class="text-2xl font-bold mt-2 text-center">{{ myTitle }}</span>
+                        <button class="btn" @click="resetValue('settings_chat')">Default</button>
                         <close class="absolute top-0 right-0" theme="filled" size="24" fill="#000000" @click="closeDialog('')" />
                     </div>
                     <div id="model_content" class="flex flex-wrap rounded m-2">
@@ -115,6 +116,10 @@ export default {
         },
         contentInputChange(event: any, myObjectName: string) {
             storeSettings().setSettings(myObjectName, this.settings_chat);
+        },
+        resetValue(myObjectName: string) {
+                this.settings_chat = storeSettings().resetSettings(myObjectName);
+                storeSettings().setSettings(myObjectName, this.settings_chat);
         }
     }
 }

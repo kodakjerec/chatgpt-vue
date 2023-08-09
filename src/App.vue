@@ -23,7 +23,7 @@
           </li>
           <div v-if="!oldLogName">
             <edit theme="outline" size="20" fill="#fff" class="mt-3" @click="editLogName(item)" />
-            <delete theme="outline" size="20" fill="#fff" class="mt-3" v-show="logList.length > 1" @click="delChatLog(item)" />
+            <delete theme="outline" size="20" fill="#fff" class="mt-3" @click="delChatLog(item)" />
           </div>
         </div>
         <li>==========</li>
