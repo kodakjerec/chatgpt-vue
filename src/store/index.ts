@@ -70,7 +70,7 @@ export const storeSettings = defineStore({
     settings: {}, // chatGPT settings
     googleOAuth2token: "", // google OAuth2 token
     googleDriveFileName: "yourGPT_localStorage.txt",
-    maxTokens: Math.round(4096*0.8)
+    maxTokens: 4096,
   }),
   getters: {
     getSecretKey(state) {

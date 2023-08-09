@@ -2,7 +2,7 @@
   <div class="bg-gray-100 flex h-screen overflow-x-hidden">
     <!-- Sidebar -->
     <div v-if="!sidebarActive" class="fixed top-1 right-1 w-8 h-8 cursor-pointer z-1000 bg-gray-100 rounded" @click="toggleSidebar">
-      <menu-unfold theme="outline" size="24" fill="#333" />
+      <menu-unfold theme="outline" size="30" fill="#333" />
     </div>
     <div ref="sidebar" class="bg-gray-800 text-white px-4 sidebar" :class="{ active: sidebarActive }" tabindex="0" @blur="closeSidebar">
       <ul class="mt-8 flex flex-col justify-between cursor-pointer">
@@ -18,9 +18,13 @@
         </li>
         <div class="flex" v-for="(item, index) in logList" :key="index">
           <li class="py-2 border-t flex-auto border-gray-700 items-center hover:bg-slate-700 hover:rounded">
-            <div :class="{ 'text-yellow-300': selectLog === item }" @click="clickLogName(item)">{{ item }}</div>
+            <div v-if="oldLogName !== item" :class="{ 'text-yellow-300': selectLog === item }" @click="clickLogName(item)">{{ item }}</div>
+            <input v-else type="text" class="border rounded-md bg-transparent" @blur="updateLogName" v-model="newLogName" ref="editingLogName">
           </li>
-          <delete theme="outline" size="20" fill="#fff" class="mt-3" v-show="logList.length > 1" @click="delChatLog(item)" />
+          <div v-if="!oldLogName">
+            <edit theme="outline" size="20" fill="#fff" class="mt-3" @click="editLogName(item)" />
+            <delete theme="outline" size="20" fill="#fff" class="mt-3" v-show="logList.length > 1" @click="delChatLog(item)" />
+          </div>
         </div>
         <li>==========</li>
         <li class="py-2 border-t border-gray-700 flex items-center hover:bg-slate-700 hover:rounded" @click="gotoPath('transcription')">
@@ -53,7 +57,7 @@
     <div v-if="sidebarActive" class="absolute w-full h-screen bg-slate-100 opacity-60 z-10"></div>
     <!-- nowLoading -->
     <div v-if="nowLoading" class="absolute w-full h-screen bg-slate-100 opacity-90 z-10">
-      <div class="inset-x-20 top-1/2 absolute font-black text-2xl">{{ loadingMessage }}</div>
+      <div class="inset-x-20 top-1/2 absolute font-black text-2xl">{{ nowLoading }}</div>
     </div>
     <!-- Content -->
     <div class="w-full">
@@ -68,13 +72,13 @@
   </div>
 </template>
 <script lang="ts">
-import { Photograph, Translate, Plus, Delete, MenuUnfold } from "@icon-park/vue-next";
+import { Photograph, Translate, Plus, Edit, Delete, MenuUnfold } from "@icon-park/vue-next";
 import { storeSettings, storeGoogleDrive } from '@/store/index';
 
 export default {
   name: 'App',
   components: {
-    Photograph, Translate, Plus, Delete, MenuUnfold
+    Photograph, Translate, Plus, Edit, Delete, MenuUnfold
   },
   data() {
     return {
@@ -82,10 +86,12 @@ export default {
       selectLog: '',
       logList: [],
       messageList: [],
-      sidebarActive: false,
+      sidebarActive: false, // 顯示sidebar
       nowLoading: false,
-      loadingMessage: "",
-      lastActiveTime: null
+      loadingMessage: "",   // 讀取視窗文字
+      lastActiveTime: null,  // 最後一次操作時間
+      oldLogName: "",  // 是否正在編輯標題文字, 並作為儲存舊文字
+      newLogName: "" // 新文字
     }
   },
   async mounted() {
@@ -94,11 +100,9 @@ export default {
     const token = storeSettings().getGDriveToken;
 
     if (token) {
-      this.nowLoading = true;
-      this.loadingMessage = "Loading cloud data.";
+      this.nowLoading = "Loading cloud data.";
       await storeGoogleDrive().cloundToLocalStorage();
-      this.nowLoading = false;
-      this.loadingMessage = "";
+      this.nowLoading = "";
     }
     this.bringlogList();
   },
@@ -170,23 +174,37 @@ export default {
       this.selectLog = logName;
       this.gotoPath('chat/' + this.selectLog);
     },
-    updateLogName(fromObject: { newLogName: string, oldName: string }) {
-      const newLogName = fromObject.newLogName;
-      const oldName = fromObject.oldName;
+    editLogName(item) {
+      this.oldLogName = item;
+      this.newLogName = item;
+      this.$nextTick(() => {
+        if (this.$refs.editingLogName) {
+          const refInput = (this.$refs.editingLogName as HTMLInputElement);
+          refInput.select();
+        }
+      })
+    },
+    updateLogName() {
+      const oldName = this.oldLogName;
+      const newLogName = this.newLogName;
+      if (newLogName !== oldName) {
+        const index = this.logList.findIndex(item => item === oldName);
 
-      const index = this.logList.findIndex(item => item === oldName);
-
-      if (newLogName) {
-        const oldName = this.logList[index];
-        // change list
-        this.logList[index] = newLogName;
-        this.setLogList();
-        // change chatLog
-        const chatLog = storeSettings().getLogData(oldName);
-        storeSettings().setLogData(newLogName, chatLog);
-        storeSettings().delLogData(oldName);
-        this.clickLogName(newLogName);
+        if (newLogName) {
+          const oldName = this.logList[index];
+          // change list
+          this.logList[index] = newLogName;
+          this.setLogList();
+          // change chatLog
+          const chatLog = storeSettings().getLogData(oldName);
+          storeSettings().setLogData(newLogName, chatLog);
+          storeSettings().delLogData(oldName);
+          this.clickLogName(newLogName);
+        }
       }
+      // finally
+      this.oldLogName = "";
+      this.newLogName = "";
     },
     gotoPath(path: string) {
       this.nowPath = path;

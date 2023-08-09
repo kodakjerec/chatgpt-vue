@@ -1,20 +1,24 @@
 <template>
   <div class="w-full overflow-y-auto h-screen" ref="chatListDom">
     <div class="min-h-screen w-full">
-      <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100">
-        <div class="text-2xl font-bold" v-if="!editing">{{ sendLogName }}
-          <div class="inline-flex cursor-pointer" @click="editLogName">
-            <edit theme="outline" size="24" fill="#000" />
-          </div>
+      <div class="absolute top-0 left-0 z-10">
+        <div class="font-bold">{{ sendLogName }}
           <span class="text-xs text-gray-500" title="tokens">{{ totalTokens }}</span>
         </div>
-        <input type="text" class="px-4 py-2 text-gray-700 bg-white border rounded-md mr-2 text-black bg-slate-400" v-else @blur="updateLogName" v-model="newLogName" ref="editingLogName">
+      </div>
+      <div class="sticky top-0 w-full h-10 bg-gray-100 flex justify-center">
+        <div class="cursor-pointer" @click="showDialog">
+          <span class="text-xs">{{ settings_chat.model }}</span>
+          <span class="text-xs"> Temp:</span><span class="text-xs">{{ settings_chat.temperature }}</span>
+          <span class="text-xs"> Pp:</span><span class="text-xs">{{ settings_chat.presence_penalty }}</span>
+          <span class="text-xs"> Fp:</span><span class="text-xs">{{ settings_chat.frequency_penalty }}</span>
+        </div>
       </div>
       <div class="flex-1 mx-2 mb-2">
         <div class="group flex flex-col px-2 py-2 hover:bg-slate-200 rounded-lg" v-for="(item, index) of messageListView" :key="index">
           <div class="flex justify-between items-center">
             <div class="font-bold flex">
-              <span>{{ roleAlias[item.role] }}：</span>
+              <span>{{ roleAlias[item.role] }}</span>
             </div>
             <div class=" group-hover:visible w-30 flex">
               <CopyContent class="invisible group-hover:visible w-30" :content="item.content" @deleteItem="deleteItem" :index="index" v-show="!isTalking" />
@@ -42,13 +46,14 @@
     <div class="sticky bottom-0 w-full p-2">
       <div>
         <div class="flex">
-          <textarea class="input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
+          <textarea class="chat-input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
           <button class="redBtn" v-if="isTalking" @click="callAbortChat()">Stop</button>
           <button class="btn" v-else @click="sendChatMessage()">Send</button>
         </div>
       </div>
     </div>
   </div>
+  <chat-setting v-if="isShowDialog" @close="closeDialog"></chat-setting>
 </template>
 
 <script lang="ts">
@@ -57,16 +62,18 @@ import Loding from "@/components/Loding.vue";
 import CopyContent from "@/components/Copy.vue";
 import VoiceSound from "@/components/VoiceSound.vue";
 import { md } from "@/libs/markdown";
-import { encoding_for_model, Tiktoken } from '@dqbd/tiktoken';
+import { encoding_for_model } from '@dqbd/tiktoken';
 import { Edit, Delete } from "@icon-park/vue-next";
 import { storeSettings } from '@/store';
 import type { ChatMessage } from '@/types';
+import ChatSetting from "./components/chatSetting.vue";
 
 export default {
   name: 'chat',
   components: {
     Loding, CopyContent, VoiceSound,
-    Edit, Delete
+    Edit, Delete,
+    ChatSetting
   },
   props: {
     sendLogName: {
@@ -76,17 +83,17 @@ export default {
   },
   data() {
     return {
-      md: md,
-      editing: '',
-      newLogName: '',
-      isTalking: false,
-      messageContent: '',
-      totalTokens: 0,
+      md: md, // markdown component
+      isTalking: false, // now is under talking
+      messageContent: '', // what user typing
+      totalTokens: 0, // used tokens
       decoder: new TextDecoder("utf-8"),
-      roleAlias: { user: "ME", assistant: "ChatGPT", system: "System" },
-      messageList: [],
-      maxTokens: Math.round(storeSettings().maxTokens*0.8),
-      enc: null // log size
+      roleAlias: { user: "User", assistant: "Assistant", system: "System" }, // role
+      messageList: [],  // messages list
+      maxTokens: storeSettings().maxTokens, // chat max tokens
+      enc: null, // calculate tokens
+      settings_chat: storeSettings().getSettings("settings_chat"),
+      isShowDialog: false // open setting dialog
     }
   },
   computed: {
@@ -309,20 +316,6 @@ Please let me know what kind of help you need, and I will provide relevant infor
       })
       return tokens;
     },
-    editLogName() {
-      this.editing = this.sendLogName;
-      this.newLogName = this.sendLogName;
-      this.$nextTick(() => {
-        if (this.$refs.editingLogName) {
-          const refInput = (this.$refs.editingLogName as HTMLInputElement);
-          refInput.select();
-        }
-      })
-    },
-    updateLogName() {
-      this.$emit('updateLogName', { newLogName: this.newLogName, oldName: this.editing });
-      this.editing = '';
-    },
     /**
      * delete one chat-log block
      * @param index 順序
@@ -330,6 +323,13 @@ Please let me know what kind of help you need, and I will provide relevant infor
     deleteItem(index: Number) {
       this.messageList.splice(index, 1);
       this.setChatLog();
+    },
+    showDialog() {
+      this.isShowDialog = true;
+    },
+    closeDialog() {
+      this.isShowDialog = false;
+      this.settings_chat = storeSettings().getSettings("settings_chat");
     }
   }
 }
