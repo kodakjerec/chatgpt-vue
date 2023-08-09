@@ -1,8 +1,8 @@
 <template>
     <div>
-        <div id="shadow" class="fixed left-0 top-0 z-1000 w-full h-full overflow-x-hidden overflow-y-auto bg-slate-100 opacity-90" @click="clickWhiteSpace($event)">
+        <div id="shadow" class="fixed left-0 top-0 z-1000 w-full h-full overflow-x-hidden overflow-y-auto bg-slate-100">
             <div id="content" class="relative top-10 z-2 w-full text-center px-6">
-                <div class="p-2 rounded border border-black appBgColor overflow-y-auto hide-scroll-bar" :class="{ 'shockWindow': shockWindow }">
+                <div class="p-2 rounded border border-black bg-white overflow-y-auto hide-scroll-bar" :class="{ 'shockWindow': shockWindow }">
                     <div id="model_header" class="relative">
                         <span class="text-2xl font-bold mt-2 text-center">{{ myTitle }}</span>
                         <button class="btn" @click="resetValue('settings_chat')">Default</button>
@@ -82,6 +82,12 @@ export default {
             ]
         }
     },
+    mounted() {
+        document.body.addEventListener('click', this.clickWhiteSpace);
+    },
+    beforeUnmount() {
+        document.body.removeEventListener('click', this.clickWhiteSpace);
+    },
     methods: {
         // 關閉視窗
         closeDialog(event) {
@@ -90,7 +96,10 @@ export default {
         // 按到白色區域, 震動視窗
         // TODO 現在會順便關閉視窗
         clickWhiteSpace(event) {
-            if (event.target.id !== "shadow") return;
+            const promptElement = document.getElementById('content');
+            if (promptElement && promptElement.contains(event.target)) {
+                return;
+            }
             this.shockWindow = true;
 
             setTimeout(() => {

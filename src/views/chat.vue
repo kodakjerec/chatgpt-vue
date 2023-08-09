@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full overflow-y-auto h-screen" ref="chatListDom">
+  <div class="w-full overflow-y-auto h-screen" ref="chatListDom" @wheel="scrolling" @touchmove="scrolling">
     <div class="min-h-screen w-full">
       <div class="absolute top-0 left-0 z-10">
         <div class="font-bold">{{ sendLogName }}
@@ -7,7 +7,7 @@
         </div>
       </div>
       <div class="sticky top-0 w-full h-10 bg-gray-100 flex justify-center">
-        <div class="cursor-pointer" @click="showDialog">
+        <div class="cursor-pointer" @click.stop="showDialog">
           <span class="text-xs">{{ settings_chat.model }}</span>
           <span class="text-xs"> Temp:</span><span class="text-xs">{{ settings_chat.temperature }}</span>
           <span class="text-xs"> Pp:</span><span class="text-xs">{{ settings_chat.presence_penalty }}</span>
@@ -44,12 +44,14 @@
       </div>
     </div>
     <div class="sticky bottom-0 w-full p-2">
-      <div>
-        <div class="flex">
-          <textarea class="chat-input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
-          <button class="redBtn" v-if="isTalking" @click="callAbortChat()">Stop</button>
-          <button class="btn" v-else @click="sendChatMessage()">Send</button>
-        </div>
+      <div v-if="isAtBottom" class="mb-2 flex justify-end">
+        <chat-prompt v-if="isShowPrompt" @getPrompt="getPrompt"></chat-prompt>
+        <div v-else class="border border-slate-300 rounded p-2 cursor-pointer" @click.stop="openPrompt">Prompt</div>
+      </div>
+      <div class="flex">
+        <textarea class="chat-input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
+        <button class="redBtn" v-if="isTalking" @click="callAbortChat()">Stop</button>
+        <button class="btn" v-else @click="sendChatMessage()">Send</button>
       </div>
     </div>
   </div>
@@ -67,13 +69,14 @@ import { Edit, Delete } from "@icon-park/vue-next";
 import { storeSettings } from '@/store';
 import type { ChatMessage } from '@/types';
 import ChatSetting from "./components/chatSetting.vue";
+import ChatPrompt from "./components/chatPrompt.vue";
 
 export default {
   name: 'chat',
   components: {
     Loding, CopyContent, VoiceSound,
     Edit, Delete,
-    ChatSetting
+    ChatSetting, ChatPrompt
   },
   props: {
     sendLogName: {
@@ -93,7 +96,9 @@ export default {
       maxTokens: storeSettings().maxTokens, // chat max tokens
       enc: null, // calculate tokens
       settings_chat: storeSettings().getSettings("settings_chat"),
-      isShowDialog: false // open setting dialog
+      isShowDialog: false, // open setting dialog
+      isShowPrompt: false, // open prompt
+      isAtBottom: false // scroll to bottom
     }
   },
   computed: {
@@ -324,12 +329,35 @@ Please let me know what kind of help you need, and I will provide relevant infor
       this.messageList.splice(index, 1);
       this.setChatLog();
     },
+    // show dialog
     showDialog() {
       this.isShowDialog = true;
     },
+    // close dialog
     closeDialog() {
       this.isShowDialog = false;
       this.settings_chat = storeSettings().getSettings("settings_chat");
+    },
+    // open prompt
+    openPrompt() {
+      this.isShowPrompt = true;
+    },
+    // get prompt, and close prompt
+    getPrompt(prompt) {
+      this.messageContent+=prompt;
+      this.isShowPrompt = false;
+    },
+    // check scrolling
+    scrolling() {
+      const scrollDiv = this.$refs.chatListDom;
+      const isAtBottom = scrollDiv.scrollTop + scrollDiv.clientHeight >= scrollDiv.scrollHeight *0.98;
+      this.isAtBottom = isAtBottom;
+
+      if (isAtBottom) {
+        console.log('Reached bottom');
+      } else {
+        console.log('Not yet at bottom');
+      }
     }
   }
 }
