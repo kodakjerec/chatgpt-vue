@@ -62,7 +62,7 @@
     <!-- Content -->
     <div class="w-full">
       <router-view v-if="nowPath === 'home'" name="home" @fromClick="(path) => nowPath = path" />
-      <router-view v-if="nowPath.slice(0, 4) === 'chat'" name="chat" :sendLogName="selectLog" @updateLogName="updateLogName" />
+      <router-view v-if="nowPath.slice(0, 4) === 'chat'" name="chat" :sendLogName="selectLog" />
       <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
       <router-view v-if="nowPath === 'translation'" name="translation" />
       <router-view v-if="nowPath === 'transcription'" name="transcription" />
