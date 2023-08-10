@@ -64,7 +64,6 @@ export const storeSettings = defineStore({
   state: () => ({
     secretKey: "lianginx", // secret key
     apiKey: "", // chatGPT api key
-    logList: [], // logList, how many logs
     logData: {}, // logData
     lastPath: "", // last view page
     settings: {}, // chatGPT settings
@@ -85,10 +84,7 @@ export const storeSettings = defineStore({
       return state.apiKey;
     },
     getLogList(state) {
-      if (state.logList.length === 0) {
-        state.logList = JSON.parse(storageGet("logList") ?? "[]");
-      }
-      return state.logList;
+      return Object.keys(state.logData);
     },
     /**
      *
@@ -125,6 +121,7 @@ export const storeSettings = defineStore({
           findData = JSON.parse(JSON.stringify(findData));
         } else {
           findData = this.resetSettings(name);
+          this.setSettings(name, findData);
         }
         return findData;
       };
@@ -143,10 +140,6 @@ export const storeSettings = defineStore({
       this.apiKey = key;
       const aesAPIKey = cryptoJS.AES.encrypt(this.apiKey, this.getSecretKey).toString();
       storageSet("apiKey", aesAPIKey, true);
-    },
-    setLogList(list: any) {
-      this.logList = list;
-      storageSet("logList", JSON.stringify(this.logList), true);
     },
     setLogData(name: string, content: Array<ChatMessage>) {
       this.logData[name] = content;

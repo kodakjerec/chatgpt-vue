@@ -10,14 +10,7 @@ const router = createRouter({
     {
       path: "/yourChatGPT/",
       name: "home",
-      components: {
-        home: () => import("@/views/home.vue"),
-        chat: () => import("@/views/chat.vue"),
-        settings: () => import("@/views/settings.vue"),
-        createOneImage: () => import("@/views/createOneImage.vue"),
-        translation: () => import("@/views/translation.vue"),
-        transcription: () => import("@/views/transcription.vue"),
-      },
+      component: () => import("@/views/home.vue")
     },
   ],
 });

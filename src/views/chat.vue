@@ -46,7 +46,7 @@
     <div class="sticky bottom-0 w-full p-2">
       <div v-if="isAtBottom" class="mb-2 flex justify-end">
         <chat-prompt v-if="isShowPrompt" @getPrompt="getPrompt"></chat-prompt>
-        <div v-else class="border border-slate-300 rounded p-2 cursor-pointer" @click.stop="openPrompt">Prompt</div>
+        <div v-else class="border border-slate-300 rounded p-2 cursor-pointer bg-slate-100" @click.stop="openPrompt">Prompt</div>
       </div>
       <div class="flex">
         <textarea class="chat-input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
@@ -84,6 +84,7 @@ export default {
       default: ''
     }
   },
+  emits:[],
   data() {
     return {
       md: md, // markdown component
@@ -113,7 +114,8 @@ export default {
     },
     'messageList.length'() {
       this.$nextTick(() => {
-        this.scrollToBottom()
+        this.scrollToBottom();
+        this.isAtBottom = true;
       })
     }
   },
@@ -350,14 +352,8 @@ Please let me know what kind of help you need, and I will provide relevant infor
     // check scrolling
     scrolling() {
       const scrollDiv = this.$refs.chatListDom;
-      const isAtBottom = scrollDiv.scrollTop + scrollDiv.clientHeight >= scrollDiv.scrollHeight *0.98;
+      const isAtBottom = Math.abs(scrollDiv.scrollHeight - scrollDiv.scrollTop - scrollDiv.clientHeight)< scrollDiv.scrollHeight*0.03 ;
       this.isAtBottom = isAtBottom;
-
-      if (isAtBottom) {
-        console.log('Reached bottom');
-      } else {
-        console.log('Not yet at bottom');
-      }
     }
   }
 }

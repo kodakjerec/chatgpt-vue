@@ -33,13 +33,14 @@
 import { Copy, Delete, Edit, VoiceOne } from "@icon-park/vue-next";
 
 export default {
-    name: 'home',
+    name: "home",
+    emits: ["fromClick"],
     components: {
         Copy, Delete, Edit, VoiceOne
     },
     methods: {
         goTo(destination:string) {
-            this.$emit('fromClick', destination);
+            this.$emit("fromClick", destination);
         }
     }
 }

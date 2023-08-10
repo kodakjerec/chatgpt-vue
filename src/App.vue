@@ -61,30 +61,37 @@
     </div>
     <!-- Content -->
     <div class="w-full">
-      <router-view v-if="nowPath === 'home'" name="home" @fromClick="(path) => nowPath = path" />
-      <router-view v-if="nowPath.slice(0, 4) === 'chat'" name="chat" :sendLogName="selectLog" />
-      <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
-      <router-view v-if="nowPath === 'translation'" name="translation" />
-      <router-view v-if="nowPath === 'transcription'" name="transcription" />
-      <router-view v-if="nowPath === 'settings'" name="settings" />
-      <router-view v-if="nowPath === 'createOneImage'" name="createOneImage" />
+      <component v-if="componentPath==='home'" :is="componentPath" @fromClick="(path) => nowPath = path"></component>
+      <component v-else-if="componentPath==='chat'" :is="componentPath" :sendLogName="selectLog"></component>
+      <component v-else :is="componentPath"></component>
     </div>
   </div>
 </template>
-<script lang="ts">
+<script lang="ts" setup>
 import { Photograph, Translate, Plus, Edit, Delete, MenuUnfold } from "@icon-park/vue-next";
 import { storeSettings, storeGoogleDrive } from '@/store/index';
+import { computed } from "vue";
+// components
+import home from "@/views/home.vue";
+import chat from "@/views/chat.vue";
+import transcription from "@/views/transcription.vue";
+import translation from "@/views/translation.vue";
+import settings from "@/views/settings.vue";
+import createOneImage from "@/views/createOneImage.vue";
 
+const logList = computed(() => storeSettings().getLogList )
+</script>
+
+<script lang="ts">
 export default {
   name: 'App',
   components: {
-    Photograph, Translate, Plus, Edit, Delete, MenuUnfold
+    Photograph, Translate, Plus, Edit, Delete, MenuUnfold,
+    home, chat, transcription, translation, settings, createOneImage
   },
   data() {
     return {
       nowPath: 'home',
-      selectLog: '',
-      logList: [],
       messageList: [],
       sidebarActive: false, // 顯示sidebar
       nowLoading: false,
@@ -92,6 +99,21 @@ export default {
       lastActiveTime: null,  // 最後一次操作時間
       oldLogName: "",  // 是否正在編輯標題文字, 並作為儲存舊文字
       newLogName: "" // 新文字
+    }
+  },
+  computed: {
+    selectLog() {
+      if (this.nowPath.indexOf("chat")>=0) {
+        return this.nowPath.replace("chat/","");
+      }
+      return "";
+    },
+    componentPath() {
+      let returnPath = this.nowPath;
+      if (returnPath.indexOf("chat")>=0) {
+        returnPath = "chat";
+      }
+      return returnPath;
     }
   },
   async mounted() {
@@ -104,103 +126,71 @@ export default {
       await storeGoogleDrive().cloundToLocalStorage();
       this.nowLoading = "";
     }
-    this.bringlogList();
+    const lastPath = storeSettings().getLastPath;
+    if (lastPath) {
+      this.nowPath = lastPath;
+    } else {
+      this.nowPath = "settings";
+    }
   },
   beforeDestroy() {
     window.removeEventListener('focus', this.handlePageFocus)
   },
   methods: {
     /**
-     * get all log list
-     */
-    bringlogList() {
-      this.logList = storeSettings().getLogList;
-
-      const lastPath = storeSettings().getLastPath;
-      if (lastPath) {
-        this.nowPath = lastPath;
-      } else {
-        this.nowPath = "settings";
-      }
-      if (this.nowPath.slice(0, 4) === 'chat') {
-        this.selectLog = this.nowPath.substring(5, this.nowPath.length);
-      }
-    },
-    /**
-     * save log list
-     */
-    setLogList() {
-      storeSettings().setLogList(this.logList);
-    },
-    /**
      * add new chat block
      */
     newChatLog() {
-      let generatedString: string = ''
-      const stringLength: number = 6
-      let isDuplicate: boolean = true
+      let generatedString: string = '';
+      let startIndex: number = 1;
+      let isDuplicate: boolean = true;
 
       while (isDuplicate) {
         // 生成一個隨機6個字符的字符串
-        generatedString = 'chat' + (Math.round(Math.random() * 1000)).toString();
+        generatedString = 'chat' + startIndex.toString();
 
         // 檢查新字符串是否已經存在於列表中
         if (!this.logList.includes(generatedString)) {
-          isDuplicate = false
+          isDuplicate = false;
         } else {
-          generatedString = ''
+          generatedString = '';
+          startIndex++;
         }
       }
-      this.logList.push(generatedString);
       this.clickLogName(generatedString);
-      this.setLogList();
     },
     /**
      * delete one chat block
      */
     delChatLog(logName: string) {
       storeSettings().delLogData(logName);
-      const findIndex = this.logList.findIndex(element => element === logName);
-      if (findIndex > -1) {
-        this.logList.splice(findIndex, 1);
-        this.clickLogName(this.logList[0]);
-        this.setLogList();
-      }
+      this.clickLogName(this.logList[0]);
     },
     /**
      * select one chat
      */
     clickLogName(logName: string) {
-      this.selectLog = logName;
-      this.gotoPath('chat/' + this.selectLog);
+      this.gotoPath('chat/' + logName);
     },
     editLogName(item) {
       this.oldLogName = item;
       this.newLogName = item;
-      this.$nextTick(() => {
-        if (this.$refs.editingLogName) {
-          const refInput = (this.$refs.editingLogName as HTMLInputElement);
-          refInput.select();
-        }
-      })
+      // this.$nextTick(() => {
+      //   if (this.$refs.editingLogName) {
+      //     const refInput = (this.$refs.editingLogName as HTMLInputElement);
+      //     refInput.select();
+      //   }
+      // })
     },
     updateLogName() {
       const oldName = this.oldLogName;
       const newLogName = this.newLogName;
-      if (newLogName !== oldName) {
-        const index = this.logList.findIndex(item => item === oldName);
-
-        if (newLogName) {
-          const oldName = this.logList[index];
-          // change list
-          this.logList[index] = newLogName;
-          this.setLogList();
-          // change chatLog
-          const chatLog = storeSettings().getLogData(oldName);
-          storeSettings().setLogData(newLogName, chatLog);
-          storeSettings().delLogData(oldName);
-          this.clickLogName(newLogName);
-        }
+      if (newLogName) {
+        // change chatLog
+        const chatLog = storeSettings().getLogData(oldName);
+        storeSettings().setLogData(newLogName, chatLog);
+        storeSettings().delLogData(oldName);
+        this.clickLogName(newLogName);
       }
       // finally
       this.oldLogName = "";
