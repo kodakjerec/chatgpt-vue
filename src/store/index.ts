@@ -59,6 +59,9 @@ export const storeVoice = defineStore({
   },
 });
 
+export interface promptInterface {
+  act: string, prompt: string
+}
 export const storeSettings = defineStore({
   id: "settings",
   state: () => ({
@@ -70,6 +73,7 @@ export const storeSettings = defineStore({
     googleOAuth2token: "", // google OAuth2 token
     googleDriveFileName: "yourGPT_localStorage.txt",
     maxTokens: 4096,
+    prompts: [] // prompts
   }),
   getters: {
     getSecretKey(state) {
@@ -107,7 +111,7 @@ export const storeSettings = defineStore({
     },
     getLastPath(state) {
       if (!state.lastPath) {
-        state.lastPath = storageGet("lastPath") ?? "";
+        state.lastPath = storageGet("lastPath") ?? "home";
       }
       return state.lastPath;
     },
@@ -134,6 +138,12 @@ export const storeSettings = defineStore({
 
       return state.googleOAuth2token;
     },
+    getPrompts(state): Array<promptInterface> {
+      if (state.prompts.length===0) {
+        state.prompts = JSON.parse(storageGet("prompts")) ?? [];
+      }
+      return state.prompts;
+    }
   },
   actions: {
     setApiKey(key: string) {
@@ -193,6 +203,10 @@ export const storeSettings = defineStore({
       const aesAPIKey = cryptoJS.AES.encrypt(token, this.getSecretKey).toString();
       storageSet("gToken", aesAPIKey);
     },
+    setPrompts(prompts:Array<promptInterface>) {
+      this.prompts = prompts;
+      storageSet("prompts", JSON.stringify(this.prompts));
+    }
   },
 });
 

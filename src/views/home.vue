@@ -30,6 +30,7 @@
     </div>
 </template>
 <script lang="ts">
+import { storeSettings } from "@/store";
 import { Copy, Delete, Edit, VoiceOne } from "@icon-park/vue-next";
 
 export default {
@@ -40,7 +41,7 @@ export default {
     },
     methods: {
         goTo(destination:string) {
-            this.$emit("fromClick", destination);
+            storeSettings().setLastPath(destination);
         }
     }
 }
