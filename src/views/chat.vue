@@ -1,6 +1,6 @@
 <template>
   <div class="w-full overflow-y-auto h-screen" ref="chatListDom" @wheel="scrolling" @touchmove="scrolling">
-    <div class="h-full w-full">
+    <div id="content" class="calContent w-full">
       <div class="absolute top-0 left-0 z-10">
         <div class="font-bold">{{ sendLogName }}
           <span class="text-xs text-gray-500" title="tokens">{{ totalTokens }}</span>
@@ -43,7 +43,7 @@
         </div>
       </div>
     </div>
-    <div class="sticky bottom-0 w-full">
+    <div id="footer" class="sticky bottom-0 w-full">
       <div v-if="isAtBottom" class="mb-1 pr-1 flex justify-end">
         <chat-prompt v-if="isShowPrompt" @getPrompt="getPrompt"></chat-prompt>
         <div v-else class="border border-slate-300 rounded p-1 cursor-pointer bg-slate-100" @click.stop="openPrompt">Prompt</div>
@@ -384,5 +384,9 @@ pre {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   border-bottom: 8px solid rgb(134, 239, 172, 1);
+}
+
+.calContent {
+  min-height: calc(100vh - 56px);
 }
 </style>
