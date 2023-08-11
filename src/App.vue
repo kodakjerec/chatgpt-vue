@@ -10,14 +10,26 @@ import settings from "@/views/settings.vue";
 import createOneImage from "@/views/createOneImage.vue";
 import prompts from './views/prompts.vue';
 import sideBar from "@/views/components/sideBar.vue";
-import { computed } from "vue";
+import { computed, onBeforeUnmount, onMounted } from "vue";
+
+// set all!
+storeSettings().setFromLocalforge();
 
 const lastPath = computed(() => storeSettings().getLastPath);
+// dynamic component
 const componentPath = computed(() => {
       if (lastPath.value.indexOf("chat")>=0) {
-        return "chat";
+        return chat;
       }
-      return lastPath.value;
+      
+      switch(lastPath.value) {
+        case "home": return home;
+        case "transcription": return transcription;
+        case "translation": return translation;
+        case "settings": return settings;
+        case "createOneImage": return createOneImage;
+        case "prompts": return prompts;
+      }
     });
 const selectLog = computed(() => {
     if (lastPath.value.indexOf("chat")>=0) {
@@ -39,7 +51,23 @@ const handlePageFocus = () => {
       if (timeDiff > 60 * 60 * 1000) { // 60 分鐘
         location.reload();
       }
+  }
+
+onMounted(async ()=>{
+  window.addEventListener('focus', handlePageFocus);
+
+    const token = storeSettings().getGDriveToken;
+
+    if (token) {
+      nowLoading = "Loading cloud data.";
+      await storeGoogleDrive().cloundToLocalStorage();
+      nowLoading = "";
     }
+})
+
+onBeforeUnmount(()=>{
+  window.removeEventListener('focus', handlePageFocus)
+})
 
 </script>
 <template>
@@ -52,34 +80,11 @@ const handlePageFocus = () => {
     </div>
     <!-- Content -->
     <div class="w-full">
-      <component v-if="componentPath==='chat'" :is="componentPath" :sendLogName="selectLog"></component>
+      <component v-if="componentPath===chat" :is="componentPath" :sendLogName="selectLog"></component>
       <component v-else :is="componentPath"></component>
     </div>
   </div>
 </template>
-
-<script lang="ts">
-export default {
-  name: 'App',
-  components: {
-    home, chat, transcription, translation, settings, createOneImage, prompts
-  },
-  async mounted() {
-    window.addEventListener('focus', this.handlePageFocus);
-
-    const token = storeSettings().getGDriveToken;
-
-    if (token) {
-      this.nowLoading = "Loading cloud data.";
-      await storeGoogleDrive().cloundToLocalStorage();
-      this.nowLoading = "";
-    }
-  },
-  beforeUnmount() {
-    window.removeEventListener('focus', this.handlePageFocus)
-  }
-}
-</script>
 <style>
 html,
 body,

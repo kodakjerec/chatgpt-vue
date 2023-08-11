@@ -260,11 +260,6 @@ export default {
       const chatLog = storeSettings().getLogData(logName);
 
       this.messageList = JSON.parse(JSON.stringify(chatLog));
-      if (this.messageList.length === 0) {
-        this.resetChatLog();
-        this.setChatLog();
-      }
-
       this.totalTokens = this.calAllTiktoken(this.messageList);
     },
     // save log

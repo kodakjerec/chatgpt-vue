@@ -15,13 +15,13 @@ export async function accessToken() {
         scope: "https://www.googleapis.com/auth/drive.file profile",
         callback: async (response) => {
           storeSettings().setGDriveToken(response.access_token);
-          createToaster().success("Login success. Checking Cloud Data.", { position: "top" });
+          createToaster().success("Login success. Checking Cloud Data.");
 
           // getUserInfo();
 
           // signed.restore or backup
           await storeGoogleDrive().cloundToLocalStorage();
-          createToaster().success("The webpage will be refreshed in 2 seconds.", { position: "top" });
+          createToaster().success("The webpage will be refreshed in 2 seconds.");
           setTimeout(() => {
             window.location.reload();
           }, 2000);
@@ -113,7 +113,7 @@ export async function gDriveCheck(fileName: string) {
     }
   } catch (e: any) {
     console.log(e);
-    createToaster().error("Failed to check data list", { position: "top" });
+    createToaster().error("Failed to check data list");
     return "error";
   }
 }
@@ -151,7 +151,7 @@ export async function gDrivePatch(contentString: string, fileName: string, fileI
     }
   } catch (e: any) {
     console.log(e);
-    createToaster().error("Failed to patch data", { position: "top" });
+    createToaster().error("Failed to patch data");
     return false;
   }
 }
@@ -197,7 +197,7 @@ export async function gDriveSave(contentString: string, fileName: string) {
     }
   } catch (e: any) {
     console.log(e);
-    createToaster().error("Failed to save data", { position: "top" });
+    createToaster().error("Failed to save data");
     return false;
   }
 }
@@ -231,7 +231,7 @@ export async function gDriveLoad(fileId: string) {
     }
   } catch (e: any) {
     console.log(e);
-    createToaster().error("Failed to load data", { position: "top" });
+    createToaster().error("Failed to load data");
     return false;
   }
 }

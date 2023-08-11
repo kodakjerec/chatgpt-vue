@@ -8,49 +8,39 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
+import { storeSettings } from '@/store';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
-export default {
-    name: "chatPrompt",
-    data() {
-        return {
-            keyword: "",
-            prompts: [{
-                "act": "123",
-                "prompt": "456"
-            },{
-                "act": "567",
-                "prompt": "123"
-            }]
-        }
-    },
-    computed: {
-        filterPrompts() {
-            let filterList = this.prompts;
-            if (this.keyword) {
-                filterList = this.prompts.filter(prompt=> prompt.act.indexOf(this.keyword)>=0);
-            }
-            return filterList;
-        }
-    },
-    mounted() {
-        document.body.addEventListener('click', this.hidePrompt);
-    },
-    beforeUnmount() {
-        document.body.removeEventListener('click', this.hidePrompt);
-    },
-    methods: {
-        // hide prompt
-        hidePrompt(event) {
-            const promptElement = document.getElementById('prompt');
-            if (promptElement && !promptElement.contains(event.target)) {
-                this.getPrompt("");
-            }
-        },
-        getPrompt(prompt) {
-            this.$emit("getPrompt", prompt);
-        }
+const keyword = ref("");
+
+const filterPrompts = computed(()=> {
+    if (keyword) {
+        return storeSettings().getPrompts.filter((prompt) => prompt.act.toLowerCase().indexOf(keyword.value.toLowerCase())>=0).slice(0,15);
     }
+    return storeSettings().getPrompts;
+})
+
+onMounted(() => {
+    document.body.addEventListener('click', hidePrompt);
+})
+onBeforeUnmount(() => {
+    document.body.removeEventListener('click', hidePrompt);
+})
+
+const hidePrompt = (event) => {
+    const promptElement = document.getElementById('prompt');
+    if (promptElement && !promptElement.contains(event.target)) {
+        getPrompt("");
+    }
+}
+
+const emits = defineEmits<{
+    "getPrompt": [prompt:string]
+}>()
+
+const getPrompt = (prompt) => {
+    emits("getPrompt", prompt);
 }
 </script>
 

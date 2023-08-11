@@ -5,14 +5,14 @@
         </div>
         <div class="h-full w-full">
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="0">
-                <div class="w-full text-center my-1">
+                <div class="w-full text-center">
                     <label class="text-gray-700 font-bold text-xl">Accounts Link</label>
                 </div>
                 <button class="btn" v-if="!googleLogined" @click="showEvents()">Google LogIn</button>
                 <button class="greenBtn" v-else @click="revokeToken()">Google LogOut</button>
             </div>
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1">
-                <div class="w-full text-center my-1">
+                <div class="w-full text-center">
                     <label class="text-gray-700 font-bold text-xl">API Key</label>
                 </div>
                 <div class="mb-2 text-sm text-gray-500">Input API Key：</div>
@@ -21,14 +21,14 @@
             </div>
             <!-- Chat -->
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="2" @focus="showTooltip('', 'settings_chat')">
-                <div class="w-full text-center my-1 flex">
-                    <div class="w-1/3"></div>
-                    <label class="text-gray-700 font-bold text-xl w-1/3">Chat</label>
-                    <div class="w-1/3 flex justify-end">
+                <div class="w-full flex text-center justify-between">
+                    <div class="w-1/6 text-start">
                         <button class="btn" @click="resetValue('settings_chat')">Default</button>
                     </div>
+                    <label class="text-gray-700 font-bold text-xl">Chat</label>
+                    <div class="w-1/6"></div>
                 </div>
-                <div class="w-full md:w-1/4 flex">
+                <div class="w-full grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">model</span>
                         <select v-model="chat.model" class="input" @change="$event => contentSelectChange($event, 'settings_chat')" @focus="showTooltip('model', 'settings_chat')">
@@ -36,19 +36,19 @@
                         </select>
                     </label>
                 </div>
-                <div class="w-full md:w-1/4 grow">
+                <div class="w-full grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Temperature</span>
                         <input v-model.number.trim.lazy="chat.temperature" class="input" type="number" step=".1" placeholder="0 to 2" required :min="0" :max="2" @change="$event => contentInputChange($event, 'settings_chat')" @focus="showTooltip('temperature', 'settings_chat')" />
                     </label>
                 </div>
-                <div class="w-full md:w-1/4 grow">
+                <div class="w-full grow">
                     <label for="presence_penalty" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Presence_penalty</span>
                         <input v-model.number.trim.lazy="chat.presence_penalty" class="input" type="number" step=".1" placeholder="-2 to 2" required :min="-2" :max="2" @change="$event => contentInputChange($event, 'settings_chat')" @focus="showTooltip('presence_penalty', 'settings_chat')" />
                     </label>
                 </div>
-                <div class="w-full md:w-1/4 grow">
+                <div class="w-full grow">
                     <label for="frequency_penalty" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Frequency_penalty</span>
                         <input v-model.number.trim.lazy="chat.frequency_penalty" class="input" type="number" step=".1" placeholder="-2 to 2" required :min="-2" :max="2" @change="$event => contentInputChange($event, 'settings_chat')" @focus="showTooltip('frequency_penalty', 'settings_chat')" />
@@ -57,12 +57,12 @@
             </div>
             <!-- Transcription -->
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="3" @focus="showTooltip('', 'settings_trans')">
-                <div class="w-full text-center my-1 flex">
-                    <div class="w-1/3"></div>
-                    <label class="text-gray-700 font-bold text-xl w-1/3">Transcription</label>
-                    <div class="w-1/3 flex justify-end">
+                <div class="w-full flex text-center justify-between">
+                    <div class="w-1/6 text-start">
                         <button class="btn" @click="resetValue('settings_trans')">Default</button>
                     </div>
+                    <label class="text-gray-700 font-bold text-xl w-1/3">Transcription</label>
+                    <div class="w-1/6"></div>
                 </div>
                 <div class="w-full md:w-1/3 grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
@@ -89,32 +89,32 @@
             </div>
             <!-- Speech -->
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="4" @focus="showTooltip('', 'settings_speech')">
-                <div class="w-full text-center my-1 flex">
-                    <div class="w-1/3"></div>
-                    <label class="text-gray-700 font-bold text-xl w-1/3">Speech</label>
-                    <div class="w-1/3 flex justify-end">
+                <div class="w-full flex text-center justify-between">
+                    <div class="w-1/6 text-start">
                         <button class="btn" @click="resetValue('settings_speech')">Default</button>
                     </div>
+                    <label class="text-gray-700 font-bold text-xl w-1/3">Speech</label>
+                    <div class="w-1/6"></div>
                 </div>
-                <div class="w-full md:w-1/4 grow">
+                <div class="w-full grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Volume</span>
                         <input v-model.number.trim.lazy="speech.volume" class="input" type="number" step=".1" placeholder="0 to 1" required :min="0" :max="1" @change="$event => contentInputChange($event, 'settings_speech')" @focus="showTooltip('volume', 'settings_speech')" />
                     </label>
                 </div>
-                <div class="w-full md:w-1/4 grow">
+                <div class="w-full grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Rate</span>
                         <input v-model.number.trim.lazy="speech.rate" class="input" type="number" step=".1" placeholder="0 to 10" required :min="0" :max="10" @change="$event => contentInputChange($event, 'settings_speech')" @focus="showTooltip('rate', 'settings_speech')" />
                     </label>
                 </div>
-                <div class="w-full md:w-1/4 grow">
+                <div class="w-full grow">
                     <label for="temperature" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">Pitch</span>
                         <input v-model.number.trim.lazy="speech.pitch" class="input" type="number" step=".1" placeholder="0 to 2" required :min="0" :max="2" @change="$event => contentInputChange($event, 'settings_speech')" @focus="showTooltip('pitch', 'settings_speech')" />
                     </label>
                 </div>
-                <div class="w-full md:w-1/4 grow">
+                <div class="w-full grow">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/2">language</span>
                         <select v-model="speech.lang" class="input" @change="$event => { contentSelectChange($event, 'settings_speech'); speechLangChange() }" @focus="showTooltip('language', 'settings_speech')">
@@ -122,7 +122,7 @@
                         </select>
                     </label>
                 </div>
-                <div class="w-full md:w-1/4 grow">
+                <div class="w-full grow">
                     <label for="voice" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">voice</span>
                         <select v-model="speech.voice" class="input w-3/4" name="speechVoice" @change="$event => contentSelectChange($event, 'settings_speech')" @focus="showTooltip('voice', 'settings_speech')">
@@ -201,7 +201,7 @@ export default {
     methods: {
         sendOrSave() {
             this.saveAPIKey(this.messageContent.trim());
-            createToaster().success(`Success`, { position: "top", duration: 2000 });
+            createToaster().success(`Success`);
         },
         /**
          * save apiKey
@@ -410,7 +410,7 @@ export default {
         },
         revokeToken() {
             revokeToken();
-            createToaster().success(`Log Out!`, { position: "top", duration: 2000 });
+            createToaster().success(`Log Out!`);
         }
     }
 }

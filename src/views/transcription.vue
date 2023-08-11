@@ -139,7 +139,7 @@ export default {
                         this.resultMy = result.text;
                     } else {
                         this.resultMy = result;
-                        createToaster().error(`Fail`, { position: "top", duration: 1000 });
+                        createToaster().error(`Fail`);
                     }
                 }
             } catch (error: any) {
@@ -256,7 +256,7 @@ export default {
                     this.resultForeign = result.choices[0].message.content;
                 } else {
                     this.resultForeign = result;
-                    createToaster().error(`Fail`, { position: "top", duration: 1000 });
+                    createToaster().error(`Fail`);
                 }
             }
         }

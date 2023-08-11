@@ -3,10 +3,10 @@
         <div id="shadow" class="fixed left-0 top-0 z-1000 w-full h-full overflow-x-hidden overflow-y-auto bg-slate-100">
             <div id="content" class="relative top-10 z-2 w-full text-center px-6">
                 <div class="p-2 rounded border border-black bg-white overflow-y-auto hide-scroll-bar" :class="{ 'shockWindow': shockWindow }">
-                    <div id="model_header" class="relative">
-                        <span class="text-2xl font-bold mt-2 text-center">{{ myTitle }}</span>
+                    <div id="model_header" class="w-full flex text-center justify-between">
                         <button class="btn" @click="resetValue('settings_chat')">Default</button>
-                        <close class="absolute top-0 right-0" theme="filled" size="24" fill="#000000" @click="closeDialog('')" />
+                        <span class="text-2xl font-bold mt-2 text-center">{{ myTitle }}</span>
+                        <close class="" theme="filled" size="24" fill="#000000" @click="closeDialog('')" />
                     </div>
                     <div id="model_content" class="flex flex-wrap rounded m-2">
                         <div class="w-full border-t mt-2 pt-2">

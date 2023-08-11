@@ -77,7 +77,7 @@ const editLogName = async (item) => {
 }
 
 const updateLogName = () => {
-    if (newLogName.value !== oldLogName.value) {
+    if (newLogName && newLogName.value !== oldLogName.value) {
         // change chatLog
         const chatLog = storeSettings().getLogData(oldLogName.value);
         storeSettings().setLogData(newLogName.value, chatLog);

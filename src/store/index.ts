@@ -80,11 +80,6 @@ export const storeSettings = defineStore({
       return state.secretKey;
     },
     getApiKey(state) {
-      if (!state.apiKey) {
-        let aesAPIKey = storageGet("apiKey") ?? "";
-        state.apiKey = cryptoJS.AES.decrypt(aesAPIKey, state.secretKey).toString(cryptoJS.enc.Utf8);
-      }
-
       return state.apiKey;
     },
     getLogList(state) {
@@ -96,9 +91,6 @@ export const storeSettings = defineStore({
      * @returns array
      */
     getLogData(state): any {
-      if (Object.keys(state.logData).length === 0) {
-        state.logData = JSON.parse(storageGet("logData") ?? "{}");
-      }
       return (name) => {
         let findData = state.logData[name];
         if (findData) {
@@ -110,15 +102,9 @@ export const storeSettings = defineStore({
       };
     },
     getLastPath(state) {
-      if (!state.lastPath) {
-        state.lastPath = storageGet("lastPath") ?? "home";
-      }
       return state.lastPath;
     },
     getSettings(state) {
-      if (Object.keys(state.settings).length === 0) {
-        state.settings = JSON.parse(storageGet("settings") ?? "{}");
-      }
       return (name) => {
         let findData = state.settings[name];
         if (findData) {
@@ -131,21 +117,41 @@ export const storeSettings = defineStore({
       };
     },
     getGDriveToken(state) {
-      if (!state.googleOAuth2token) {
-        let aesToken = storageGet("gToken") ?? "";
-        state.googleOAuth2token = cryptoJS.AES.decrypt(aesToken, state.secretKey).toString(cryptoJS.enc.Utf8);
-      }
-
       return state.googleOAuth2token;
     },
     getPrompts(state): Array<promptInterface> {
-      if (state.prompts.length===0) {
-        state.prompts = JSON.parse(storageGet("prompts")) ?? [];
-      }
       return state.prompts;
     }
   },
   actions: {
+    setFromLocalforge() {
+      const stateKeys = Object.keys(this.$state);
+      for (let i = 0; i < stateKeys.length; i++) {
+        const key = stateKeys[i];
+        switch(key) {
+          case "apiKey":
+              let aesAPIKey = storageGet("apiKey") ?? "";
+              this.apiKey = cryptoJS.AES.decrypt(aesAPIKey, this.getSecretKey).toString(cryptoJS.enc.Utf8);
+              break;
+          case "googleOAuth2token":
+              let aesToken = storageGet("gToken") ?? "";
+              this.googleOAuth2token = cryptoJS.AES.decrypt(aesToken, this.getSecretKey).toString(cryptoJS.enc.Utf8);
+              break;
+          case "lastPath":
+              const getObjectString = storageGet(key);
+              if(getObjectString) {
+                this.$state[key] = getObjectString;
+              }
+              break;
+          default:
+              const getObjectJSON = storageGet(key);
+              if(getObjectJSON) {
+                this.$state[key] = JSON.parse(getObjectJSON);
+              }
+              break;
+        }
+      }
+    },
     setApiKey(key: string) {
       this.apiKey = key;
       const aesAPIKey = cryptoJS.AES.encrypt(this.apiKey, this.getSecretKey).toString();
