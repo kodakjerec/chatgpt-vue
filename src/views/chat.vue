@@ -1,6 +1,6 @@
 <template>
   <div class="w-full overflow-y-auto h-screen" ref="chatListDom" @wheel="scrolling" @touchmove="scrolling">
-    <div class="min-h-screen w-full">
+    <div class="h-full w-full">
       <div class="absolute top-0 left-0 z-10">
         <div class="font-bold">{{ sendLogName }}
           <span class="text-xs text-gray-500" title="tokens">{{ totalTokens }}</span>
@@ -43,15 +43,20 @@
         </div>
       </div>
     </div>
-    <div class="sticky bottom-0 w-full p-2">
-      <div v-if="isAtBottom" class="mb-2 flex justify-end">
+    <div class="sticky bottom-0 w-full">
+      <div v-if="isAtBottom" class="mb-1 pr-1 flex justify-end">
         <chat-prompt v-if="isShowPrompt" @getPrompt="getPrompt"></chat-prompt>
-        <div v-else class="border border-slate-300 rounded p-2 cursor-pointer bg-slate-100" @click.stop="openPrompt">Prompt</div>
+        <div v-else class="border border-slate-300 rounded p-1 cursor-pointer bg-slate-100" @click.stop="openPrompt">Prompt</div>
       </div>
-      <div class="flex">
-        <textarea class="chat-input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
-        <button class="redBtn" v-if="isTalking" @click="callAbortChat()">Stop</button>
-        <button class="btn" v-else @click="sendChatMessage()">Send</button>
+      <div class="flex px-1 pb-1">
+        <textarea ref="chatTextarea" class="chat-input" placeholder="Please input something" 
+                  :rows="dynamicTextareaHeight"
+                  v-model="messageContent" 
+                  @keydown="keydownEvent"></textarea>
+        <div class="h-14 self-end">
+          <button class="redBtn h-full" v-if="isTalking" @click="callAbortChat()">Stop</button>
+          <button class="btn h-full" v-else @click="sendChatMessage()">Send</button>
+        </div>
       </div>
     </div>
   </div>
@@ -99,13 +104,14 @@ export default {
       settings_chat: storeSettings().getSettings("settings_chat"),
       isShowDialog: false, // open setting dialog
       isShowPrompt: false, // open prompt
-      isAtBottom: false // scroll to bottom
+      isAtBottom: false, // scroll to bottom
+      dynamicTextareaHeight: 1 // textarea height
     }
   },
   computed: {
     messageListView(): any[] {
       return this.messageList.filter((v) => v.role !== 'system');
-    },
+    }
   },
   watch: {
     // vue: under the same path, and change different chat-log
@@ -117,6 +123,9 @@ export default {
         this.scrollToBottom();
         this.isAtBottom = true;
       })
+    },
+    messageContent(newValue) {
+      this.dynamicTextareaHeight = newValue.split("\n").length;
     }
   },
   mounted() {
@@ -258,8 +267,14 @@ export default {
      *  */
     getChatLog(logName: string) {
       const chatLog = storeSettings().getLogData(logName);
+      
+      // have name but no data
+      if( logName && chatLog.length===0 ) {
+        this.resetChatLog();
+        this.setChatLog();
+      }
 
-      this.messageList = JSON.parse(JSON.stringify(chatLog));
+      this.messageList = chatLog;
       this.totalTokens = this.calAllTiktoken(this.messageList);
     },
     // save log
