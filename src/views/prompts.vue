@@ -43,13 +43,6 @@ const importCSV = (event) => {
 
         reader.readAsText(file); // 讀取檔案內容，此處假設為純文字檔案
 }
-onMounted(async ()=>{
-    if (prompts.value.length===0) {
-        const response = await fetch("/src/assets/prompts.csv");
-        const fileContent = await response.text();
-        loadCSV(fileContent)
-    }
-})
 </script>
 
 <template>
