@@ -1,6 +1,6 @@
 <template>
   <div class="w-full overflow-y-auto h-screen" ref="chatListDom" @wheel="scrolling" @touchmove="scrolling">
-    <div id="content" class="calContent w-full">
+    <div id="chatContent" class="calContent w-full">
       <div class="absolute top-0 left-0 z-10">
         <div class="font-bold">{{ sendLogName }}
           <span class="text-xs text-gray-500" title="tokens">{{ totalTokens }}</span>
@@ -50,7 +50,6 @@
       </div>
       <div class="flex px-1 pb-1">
         <textarea ref="chatTextarea" class="chat-input" placeholder="Please input something" 
-                  :rows="dynamicTextareaHeight"
                   v-model="messageContent" 
                   @keydown="keydownEvent"></textarea>
         <div class="h-14 self-end">
@@ -64,17 +63,17 @@
 </template>
 
 <script lang="ts">
-import { chat, abortChat } from "@/libs/gpt";
-import Loding from "@/components/Loding.vue";
 import CopyContent from "@/components/Copy.vue";
+import Loding from "@/components/Loding.vue";
 import VoiceSound from "@/components/VoiceSound.vue";
+import { abortChat, chat } from "@/libs/gpt";
 import { md } from "@/libs/markdown";
-import { encoding_for_model } from '@dqbd/tiktoken';
-import { Edit, Delete } from "@icon-park/vue-next";
 import { storeSettings } from '@/store';
 import type { ChatMessage } from '@/types';
-import ChatSetting from "./components/chatSetting.vue";
+import { encoding_for_model } from '@dqbd/tiktoken';
+import { Delete, Edit } from "@icon-park/vue-next";
 import ChatPrompt from "./components/chatPrompt.vue";
+import ChatSetting from "./components/chatSetting.vue";
 
 export default {
   name: 'chat',
@@ -104,8 +103,7 @@ export default {
       settings_chat: storeSettings().getSettings("settings_chat"),
       isShowDialog: false, // open setting dialog
       isShowPrompt: false, // open prompt
-      isAtBottom: false, // scroll to bottom
-      dynamicTextareaHeight: 1 // textarea height
+      isAtBottom: false // scroll to bottom
     }
   },
   computed: {
@@ -124,8 +122,20 @@ export default {
         this.isAtBottom = true;
       })
     },
+    // detect textarea height
     messageContent(newValue) {
-      this.dynamicTextareaHeight = newValue.split("\n").length;
+      const textarea = this.$refs.chatTextarea
+      const fontSize = parseInt(getComputedStyle(textarea).fontSize);
+      const rowCharacterCount = Math.floor(textarea.offsetWidth / (fontSize * 0.55)); // Adjust this value based on the font and stylings
+      let totalRows = 0;
+
+      newValue.split("\n").map(row=>{
+        const extraRows = Math.ceil(row.length/rowCharacterCount);
+        console.log(row.length, rowCharacterCount, extraRows)
+        totalRows += extraRows;
+      })
+      console.log(totalRows)
+      textarea.rows = totalRows;
     }
   },
   mounted() {

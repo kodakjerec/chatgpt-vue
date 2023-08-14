@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { storeSettings, type promptInterface } from '@/store';
 import { createToaster } from "@meforma/vue-toaster";
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const keyword = ref("");
 const prompts = computed(()=> {
@@ -43,6 +43,22 @@ const importCSV = (event) => {
 
         reader.readAsText(file); // 讀取檔案內容，此處假設為純文字檔案
 }
+
+const exportCSV = () =>{
+    let fileContent = "";
+    storeSettings().getPrompts.map(item=>{
+        fileContent += `"${item.act}","${item.prompt}"\n`
+    })
+    const blob = new Blob([fileContent], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = "prompts.csv";
+    link.click();
+    link.remove();
+
+    createToaster().success("Output File: prompts.csv");
+}
 </script>
 
 <template>
@@ -50,12 +66,16 @@ const importCSV = (event) => {
         <div class="w-full text-center">
             <label class="text-gray-700 font-bold text-xl">Import</label>
         </div>
-        <input type="file" acept="*" ref="fileInput" @change="importCSV">
+        <label for="file-upload" class="btn">
+            Import
+        </label>
+        <input id="file-upload" class="input-file" type="file" accept="*" @change="importCSV" />
     </div>
     <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1">
         <div class="w-full text-center">
             <label class="text-gray-700 font-bold text-xl">Export</label>
         </div>
+        <button class="btn" @click="exportCSV">Export</button>
     </div>
     <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="2">
         <div class="w-full flex text-center">

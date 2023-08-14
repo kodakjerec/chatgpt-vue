@@ -17,7 +17,7 @@ storeSettings().setFromLocalforge();
 
 const lastPath = computed(() => storeSettings().getLastPath);
 // dynamic component
-const componentPath = computed(() => {
+const componentPath:any = computed(() => {
       if (lastPath.value.indexOf("chat")>=0) {
         return chat;
       }

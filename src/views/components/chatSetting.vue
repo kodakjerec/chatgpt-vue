@@ -1,7 +1,7 @@
 <template>
     <div>
         <div id="shadow" class="fixed left-0 top-0 z-1000 w-full h-full overflow-x-hidden overflow-y-auto bg-slate-100">
-            <div id="content" class="relative top-10 z-2 w-full text-center px-6">
+            <div id="chatSettingDialog" class="relative top-10 z-2 w-full text-center px-6">
                 <div class="p-2 rounded border border-black bg-white overflow-y-auto hide-scroll-bar" :class="{ 'shockWindow': shockWindow }">
                     <div id="model_header" class="w-full flex text-center justify-between">
                         <button class="btn" @click="resetValue('settings_chat')">Default</button>
@@ -55,8 +55,8 @@
 </template>
 
 <script lang="ts">
-import { Close } from "@icon-park/vue-next";
 import { storeSettings } from '@/store';
+import { Close } from "@icon-park/vue-next";
 
 export default {
     name: "calendarDialog",
@@ -96,7 +96,8 @@ export default {
         // 按到白色區域, 震動視窗
         // TODO 現在會順便關閉視窗
         clickWhiteSpace(event) {
-            const promptElement = document.getElementById('content');
+            // 白色方框內按下按鈕, 不關閉
+            const promptElement = document.getElementById('chatSettingDialog');
             if (promptElement && promptElement.contains(event.target)) {
                 return;
             }

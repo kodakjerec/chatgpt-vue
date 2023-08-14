@@ -34,12 +34,17 @@
             <!-- upload -->
             <div class="w-full">
                 <div class="flex flex-row justify-center">
-                    <div class="w-3/4 hidden sm:block">
-                        <input type="file" acept="audio/*" ref="fileInput" @change="handleFileSelect" :disabled="isLoading || isRecording">
-                        <div class="border border-dashed border-blue-500 text-center" @dragover.prevent @drop="handleDrop" @dragenter="isDragging = true" @dragleave="isDragging = false" :class="{ 'dragging': isDragging }">
-                            <p>Drag and drop files here</p>
-                            <p class="text-xs">mp3, mp4, mpeg, mpga, m4a, wav, or webm.</p>
-                            <p class="text-xs text-red-500">Caution! “m4a” has a few errors.</p>
+                    <div class="w-16 sm:w-3/4">
+                        <div class="border border-dashed border-blue-500 flex text-center h-full" @dragover.prevent @drop="handleDrop" @dragenter="isDragging = true" @dragleave="isDragging = false" :class="{ 'dragging': isDragging }">
+                            <label for="file-upload" class="btn flex">
+                                <span class="self-center">Import</span>
+                            </label>
+                            <input id="file-upload" class="input-file" type="file" accept="audio/*" @change="handleFileSelect">
+                            <div class="self-center hidden sm:block">
+                                <p>Drag and drop files here</p>
+                                <p class="text-xs">mp3, mp4, mpeg, mpga, m4a, wav, or webm.</p>
+                                <p class="text-xs text-red-500">Caution! “m4a” has a few errors.</p>
+                            </div>
                         </div>
                     </div>
                     <div class="w-1/4">

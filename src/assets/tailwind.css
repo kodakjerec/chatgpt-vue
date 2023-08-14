@@ -18,6 +18,17 @@
   .chat-input {
     @apply p-1 text-gray-700 bg-white rounded-md mr-2 sm:mr-4 outline-none focus:ring focus:ring-blue-500 flex-grow;
   }
+/* upload file */
+  .input-file {
+    @apply absolute overflow-hidden w-0 h-0
+  }
+  .custom-file-upload {
+    @apply inline-block px-2 py-4 cursor-pointer text-blue-500 rounded
+  }
+  
+  .custom-file-upload:hover {
+    background: #45a049;
+  }
 
   .results-container {
     display: flex;
