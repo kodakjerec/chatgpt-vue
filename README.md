@@ -3,9 +3,16 @@
 # chatgpt-vue
 
 A simple chat dialogue using Vue3 + Typescript + Tailwind CSS framework, utilizing OpenAI’s gpt-4 model API, supporting continuous dialogue.
+## Main
+<img src="img/preview.png" height="300" alt="main">
 
-<img src="img/preview.jpg" width="300">
+## Chat Setting
+<img src="img/openSetting.png" height="300" alt="openSetting">
+<img src="img/openSetting2.png" height="300" alt="chat settings">
 
+## Import Prompts
+
+## Use Prompts
 ## Installation
 
 ```bash
@@ -32,14 +39,9 @@ VITE v3.2.5  ready in 294 ms
 # Starting Guide
 
 1. Enter __Settings__ and import an API key.
-2. Create a new chat and start chatting.
+2. Create a new __chat__ and start chatting.
 3. __Transcription__ can record your voice and translate it into the desired language.
 
-
-# Chat Log
-
-* Single click: View chat contents.  
-* Trash can: Clear the chat.
 # Features
 
 1. This system uses the gpt-4 model.  

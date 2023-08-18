@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { Photograph, Translate, Plus, Edit, Delete, MenuUnfold, Setting, TipsOne } from "@icon-park/vue-next";
-import { ref, computed, nextTick } from 'vue';
 import { storeSettings } from '@/store/index';
+import { Delete, Edit, MenuUnfold, Photograph, Plus, Setting, TipsOne, Translate } from "@icon-park/vue-next";
+import { computed, nextTick, ref } from 'vue';
 
 let sidebarActive = ref(false); // 顯示sidebar
 const sidebar = ref(null);
@@ -127,24 +127,6 @@ const gotoPath = (path: string) => {
             </div>
             
             <li class="sidebarLi"
-                :class="{ 'text-yellow-300': lastPath === 'transcription' }"
-                @click="gotoPath('transcription')">
-                <div class="flex items-center">
-                <translate theme="outline" size="24" fill="#fff" />
-                transcription
-                </div>
-            </li>
-            
-            <li class="sidebarLi"
-                :class="{ 'text-yellow-300': lastPath === 'translation' }"
-                @click="gotoPath('translation')">
-                <div class="flex items-center">
-                <translate theme="outline" size="24" fill="#fff" />
-                translation
-                </div>
-            </li>
-            
-            <li class="sidebarLi"
                 :class="{ 'text-yellow-300': lastPath === 'prompts' }"
                 @click="gotoPath('prompts')">
                 <div class="flex items-center">
@@ -159,6 +141,24 @@ const gotoPath = (path: string) => {
                 <div class="flex items-center">
                 <setting theme="outline" size="24" fill="#fff" />
                 Settings
+                </div>
+            </li>
+            
+            <li class="sidebarLi"
+                :class="{ 'text-yellow-300': lastPath === 'transcription' }"
+                @click="gotoPath('transcription')">
+                <div class="flex items-center">
+                <translate theme="outline" size="24" fill="#fff" />
+                transcription
+                </div>
+            </li>
+            
+            <li class="sidebarLi"
+                :class="{ 'text-yellow-300': lastPath === 'translation' }"
+                @click="gotoPath('translation')">
+                <div class="flex items-center">
+                <translate theme="outline" size="24" fill="#fff" />
+                translation
                 </div>
             </li>
             

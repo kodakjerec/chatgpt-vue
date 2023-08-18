@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { storeSettings, type promptInterface } from '@/store';
+import { EfferentFour } from "@icon-park/vue-next";
 import { createToaster } from "@meforma/vue-toaster";
 import { computed, ref } from 'vue';
 
@@ -10,21 +11,30 @@ const prompts = computed(()=> {
     }
     return storeSettings().getPrompts;
 })
+const appendStyle = ref(1);
+const linka = "https://github.com/f/awesome-chatgpt-prompts/blob/main/prompts.csv";
+const linkb = "https://github.com/PlexPt/awesome-chatgpt-prompts-zh/blob/main/prompts-zh-TW.json";
 
-const loadCSV = (fileContent) => {
+const loadData = (filearray:Array<promptInterface>):Array<promptInterface> => {
     let promptsArray = [] as Array<promptInterface>;
-    const filearray = fileContent.split("\n");
+    if(appendStyle.value === 2) {
+        promptsArray = storeSettings().getPrompts;
+    }
     filearray.map(row=>{
-        if (row) {
-            let items = row.split(",");
+        const findIndex = promptsArray.findIndex(item=>item.act===row.act);
+        if (findIndex>=0) {
+            promptsArray[findIndex] = {
+                act: row.act,
+                prompt: row.prompt
+            }
+        } else {
             promptsArray.push({
-                act: items[0].replaceAll("\"",""),
-                prompt: items[1].replaceAll("\"","")
-            });
+                act: row.act,
+                prompt: row.prompt
+            })
         }
     })
-    storeSettings().setPrompts(promptsArray);
-    createToaster().success("Loading Complete.")
+    return promptsArray;
 }
 
 const importCSV = (event) => {
@@ -33,15 +43,63 @@ const importCSV = (event) => {
     if (!files) return;
     const file = files[0];
     (event.target as HTMLInputElement).value = '';
-        const reader = new FileReader();
+    const reader = new FileReader();
 
-        reader.onload = (e:any) => {
-            // 將檔案內容存儲到data變數中
-            const fileContent = e.target.result;
-            loadCSV(fileContent);
-        };
+    reader.onload = async (e:any) => {
+        // 將檔案內容存儲到data變數中
+        const fileContent = e.target.result;
+        try {
+            // 產生轉化後的array
+            let fromArray = [] as Array<promptInterface>;
+            fileContent.split("\n").map(row=>{
+                if (row) {
+                    let items = row.split(",");
+                    fromArray.push({
+                        act: items[0].replaceAll("\"",""),
+                        prompt: items[1].replaceAll("\"","")
+                    })
+                }
+            })
+            const promptsArray:Array<promptInterface> = loadData(fromArray);
+                
+            if(promptsArray) {
+                storeSettings().setPrompts(promptsArray);
+                createToaster().success("Loading Complete.");
+            }
+        } catch {
+            createToaster().success("Loading Fail.");
+        }
+    };
 
-        reader.readAsText(file); // 讀取檔案內容，此處假設為純文字檔案
+    reader.readAsText(file); // 讀取檔案內容，此處假設為純文字檔案
+}
+
+const importJSON = (event) => {
+    if (!event.target) return;
+    const files = (event.target as HTMLInputElement).files;
+    if (!files) return;
+    const file = files[0];
+    (event.target as HTMLInputElement).value = '';
+    const reader = new FileReader();
+
+    reader.onload = (e:any) => {
+        // 將檔案內容存儲到data變數中
+        const fileContent = e.target.result;
+        try {
+            // 產生轉化後的array
+            let fromArray: Array<promptInterface> = JSON.parse(fileContent);
+                
+            const promptsArray:Array<promptInterface> = loadData(fromArray);
+            if(promptsArray) {
+                storeSettings().setPrompts(promptsArray);
+                createToaster().success("Loading Complete.");
+            }
+        } catch {
+            createToaster().success("Loading Fail.");
+        }
+    };
+
+    reader.readAsText(file); // 讀取檔案內容，此處假設為純文字檔案
 }
 
 const exportCSV = () =>{
@@ -66,10 +124,40 @@ const exportCSV = () =>{
         <div class="w-full text-center">
             <label class="text-gray-700 font-bold text-xl">Import</label>
         </div>
-        <label for="file-upload" class="btn">
-            Import
-        </label>
-        <input id="file-upload" class="input-file" type="file" accept="*" @change="importCSV" />
+        <div class="w-full m-2 flex">
+            <div class="radioBtn">
+                <input name="appendStyle" id="appendStyle_1" type="radio" :value="1" v-model="appendStyle">
+                <label for="appendStyle_1">Overwrite</label>
+            </div>
+            <div class="radioBtn">
+                <input name="appendStyle" id="appendStyle_2" type="radio" :value="2" v-model="appendStyle">
+                <label for="appendStyle_2">Append</label>
+            </div>
+        </div>
+        <div class="flex m-1 flex-col text-center">
+            <label for="file-upload" class="btn">
+                Import CSV
+            </label>
+            <span class="text-blue-500">
+                <a :href="linka" target="_blank">
+                    awesome-chatgpt-prompts
+                    <efferent-four theme="outline" size="18" fill="#0000ff"/>
+                </a>
+            </span>
+            <input id="file-upload" class="input-file" type="file" accept="*" @change="importCSV" />
+        </div>
+        <div class="flex m-1 flex-col text-center">
+            <label for="file-upload-2" class="btn">
+                Import JSON
+            </label>
+            <span class="text-blue-500">
+                <a :href="linkb" target="_blank">
+                    awesome-chatgpt-prompts-zh
+                    <efferent-four theme="outline" size="18" fill="#0000ff"/>
+                </a>
+            </span>
+            <input id="file-upload-2" class="input-file" type="file" accept="*" @change="importJSON" />
+        </div>
     </div>
     <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1">
         <div class="w-full text-center">
@@ -97,3 +185,11 @@ const exportCSV = () =>{
         </div>
     </div>
 </template>
+<style scoped>
+.radioBtn {
+    @apply mr-2 border p-2 rounded hover:bg-blue-300
+}
+.radioBtn input {
+    @apply mr-2 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300
+}
+</style>

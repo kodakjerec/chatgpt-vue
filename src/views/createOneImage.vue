@@ -46,9 +46,8 @@
 </template>
 
 <script lang="ts">
-import cryptoJS from "crypto-js";
-import { imagesGenerations } from "@/libs/gpt";
 import Loding from "@/components/Loding.vue";
+import { imagesGenerations } from "@/libs/gpt";
 import { Download } from "@icon-park/vue-next";
 
 export default {
@@ -123,7 +122,6 @@ export default {
     },
     downloadImage(url: string, filename: string) {
       var link = document.createElement('a');
-      console.log(url, filename)
       link.href = url;
       link.download = filename;
 

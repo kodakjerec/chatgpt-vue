@@ -1,7 +1,7 @@
-import type { ChatMessage } from "@/types/gpt";
-import { createPinia, defineStore } from "pinia";
-import cryptoJS from "crypto-js";
 import { gDriveCheck, gDriveLoad, gDrivePatch, gDriveSave } from "@/libs/gDrive";
+import type { ChatMessage } from "@/types/gpt";
+import cryptoJS from "crypto-js";
+import { createPinia, defineStore } from "pinia";
 
 // voice settings
 const synth = window.speechSynthesis;
@@ -218,7 +218,9 @@ export const storeSettings = defineStore({
 
 export const storeGoogleDrive = defineStore({
   id: "googleDrive",
-  state: () => ({}),
+  state: () => ({
+    saveKeys: ["lastPath","logData","settings","apiKey","prompts"]
+  }),
   getters: {},
   actions: {
     /**
@@ -228,20 +230,23 @@ export const storeGoogleDrive = defineStore({
     async localStorageToCloud() {
       const token = storeSettings().getGDriveToken;
       if (token) {
-        const saveData = JSON.stringify(localStorage);
+        let saveData = {};
+        this.saveKeys.map(key=>{
+          saveData[key] = storageGet(key);
+        });
         const fileName = storeSettings().googleDriveFileName;
         // check file exists on google-drive
         const fileId = await gDriveCheck(fileName);
 
         if (fileId !== "error") {
           if (fileId) {
-            const patchResult = await gDrivePatch(saveData, fileName, fileId);
+            const patchResult = await gDrivePatch(JSON.stringify(saveData), fileName, fileId);
 
             if (patchResult) {
               return `Patched Filename: ` + fileName;
             }
           } else {
-            const upResult = await gDriveSave(saveData, fileName);
+            const upResult = await gDriveSave(JSON.stringify(saveData), fileName);
 
             if (upResult) {
               return `Uploaded. Filename: ` + fileName;

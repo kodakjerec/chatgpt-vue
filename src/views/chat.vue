@@ -20,8 +20,8 @@
             <div class="font-bold flex">
               <span>{{ roleAlias[item.role] }}</span>
             </div>
-            <div class=" group-hover:visible w-30 flex">
-              <CopyContent class="invisible group-hover:visible w-30" :content="item.content" @deleteItem="deleteItem" :index="index" v-show="!isTalking" />
+            <div class="w-30 flex">
+              <CopyContent class="visible group-hover:visible sm:invisible w-30" :content="item.content" @deleteItem="deleteItem" :index="index" v-show="!isTalking" />
               <voice-sound :content="item.content" v-show="!isTalking" />
             </div>
           </div>
@@ -130,11 +130,10 @@ export default {
       let totalRows = 0;
 
       newValue.split("\n").map(row=>{
-        const extraRows = Math.ceil(row.length/rowCharacterCount);
-        console.log(row.length, rowCharacterCount, extraRows)
+        let extraRows = Math.ceil(row.length/rowCharacterCount);
+        if(extraRows===0) extraRows=1;
         totalRows += extraRows;
       })
-      console.log(totalRows)
       textarea.rows = totalRows;
     }
   },
