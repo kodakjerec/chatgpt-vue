@@ -128,8 +128,8 @@ export default {
             storeSettings().setSettings(myObjectName, this.settings_chat);
         },
         resetValue(myObjectName: string) {
-                this.settings_chat = storeSettings().resetSettings(myObjectName);
-                storeSettings().setSettings(myObjectName, this.settings_chat);
+            this.settings_chat = storeSettings().resetSettings(myObjectName);
+            storeSettings().setSettings(myObjectName, this.settings_chat);
         }
     }
 }

@@ -49,9 +49,7 @@
         <div v-else class="border border-slate-300 rounded p-1 cursor-pointer bg-slate-100" @click.stop="openPrompt">Prompt</div>
       </div>
       <div class="flex px-1 pb-1">
-        <textarea ref="chatTextarea" class="chat-input" placeholder="Please input something" 
-                  v-model="messageContent" 
-                  @keydown="keydownEvent"></textarea>
+          <textarea ref="chatTextarea" class="chat-input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
         <div class="h-14 self-end">
           <button class="redBtn h-full" v-if="isTalking" @click="callAbortChat()">Stop</button>
           <button class="btn h-full" v-else @click="sendChatMessage()">Send</button>
@@ -88,7 +86,7 @@ export default {
       default: ''
     }
   },
-  emits:[],
+  emits: [],
   data() {
     return {
       md: md, // markdown component
@@ -129,9 +127,9 @@ export default {
       const rowCharacterCount = Math.floor(textarea.offsetWidth / (fontSize * 0.55)); // Adjust this value based on the font and stylings
       let totalRows = 0;
 
-      newValue.split("\n").map(row=>{
-        let extraRows = Math.ceil(row.length/rowCharacterCount);
-        if(extraRows===0) extraRows=1;
+      newValue.split("\n").map(row => {
+        let extraRows = Math.ceil(row.length / rowCharacterCount);
+        if (extraRows === 0) extraRows = 1;
         totalRows += extraRows;
       })
       textarea.rows = totalRows;
@@ -276,9 +274,9 @@ export default {
      *  */
     getChatLog(logName: string) {
       const chatLog = storeSettings().getLogData(logName);
-      
+
       // have name but no data
-      if( logName && chatLog.length===0 ) {
+      if (logName && chatLog.length === 0) {
         this.resetChatLog();
         this.setChatLog();
       }
@@ -365,13 +363,13 @@ Please let me know what kind of help you need, and I will provide relevant infor
     },
     // get prompt, and close prompt
     getPrompt(prompt) {
-      this.messageContent+=prompt;
+      this.messageContent += prompt;
       this.isShowPrompt = false;
     },
     // check scrolling
     scrolling() {
       const scrollDiv = this.$refs.chatListDom;
-      const isAtBottom = Math.abs(scrollDiv.scrollHeight - scrollDiv.scrollTop - scrollDiv.clientHeight)< scrollDiv.scrollHeight*0.03 ;
+      const isAtBottom = Math.abs(scrollDiv.scrollHeight - scrollDiv.scrollTop - scrollDiv.clientHeight) < scrollDiv.scrollHeight * 0.03;
       this.isAtBottom = isAtBottom;
     }
   }

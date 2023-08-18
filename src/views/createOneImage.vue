@@ -1,46 +1,46 @@
 <template>
   <div class="w-full overflow-y-auto max-h-screen">
     <div class="min-h-screen w-full">
-    <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100"></div>
-      <div class=''>
-        <label class="block font-medium text-black" for="prompt">Prompt</label>
-        <textarea class="block w-full mt-1 rounded-md border-red-300 shadow-sm input" rows="3" placeholder="請輸入 Prompt"
-          v-model="inputPrompt"></textarea>
-      </div>
-      <div class="flex">
-        <div class="w-1/3 mx-2">
-          <label class="block font-medium text-black" for="number">Number</label>
-          <input class="block w-full mt-1 rounded-md border-black-300 shadow-sm input" type="number"
-            placeholder="請輸入 Number" v-model="inputNumber">
-        </div>
-        <div class="w-1/3 mx-2">
-          <label class="block font-medium text-black" for="size">Size</label>
-          <select class="block w-full mt-1 rounded-md border-gray-300 shadow-sm input" v-model="inputSize">
-            <option>256x256</option>
-            <option>512x512</option>
-            <option>1024x1024</option>
-          </select>
-        </div>
-      </div>
-      <div>
-        <button class="btn" id="createButton" :disabled="isTalking" @click="imagesGenerations">Create</button>
-      </div>
-    <!-- images -->
-    <div>
-      <Loding v-if="isTalking" />
-      <div v-else>
-        <div class="results-container">
-          <div v-for="(item, index) in results" :key="index">
-            <img class="w-1/3 h-1/3" :src="item.url">
-            <div class="modal-buttons">
-              <button @click="saveImage(item.url)">
-                <download theme="outline" size="24" fill="#000"/>
-              </button>
+              <div class="sticky top-0 pt-4 w-full h-12 bg-gray-100"></div>
+            <div class=''>
+              <label class="block font-medium text-black" for="prompt">Prompt</label>
+                <textarea class="block w-full mt-1 rounded-md border-red-300 shadow-sm input" rows="3" placeholder="請輸入 Prompt" v-model="inputPrompt"></textarea>
+          </div>
+          <div class="flex">
+            <div class="w-1/3 mx-2">
+              <label class="block font-medium text-black" for="number">Number</label>
+                  <input class="block w-full mt-1 rounded-md border-black-300 shadow-sm input" type="number" placeholder="請輸入 Number" v-model="inputNumber">
+              </div>
+              <div class="w-1/3 mx-2">
+                <label class="block font-medium text-black" for="size">Size</label>
+                <select class="block w-full mt-1 rounded-md border-gray-300 shadow-sm input" v-model="inputSize">
+                  <option>256x256</option>
+                  <option>512x512</option>
+                  <option>1024x1024</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <button class="btn" id="createButton" :disabled="isTalking" @click="imagesGenerations">Create</button>
+            </div>
+              <!-- images -->
+              <div>
+                <Loding v-if="isTalking" />
+                <div v-else>
+                  <div class="results-container">
+                    <div v-for="(item, index) in results" :key="index">
+                      <img class="w-1/3 h-1/3" :src="item.url">
+                      <div class="modal-buttons">
+                        <button @click="saveImage(item.url)">
+                        <download theme="outline" size="24" fill="#000"
+ />
+                    </button>
+                  </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+
     </div>
   </div>
 </template>
