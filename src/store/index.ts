@@ -60,7 +60,8 @@ export const storeVoice = defineStore({
 });
 
 export interface promptInterface {
-  act: string, prompt: string
+  act: string;
+  prompt: string;
 }
 export const storeSettings = defineStore({
   id: "settings",
@@ -73,16 +74,16 @@ export const storeSettings = defineStore({
     googleOAuth2token: "", // google OAuth2 token
     googleDriveFileName: "yourGPT_localStorage.txt",
     maxTokens: 4096,
-    prompts: [] // prompts
+    prompts: [], // prompts
   }),
   getters: {
-    getSecretKey(state) {
+    getSecretKey(state): string {
       return state.secretKey;
     },
-    getApiKey(state) {
+    getApiKey(state): string {
       return state.apiKey;
     },
-    getLogList(state) {
+    getLogList(state): Array<any> {
       return Object.keys(state.logData);
     },
     /**
@@ -90,9 +91,9 @@ export const storeSettings = defineStore({
      * @param state
      * @returns array
      */
-    getLogData(state) {
-      return (name:string) => {
-        let findData:Array<any> = state.logData[name];
+    getLogData(state): Object {
+      return (name: string) => {
+        let findData: Array<any> = state.logData[name];
         if (findData) {
           findData = JSON.parse(JSON.stringify(findData));
         } else {
@@ -101,10 +102,10 @@ export const storeSettings = defineStore({
         return findData;
       };
     },
-    getLastPath(state) {
+    getLastPath(state): string {
       return state.lastPath;
     },
-    getSettings(state) {
+    getSettings(state): any {
       return (name) => {
         let findData = state.settings[name];
         if (findData) {
@@ -116,39 +117,41 @@ export const storeSettings = defineStore({
         return findData;
       };
     },
-    getGDriveToken(state) {
+    getGDriveToken(state): string {
       return state.googleOAuth2token;
     },
     getPrompts(state): Array<promptInterface> {
-      return state.prompts;
-    }
+      return state.prompts ?? [];
+    },
   },
   actions: {
     setFromLocalforge() {
       const stateKeys = Object.keys(this.$state);
       for (let i = 0; i < stateKeys.length; i++) {
         const key = stateKeys[i];
-        switch(key) {
+        switch (key) {
           case "apiKey":
-              let aesAPIKey = storageGet("apiKey") ?? "";
-              this.apiKey = cryptoJS.AES.decrypt(aesAPIKey, this.getSecretKey).toString(cryptoJS.enc.Utf8);
-              break;
+            let aesAPIKey = storageGet("apiKey") ?? "";
+            this.apiKey = cryptoJS.AES.decrypt(aesAPIKey, this.getSecretKey).toString(cryptoJS.enc.Utf8);
+            break;
           case "googleOAuth2token":
-              let aesToken = storageGet("gToken") ?? "";
-              this.googleOAuth2token = cryptoJS.AES.decrypt(aesToken, this.getSecretKey).toString(cryptoJS.enc.Utf8);
-              break;
+            let aesToken = storageGet("gToken") ?? "";
+            this.googleOAuth2token = cryptoJS.AES.decrypt(aesToken, this.getSecretKey).toString(cryptoJS.enc.Utf8);
+            break;
           case "lastPath":
-              const getObjectString = storageGet(key);
-              if(getObjectString) {
-                this.$state[key] = getObjectString;
-              }
-              break;
+            const getObjectString = storageGet(key);
+            if (getObjectString) {
+              this.$state[key] = getObjectString;
+            } else {
+              this.$state[key] = "home";
+            }
+            break;
           default:
-              const getObjectJSON = storageGet(key);
-              if(getObjectJSON) {
-                this.$state[key] = JSON.parse(getObjectJSON);
-              }
-              break;
+            const getObjectJSON = storageGet(key);
+            if (getObjectJSON) {
+              this.$state[key] = JSON.parse(getObjectJSON);
+            }
+            break;
         }
       }
     },
@@ -188,8 +191,8 @@ export const storeSettings = defineStore({
           findData = {
             model: "whisper-1",
             temperature: 0,
-            language: "zh-TW",
-            toLanguage: "en-US",
+            language: "zh-TW", // speechRecognition
+            toLanguage: "en", // whisper
           };
           break;
         case "settings_speech":
@@ -209,17 +212,17 @@ export const storeSettings = defineStore({
       const aesAPIKey = cryptoJS.AES.encrypt(token, this.getSecretKey).toString();
       storageSet("gToken", aesAPIKey);
     },
-    setPrompts(prompts:Array<promptInterface>) {
+    setPrompts(prompts: Array<promptInterface>) {
       this.prompts = prompts;
       storageSet("prompts", JSON.stringify(this.prompts));
-    }
+    },
   },
 });
 
 export const storeGoogleDrive = defineStore({
   id: "googleDrive",
   state: () => ({
-    saveKeys: ["lastPath","logData","settings","apiKey","prompts"]
+    saveKeys: ["lastPath", "logData", "settings", "apiKey", "prompts"],
   }),
   getters: {},
   actions: {
@@ -231,7 +234,7 @@ export const storeGoogleDrive = defineStore({
       const token = storeSettings().getGDriveToken;
       if (token) {
         let saveData = {};
-        this.saveKeys.map(key=>{
+        this.saveKeys.map((key) => {
           saveData[key] = storageGet(key);
         });
         const fileName = storeSettings().googleDriveFileName;

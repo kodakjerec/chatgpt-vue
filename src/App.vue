@@ -17,25 +17,25 @@ storeSettings().setFromLocalforge();
 
 const lastPath = computed(() => storeSettings().getLastPath);
 // dynamic component
-const componentPath:any = computed(() => {
-      if (lastPath.value.indexOf("chat")>=0) {
-        return chat;
-      }
-      
-      switch(lastPath.value) {
-        case "home": return home;
-        case "transcription": return transcription;
-        case "translation": return translation;
-        case "settings": return settings;
-        case "createOneImage": return createOneImage;
-        case "prompts": return prompts;
-      }
-    });
+const componentPath: any = computed(() => {
+  if (lastPath.value.indexOf("chat") >= 0) {
+    return chat;
+  }
+
+  switch (lastPath.value) {
+    case "home": return home;
+    case "transcription": return transcription;
+    case "translation": return translation;
+    case "settings": return settings;
+    case "createOneImage": return createOneImage;
+    case "prompts": return prompts;
+  }
+});
 const selectLog = computed(() => {
-    if (lastPath.value.indexOf("chat")>=0) {
-        return lastPath.value.replace("chat/","");
-      }
-      return "";
+  if (lastPath.value.indexOf("chat") >= 0) {
+    return lastPath.value.replace("chat/", "");
+  }
+  return "";
 })
 
 let nowLoading = "";
@@ -44,28 +44,30 @@ let lastActiveTime = new Date().getTime();  // 最後一次操作時間
  * Refresh the screen after being idle for a long time
  */
 const handlePageFocus = () => {
-      const currentTime: number = new Date().getTime();
-      const timeDiff: number = currentTime - lastActiveTime;
-      lastActiveTime = currentTime;
-      // 如果背景中放置的時間超過指定時間，就重新載入頁面
-      if (timeDiff > 60 * 60 * 1000) { // 60 分鐘
-        location.reload();
-      }
+  const currentTime: number = new Date().getTime();
+  const timeDiff: number = currentTime - lastActiveTime;
+  lastActiveTime = currentTime;
+  // 如果背景中放置的時間超過指定時間，就重新載入頁面
+  if (timeDiff > 60 * 60 * 1000) { // 60 分鐘
+    location.reload();
   }
+}
 
-onMounted(async ()=>{
+onMounted(async () => {
   window.addEventListener('focus', handlePageFocus);
 
-    const token = storeSettings().getGDriveToken;
+  const token = storeSettings().getGDriveToken;
 
-    if (token) {
-      nowLoading = "Loading cloud data.";
-      await storeGoogleDrive().cloundToLocalStorage();
-      nowLoading = "";
-    }
+  if (token) {
+    nowLoading = "Loading cloud data.";
+    await storeGoogleDrive().cloundToLocalStorage();
+    nowLoading = "";
+  }
+
+
 })
 
-onBeforeUnmount(()=>{
+onBeforeUnmount(() => {
   window.removeEventListener('focus', handlePageFocus)
 })
 
@@ -80,7 +82,7 @@ onBeforeUnmount(()=>{
     </div>
     <!-- Content -->
     <div class="w-full">
-      <component v-if="componentPath===chat" :is="componentPath" :sendLogName="selectLog"></component>
+      <component v-if="componentPath === chat" :is="componentPath" :sendLogName="selectLog"></component>
       <component v-else :is="componentPath"></component>
     </div>
   </div>

@@ -6,9 +6,9 @@
             <div class="w-full flex flex-col justify-center h-3/4">
                 <div class="w-full md:w-1/3">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
-                        <span class="w-1/4">language</span>
+                        <span class="w-1/4">YourVoice</span>
                         <select v-model="transcriptionSettings.language" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
-                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
+                            <option v-for="(value, key) of speechLangList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
                         </select>
                         <voice-sound :content="resultMy" v-show="!isLoading" />
                     </label>
@@ -16,14 +16,15 @@
                 <textarea v-model="resultMy" class="input w-full text-justify whitespace-pre-line" placeholder="Audio Content"></textarea>
 
                 <p class="flex justify-center">
-                    <Loding class="mt-1" v-if="isLoading" />
-                    <translation class="w-10" theme="outline" size="24" fill="#333" @click="startTranslation()" v-else />
+                    <Loding v-if="isLoading" class="mt-1" aria-label="Loading" />
+                    <translation v-else class="w-10" theme="outline" size="48" fill="#333" @click="startTranslation()" aria-label="translation" />
                 </p>
+
                 <div class="w-full md:w-1/3">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
-                        <span class="w-1/4">language</span>
+                        <span class="w-1/4">To</span>
                         <select v-model="transcriptionSettings.toLanguage" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
-                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
+                            <option v-for="(value, key) of openAPILangList" :key="key" :value="key">{{ key + ' ' + value.nativeName }}</option>
                         </select>
                         <voice-sound :content="resultForeign" v-show="!isLoading" />
                     </label>
@@ -48,10 +49,10 @@
                         </div>
                     </div>
                     <div class="w-1/4">
-                        <div @click="startRecording2()" v-if="!isRecording">
+                        <div @click="startRecording()" v-if="!isRecording">
                             <voice theme="outline" size="100" fill="#333" class="hover:cursor-pointer" />
                         </div>
-                        <div class="loading" @click="stopRecording2()" v-else>
+                        <div class="loading" @click="stopRecording()" v-else>
                             <round theme="multi-color" size="100" :fill="['#f5a623', '#ff0000', '#ffffff', '#417505']" />
                             <round theme="multi-color" size="100" :fill="['#ffffff', '#ff0000', '#ffffff', '#417505']" />
                             <round theme="multi-color" size="100" :fill="['#bd10e0', '#ff0000', '#ffffff', '#417505']" />
@@ -62,7 +63,8 @@
                     <span class="w-20">prompt</span>
                     <input v-model.number.trim.lazy="prompt" class="input" id="prompt" name="prompt" :disabled="isLoading"
                         placeholder="An optional text to guide the model's style or continue a previous audio segment. The prompt should be in English." />
-                </label> -->
+                </labe
+l> -->
             </div>
         </div>
     </div>
@@ -70,6 +72,7 @@
 
 <script lang="ts">
 import { list } from '@/assets/BCP47';
+import * as list2 from '@/assets/ISO639_1.json';
 import Loding from "@/components/Loding.vue";
 import VoiceSound from "@/components/VoiceSound.vue";
 import { audioTranscriptions, chat } from "@/libs/gpt";
@@ -88,11 +91,12 @@ export default {
             decoder: new TextDecoder("utf-8"),
             resultForeign: '' as string,
             resultMy: '' as string,
-            transcriptionSettings: {} as any,
+            transcriptionSettings: storeSettings().getSettings("settings_trans"),
             // recorder
             mediaRecorder: null,
             chunks: [],
-            languageList: list
+            speechLangList: list,
+            openAPILangList: list2
         }
     },
     components: {
@@ -101,7 +105,6 @@ export default {
         VoiceSound
     },
     mounted() {
-        this.transcriptionSettings = this.getSettingsTrans();
         this.checkApi();
     },
     methods: {
@@ -153,10 +156,10 @@ export default {
             }
         },
         /**
-         * Parse the stream returned by chatGpt
-         * @param reader 格式
-         * @param status response
-         */
+        * Parse the stream returned by chatGpt
+        * @param reader 格式
+        * @param status response
+        */
         async readStream(reader: ReadableStreamDefaultReader<Uint8Array>, status: number) {
             let returnResult = '';
 
@@ -178,75 +181,45 @@ export default {
 
             return returnResult;
         },
-        /**
-         * get trans settings
-         */
-        getSettingsTrans() {
-            const settings_Trans = storeSettings().getSettings("settings_trans");
-
-            return settings_Trans;
-        },
-        async startRecording() {
-            let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            if (stream) {
-                this.isRecording = true;
-                this.chunks = [];
-
-                // create MediaRecorder
-                this.mediaRecorder = new MediaRecorder(stream);
-
-                // start recording
-                this.mediaRecorder.start();
-                this.mediaRecorder.addEventListener('dataavailable', event => {
-                    if (event.data.size > 0) {
-                        const blob = event.data;
-                        let file = new File([blob], 'sound01.wav', { type: 'audio/wav' });
-                        this.beforeUploading(file);
-                    }
-                });
-
-            }
-        },
-        stopRecording() {
-            try {
-                if (this.mediaRecorder && this.mediaRecorder.state === "recording") {
-                    this.mediaRecorder.stop();
-                }
-            } catch (e) {
-                console.log("stopRecording error", e);
-            } finally {
-                this.isRecording = false;
-            }
-        },
-        checkApi(){
-            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+        checkApi() {
+            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
             if (!SpeechRecognition) {
-                return
+                return;
             }
+            const recognition = new SpeechRecognition();
 
-            const recognition = new SpeechRecognition()
+            recognition.lang = this.transcriptionSettings.language;
+            recognition.continuous = false;
+            recognition.interimResults = false;
 
-            recognition.lang = this.transcriptionSettings.language
-            recognition.interimResults = true
+            recognition.addEventListener('start', event => {
+            })
 
             recognition.addEventListener('result', event => {
-                console.log(event);
+                const text = event.results[0][0]["transcript"];
+                this.resultMy += text;
             })
 
             recognition.addEventListener('end', () => {
-    
+                // 如果不是使用者按下的停止, 就繼續錄音
+                if (this.isRecording) {
+                    this.mediaRecorder.start();
+                } else {
+                    this.startTranslation();
+                }
             })
 
             this.mediaRecorder = recognition;
         },
-        startRecording2() {
+        startRecording() {
+            this.resultMy = "";
             this.mediaRecorder.start();
-                this.isRecording = true;
+            this.isRecording = true;
         },
-        stopRecording2() {
+        stopRecording() {
             this.mediaRecorder.stop();
-                this.isRecording = false;
+            this.isRecording = false;
         },
         async startTranslation() {
             this.isLoading = true;
@@ -265,7 +238,10 @@ export default {
          * translate to wanted language
          */
         async translate() {
-            if (this.resultMy === '') return;
+            if (this.resultMy === '') {
+                createToaster().warning("No message. Please try again");
+                return;
+            };
 
             let sendMessageList = [] as Array<any>;
             sendMessageList.push({

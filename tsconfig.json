@@ -9,7 +9,14 @@
     "resolveJsonModule": true,
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "lib": ["ESNext", "DOM"]
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ]
   },
   "references": [
     {
