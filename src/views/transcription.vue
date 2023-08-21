@@ -184,10 +184,10 @@ export default {
         checkApi() {
             window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-            if (!SpeechRecognition) {
+            if (!window.SpeechRecognition) {
                 return;
             }
-            const recognition = new SpeechRecognition();
+            const recognition = new window.SpeechRecognition();
 
             recognition.lang = this.transcriptionSettings.language;
             recognition.continuous = false;

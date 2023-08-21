@@ -91,7 +91,7 @@ export const storeSettings = defineStore({
      * @param state
      * @returns array
      */
-    getLogData(state): Object {
+    getLogData(state): any {
       return (name: string) => {
         let findData: Array<any> = state.logData[name];
         if (findData) {

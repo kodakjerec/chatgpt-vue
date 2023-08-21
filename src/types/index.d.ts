@@ -1,7 +1,8 @@
 export {};
 
 declare global {
-  interface window {
+  interface Window {
     SpeechRecognition: any; // 👈️ turn off type checking
+    webkitSpeechRecognition: any;
   }
 }

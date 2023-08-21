@@ -49,7 +49,7 @@
         <div v-else class="border border-slate-300 rounded p-1 cursor-pointer bg-slate-100" @click.stop="openPrompt">Prompt</div>
       </div>
       <div class="flex px-1 pb-1">
-          <textarea ref="chatTextarea" class="chat-input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
+        <textarea ref="chatTextarea" class="chat-input" placeholder="Please input something" v-model="messageContent" @keydown="keydownEvent"></textarea>
         <div class="h-14 self-end">
           <button class="redBtn h-full" v-if="isTalking" @click="callAbortChat()">Stop</button>
           <button class="btn h-full" v-else @click="sendChatMessage()">Send</button>
@@ -67,7 +67,7 @@ import VoiceSound from "@/components/VoiceSound.vue";
 import { abortChat, chat } from "@/libs/gpt";
 import { md } from "@/libs/markdown";
 import { storeSettings } from '@/store';
-import type { ChatMessage } from '@/types';
+import type { ChatMessage } from '@/types/gpt';
 import { encoding_for_model } from '@dqbd/tiktoken';
 import { Delete, Edit } from "@icon-park/vue-next";
 import ChatPrompt from "./components/chatPrompt.vue";

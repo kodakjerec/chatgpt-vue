@@ -1,4 +1,4 @@
-import type { ChatMessage } from "@/types";
+import type { ChatMessage } from "@/types/gpt";
 import { storeSettings } from "@/store/index";
 
 let controller = new AbortController();
