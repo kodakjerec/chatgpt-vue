@@ -8,7 +8,7 @@
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">language</span>
                         <select v-model="transcriptionSettings.language" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
-                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.nativeName }}</option>
+                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
                         </select>
                         <voice-sound :content="resultMy" v-show="!isLoading" />
                     </label>
@@ -23,7 +23,7 @@
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">language</span>
                         <select v-model="transcriptionSettings.toLanguage" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
-                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.nativeName }}</option>
+                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
                         </select>
                         <voice-sound :content="resultForeign" v-show="!isLoading" />
                     </label>
@@ -48,10 +48,10 @@
                         </div>
                     </div>
                     <div class="w-1/4">
-                        <div @click="startRecording()" v-if="!isRecording">
+                        <div @click="startRecording2()" v-if="!isRecording">
                             <voice theme="outline" size="100" fill="#333" class="hover:cursor-pointer" />
                         </div>
-                        <div class="loading" @click="stopRecording()" v-else>
+                        <div class="loading" @click="stopRecording2()" v-else>
                             <round theme="multi-color" size="100" :fill="['#f5a623', '#ff0000', '#ffffff', '#417505']" />
                             <round theme="multi-color" size="100" :fill="['#ffffff', '#ff0000', '#ffffff', '#417505']" />
                             <round theme="multi-color" size="100" :fill="['#bd10e0', '#ff0000', '#ffffff', '#417505']" />
@@ -69,22 +69,14 @@
 </template>
 
 <script lang="ts">
-import { audioTranscriptions, chat } from "@/libs/gpt";
+import { list } from '@/assets/BCP47';
 import Loding from "@/components/Loding.vue";
 import VoiceSound from "@/components/VoiceSound.vue";
-import { Voice, Round, SortTwo, Translation } from "@icon-park/vue-next";
-import * as list from '@/assets/ISO639_1.json';
+import { audioTranscriptions, chat } from "@/libs/gpt";
 import { storeSettings } from '@/store';
+import { Round, SortTwo, Translation, Voice } from "@icon-park/vue-next";
 import { createToaster } from '@meforma/vue-toaster';
 
-interface fileDetail {
-    id: string,
-    object: string,
-    bytes: number,
-    created_at: number,
-    filename: string,
-    purpose: string
-}
 export default {
     name: 'transcription',
     data() {
@@ -110,6 +102,7 @@ export default {
     },
     mounted() {
         this.transcriptionSettings = this.getSettingsTrans();
+        this.checkApi();
     },
     methods: {
         async handleFileSelect(event: Event) {
@@ -225,6 +218,36 @@ export default {
                 this.isRecording = false;
             }
         },
+        checkApi(){
+            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
+            if (!SpeechRecognition) {
+                return
+            }
+
+            const recognition = new SpeechRecognition()
+
+            recognition.lang = this.transcriptionSettings.language
+            recognition.interimResults = true
+
+            recognition.addEventListener('result', event => {
+                console.log(event);
+            })
+
+            recognition.addEventListener('end', () => {
+    
+            })
+
+            this.mediaRecorder = recognition;
+        },
+        startRecording2() {
+            this.mediaRecorder.start();
+                this.isRecording = true;
+        },
+        stopRecording2() {
+            this.mediaRecorder.stop();
+                this.isRecording = false;
+        },
         async startTranslation() {
             this.isLoading = true;
             await this.translate();
@@ -236,7 +259,7 @@ export default {
          * simple content select change
          */
         contentSelectChange(event: any, myObjectName: string) {
-            storeSettings().setSettings(myObjectName, JSON.stringify(this.transcriptionSettings));
+            storeSettings().setSettings(myObjectName, this.transcriptionSettings);
         },
         /**
          * translate to wanted language

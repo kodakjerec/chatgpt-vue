@@ -82,13 +82,13 @@
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">language</span>
                         <select v-model="trans.language" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')" @focus="showTooltip('language', 'settings_trans')">
-                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.nativeName }}</option>
+                            <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
                         </select>
                     </label>
                 </div>
             </div>
             <!-- Speech -->
-            <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="4" @focus="showTooltip('', 'settings_speech')">
+            <div v-if="totalVoices" class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="4" @focus="showTooltip('', 'settings_speech')">
                 <div class="w-full flex text-center justify-between">
                     <div class="w-1/6 text-start">
                         <button class="btn" @click="resetValue('settings_speech')">Default</button>
@@ -139,10 +139,10 @@
 </template>
 
 <script lang="ts">
-import { storeVoice, storeSettings, storeGoogleDrive } from '@/store/index';
-import * as list from '@/assets/ISO639_1.json';
-import { createToaster } from '@meforma/vue-toaster';
+import { list } from '@/assets/BCP47';
 import { accessToken, revokeToken } from '@/libs/gDrive';
+import { storeGoogleDrive, storeSettings, storeVoice } from '@/store/index';
+import { createToaster } from '@meforma/vue-toaster';
 
 interface MyObject {
     [key: string]: any;
@@ -188,15 +188,17 @@ export default {
         // voices
         await storeVoice().setTotalVoices();
         this.totalVoices = storeVoice().getTotalVoices;
-        this.speechLangList = this.totalVoices.reduce((acc, cur) => {
-            const { lang } = cur;
-            if (!acc[lang]) acc[lang] = { sub: [cur] };
-            else acc[lang].sub.push(cur);
+        if(this.totalVoices) {
+            this.speechLangList = this.totalVoices.reduce((acc, cur) => {
+                const { lang } = cur;
+                if (!acc[lang]) acc[lang] = { sub: [cur] };
+                else acc[lang].sub.push(cur);
 
-            return acc;
-        }, {});
+                return acc;
+            }, {});
 
-        this.speechLangChange();
+            this.speechLangChange();
+        }
     },
     methods: {
         sendOrSave() {

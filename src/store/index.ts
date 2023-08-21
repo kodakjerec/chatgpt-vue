@@ -188,8 +188,8 @@ export const storeSettings = defineStore({
           findData = {
             model: "whisper-1",
             temperature: 0,
-            language: "zh",
-            toLanguage: "en",
+            language: "zh-TW",
+            toLanguage: "en-US",
           };
           break;
         case "settings_speech":
