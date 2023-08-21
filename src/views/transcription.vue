@@ -8,7 +8,7 @@
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">YourVoice</span>
                         <select v-model="transcriptionSettings.language" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
-                            <option v-for="(value, key) of speechLangList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
+                            <option v-for="(value, key) of yourVoiceLangList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
                         </select>
                         <voice-sound :content="resultMy" v-show="!isLoading" />
                     </label>
@@ -95,7 +95,7 @@ export default {
             // recorder
             mediaRecorder: null,
             chunks: [],
-            speechLangList: list,
+            yourVoiceLangList: list,
             openAPILangList: list2
         }
     },

@@ -82,7 +82,7 @@
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">language</span>
                         <select v-model="trans.language" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')" @focus="showTooltip('language', 'settings_trans')">
-                                <option v-for="(value, key) of languageList" :key="key" :value="key">{{ key + ' ' + value.nativeName }}</option>
+                                <option v-for="(value, key) of yourVoiceLangList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
                         </select>
                     </label>
                 </div>
@@ -139,7 +139,7 @@
 </template>
 
 <script lang="ts">
-import * as list from '@/assets/ISO639_1.json';
+import { list } from '@/assets/BCP47';
 import { accessToken, revokeToken } from '@/libs/gDrive';
 import { storeGoogleDrive, storeSettings, storeVoice } from '@/store/index';
 import { createToaster } from '@meforma/vue-toaster';
@@ -158,7 +158,7 @@ export default {
             chat: {} as any,
             trans: {} as any,
             speech: {} as any,
-            languageList: list,
+            yourVoiceLangList: list,
             totalVoices: [] as any[],
             speechLangList: [] as any[],
             speechVoiceList: [] as any[],
