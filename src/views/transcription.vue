@@ -17,7 +17,7 @@
 
                 <p class="flex justify-center">
                     <Loding v-if="isLoading" class="mt-1" aria-label="Loading" />
-                    <translation v-else class="w-10" theme="outline" size="48" fill="#333" @click="startTranslation()" aria-label="translation" />
+                    <double-down v-else class="w-10" theme="outline" size="48" fill="#333" @click="startTranslation()" aria-label="translation" />
                 </p>
 
                 <div class="w-full md:w-1/3">
@@ -72,12 +72,12 @@ l> -->
 
 <script lang="ts">
 import { list } from '@/assets/BCP47';
-import * as list2 from '@/assets/ISO639_1.json';
+import { list2 } from '@/assets/ISO639_1';
 import Loding from "@/components/Loding.vue";
 import VoiceSound from "@/components/VoiceSound.vue";
 import { audioTranscriptions, chat } from "@/libs/gpt";
 import { storeSettings } from '@/store';
-import { Round, SortTwo, Translation, Voice } from "@icon-park/vue-next";
+import { DoubleDown, Round, SortTwo, Voice } from "@icon-park/vue-next";
 import { createToaster } from '@meforma/vue-toaster';
 
 export default {
@@ -101,7 +101,7 @@ export default {
     },
     components: {
         Loding,
-        Voice, Round, SortTwo, Translation,
+        Voice, Round, SortTwo, DoubleDown,
         VoiceSound
     },
     mounted() {

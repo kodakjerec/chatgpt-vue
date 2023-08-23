@@ -1,5 +1,5 @@
-import type { ChatMessage } from "@/types/gpt";
 import { storeSettings } from "@/store/index";
+import type { ChatMessage } from "@/types/gpt";
 
 let controller = new AbortController();
 let signal = controller.signal;
@@ -133,7 +133,7 @@ export async function audioTranscriptions(file: File, prompt: string) {
   formData.append("file", file);
   formData.append("model", transcriptionSettings.model);
   formData.append("temperature", transcriptionSettings.temperature);
-  formData.append("language", transcriptionSettings.language);
+  formData.append("language", transcriptionSettings.language.substring(0,2));
   if (prompt) formData.append("prompt", prompt);
 
   try {

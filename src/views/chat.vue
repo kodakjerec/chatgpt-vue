@@ -83,7 +83,7 @@ export default {
   props: {
     sendLogName: {
       type: String,
-      default: ''
+      default: "chat1"
     }
   },
   emits: [],
@@ -285,16 +285,6 @@ export default {
         {
           role: "system",
           content: "You are ChatGPT, a large-scale language model trained by OpenAI, and you respond as concisely as possible.",
-        });
-      this.messageList.push(
-        {
-          role: "assistant",
-          content: `Hello, I am an AI language model and I can provide some common services and information, such as:
-
-Translation: I can translate Chinese to English, English to Chinese, and other languages such as French, Japanese, Spanish, etc.
-Consultation Services: If you need advice for any questions, such as health, legal, investment, etc., I will do my best to help you.
-Chatting: If you feel lonely or bored, we can talk about some interesting topics to relieve your stress.
-Please let me know what kind of help you need, and I will provide relevant information and advice based on your needs.`,
         });
     },
     // clean message content

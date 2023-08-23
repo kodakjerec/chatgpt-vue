@@ -57,7 +57,12 @@ const newChatLog = () => {
  */
 const delChatLog = (logName: string) => {
     storeSettings().delLogData(logName);
-    clickLogName(logList.value[0]);
+    
+    if(logList.value.length===0) {
+        newChatLog();
+    } else {
+        clickLogName(logList.value[0]);
+    }
 }
 /**
  * select one chat
@@ -122,7 +127,7 @@ const gotoPath = (path: string) => {
                 </li>
                 <div v-if="!oldLogName">
                     <edit theme="outline" size="20" fill="#fff" class="mt-3" @click="editLogName(item)" />
-                    <delete theme="outline" size="20" fill="#fff" class="mt-3" @click="delChatLog(item)" />
+                    <delete v-if="logList.length>1" theme="outline" size="20" fill="#fff" class="mt-3" @click="delChatLog(item)" />
                 </div>
             </div>
             
