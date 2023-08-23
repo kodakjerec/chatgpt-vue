@@ -191,7 +191,7 @@ export const storeSettings = defineStore({
             model: "whisper-1",
             temperature: 0,
             language: "zh-TW", // speechRecognition
-            toLanguage: "en", // whisper
+            toLanguage: "en-US", // whisper
           };
           break;
         case "settings_speech":

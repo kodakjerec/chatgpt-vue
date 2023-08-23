@@ -17,14 +17,17 @@
 
                 <p class="flex justify-center">
                     <Loding v-if="isLoading" class="mt-1" aria-label="Loading" />
-                    <double-down v-else class="w-10" theme="outline" size="48" fill="#333" @click="startTranslation()" aria-label="translation" />
+                    <div class="flex items-center cursor-pointer" v-else @click="startTranslation()">
+                        <double-down class="w-10" theme="outline" size="48" fill="#333" aria-label="translation" />
+                        <span>Trans</span>
+                    </div>
                 </p>
 
                 <div class="w-full md:w-1/3">
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">To</span>
                         <select v-model="transcriptionSettings.toLanguage" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')">
-                            <option v-for="(value, key) of openAPILangList" :key="key" :value="key">{{ key + ' ' + value.nativeName }}</option>
+                            <option v-for="(value, key) of openAPILangList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
                         </select>
                         <voice-sound :content="resultForeign" v-show="!isLoading" />
                     </label>
@@ -34,8 +37,8 @@
             </div>
             <!-- upload -->
             <div class="w-full">
-                <div class="flex flex-row justify-center">
-                    <div class="w-16 sm:w-3/4">
+                <div class="flex justify-between">
+                    <div class="border-none">
                         <div class="border border-dashed border-blue-500 flex text-center h-full" @dragover.prevent @drop="handleDrop" @dragenter="isDragging = true" @dragleave="isDragging = false" :class="{ 'dragging': isDragging }">
                             <label for="file-upload" class="btn flex">
                                 <span class="self-center">Import</span>
@@ -48,7 +51,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="w-1/4">
+                    <div class="">
                         <div @click="startRecording()" v-if="!isRecording">
                             <voice theme="outline" size="100" fill="#333" class="hover:cursor-pointer" />
                         </div>
@@ -72,7 +75,6 @@ l> -->
 
 <script lang="ts">
 import { list } from '@/assets/BCP47';
-import { list2 } from '@/assets/ISO639_1';
 import Loding from "@/components/Loding.vue";
 import VoiceSound from "@/components/VoiceSound.vue";
 import { audioTranscriptions, chat } from "@/libs/gpt";
@@ -96,7 +98,7 @@ export default {
             mediaRecorder: null,
             chunks: [],
             yourVoiceLangList: list,
-            openAPILangList: list2
+            openAPILangList: list
         }
     },
     components: {
@@ -275,6 +277,10 @@ export default {
 </style>
 
 <style scoped>
+.loading {
+    position: relative;
+    margin-right: 100px;
+}
 .loading>span {
     width: 0px;
     animation-name: ball-grid-beat;
