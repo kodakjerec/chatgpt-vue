@@ -42,36 +42,33 @@ export function revokeToken() {
  * @returns 使用者id
  */
 async function getUserInfo() {
-  const response = await fetch(
-    'https://www.googleapis.com/oauth2/v3/tokeninfo',
-    {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + storeSettings().getGDriveToken,
-      },
-    }
-  );
+  const response = await fetch("https://www.googleapis.com/oauth2/v3/tokeninfo", {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + storeSettings().getGDriveToken,
+    },
+  });
   const { body, status } = response;
-    if (body) {
-      const reader = body.getReader();
-      const decoder = new TextDecoder("utf-8");
+  if (body) {
+    const reader = body.getReader();
+    const decoder = new TextDecoder("utf-8");
 
-      while (true) {
-        // eslint-disable-next-line no-await-in-loop
-        const { done, value } = await reader.read();
-        if (done) break;
+    while (true) {
+      // eslint-disable-next-line no-await-in-loop
+      const { done, value } = await reader.read();
+      if (done) break;
 
-        const decodedText = decoder.decode(value, { stream: true });
-        const json = JSON.parse(decodedText); // start with "data: "
-        if (status !== 200) {
-          const content = json.error.message ?? decodedText;
-          clearToken(status);
-          return "";
-        } else {
-          return decodedText.sub;
-        }
+      const decodedText = decoder.decode(value, { stream: true });
+      const json = JSON.parse(decodedText); // start with "data: "
+      if (status !== 200) {
+        const content = json.error.message ?? decodedText;
+        clearToken(status);
+        return "";
+      } else {
+        return decodedText.sub;
       }
     }
+  }
 }
 
 export async function gDriveCheck(fileName: string) {
@@ -213,10 +210,13 @@ export async function gDriveLoad(fileId: string) {
     if (body) {
       const reader = body.getReader();
       const decoder = new TextDecoder("utf-8");
+      let totalText = "";
       while (true) {
         // eslint-disable-next-line no-await-in-loop
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          return totalText;
+        }
 
         const decodedText = decoder.decode(value, { stream: true });
         if (status !== 200) {
@@ -225,7 +225,7 @@ export async function gDriveLoad(fileId: string) {
           clearToken(status);
           return false;
         } else {
-          return decodedText;
+          totalText += decodedText;
         }
       }
     }
