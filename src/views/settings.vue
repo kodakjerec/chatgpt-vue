@@ -142,6 +142,7 @@
 import { list } from '@/assets/BCP47';
 import { accessToken, revokeToken } from '@/libs/gDrive';
 import { storeGoogleDrive, storeSettings, storeVoice } from '@/store/index';
+import { gptModelList } from '@/types/gpt';
 import { createToaster } from '@meforma/vue-toaster';
 
 interface MyObject {
@@ -164,12 +165,7 @@ export default {
             speechVoiceList: [] as any[],
             tooltipText: '',
             tooltipTextTw: '',
-            modelList: [
-                { key: 'gpt-3.5-turbo', tokens: 4096 },
-                { key: 'gpt-3.5-turbo-16k', tokens: 16384 },
-                { key: 'gpt-4', tokens: 8192 },
-                { key: 'gpt-4-32k', tokens: 32768 },
-            ]
+            modelList: gptModelList
         }
     },
     computed: {
@@ -292,10 +288,6 @@ export default {
             let myObject: MyObject = {};
             switch (myObjectName) {
                 case "settings_chat":
-                    let findObject = this.modelList.find(model => model.key === event.target.value);
-                    if (findObject) {
-                        storeSettings().maxTokens = findObject.tokens;
-                    }
                     myObject = this.chat; break;
                 case "settings_trans":
                     myObject = this.trans; break;

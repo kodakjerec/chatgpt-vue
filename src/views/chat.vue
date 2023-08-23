@@ -96,7 +96,6 @@ export default {
       decoder: new TextDecoder("utf-8"),
       roleAlias: { user: "User", assistant: "Assistant", system: "System" }, // role
       messageList: [],  // messages list
-      maxTokens: storeSettings().maxTokens, // chat max tokens
       enc: null, // calculate tokens
       settings_chat: storeSettings().getSettings("settings_chat"),
       isShowDialog: false, // open setting dialog
@@ -113,12 +112,6 @@ export default {
     // vue: under the same path, and change different chat-log
     sendLogName() {
       this.getChatLog(this.sendLogName);
-    },
-    'messageList.length'() {
-      this.$nextTick(() => {
-        this.scrollToBottom();
-        this.isAtBottom = true;
-      })
     },
     // detect textarea height
     messageContent(newValue) {
@@ -183,26 +176,23 @@ export default {
         this.messageList.push({ role: "user", content });
         this.clearMessageContent();
 
-        let calTokens: number = 0;
-        let sendMessageList: Array<ChatMessage> = [];
-        for (let i = this.messageList.length - 1; i >= 0; i--) {
-          let newTokens = this.calTiktoken(this.messageList[i].content);
-
-          if (calTokens + newTokens < this.maxTokens) {
-            calTokens += newTokens; // accumulation of tokens
-            sendMessageList.push(this.messageList[i]);
-          } else {
-            break;
-          }
-        }
+        let sendMessageList: Array<ChatMessage> = JSON.parse(JSON.stringify(this.messageList));
 
         sendMessageList = sendMessageList.reverse(); // newest message on top level
         this.messageList.push({ role: "assistant", content: '' }); // waiting for ai answer
+        this.$nextTick(() => {
+          this.scrollToBottom();
+          this.isAtBottom = true;
+        })
 
         const { body, status } = await chat(sendMessageList);
         if (body) {
           const reader = body.getReader();
           await this.readStream(reader, status);
+          this.$nextTick(() => {
+            this.scrollToBottom();
+            this.isAtBottom = true;
+          })
         }
       } catch (error: any) {
         this.appendLastMessageContent(error);

@@ -56,6 +56,7 @@
 
 <script lang="ts">
 import { storeSettings } from '@/store';
+import { gptModelList } from '@/types/gpt';
 import { Close } from "@icon-park/vue-next";
 
 export default {
@@ -74,12 +75,7 @@ export default {
             myTitle: this.title,
             settings_chat: storeSettings().getSettings("settings_chat"),
             shockWindow: false,
-            modelList: [
-                { key: 'gpt-3.5-turbo', tokens: 4096 },
-                { key: 'gpt-3.5-turbo-16k', tokens: 16384 },
-                { key: 'gpt-4', tokens: 8192 },
-                { key: 'gpt-4-32k', tokens: 32768 },
-            ]
+            modelList: gptModelList
         }
     },
     mounted() {
@@ -116,12 +112,6 @@ export default {
             event.target.select();
         },
         contentSelectChange(event: any, myObjectName: string) {
-            const target = event.target as HTMLSelectElement;
-
-            let findObject = this.modelList.find(model => model.key === event.target.value);
-            if (findObject) {
-                storeSettings().maxTokens = findObject.tokens;
-            }
             storeSettings().setSettings(myObjectName, this.settings_chat);
         },
         contentInputChange(event: any, myObjectName: string) {
