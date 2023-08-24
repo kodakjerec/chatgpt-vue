@@ -178,7 +178,6 @@ export default {
 
         let sendMessageList: Array<ChatMessage> = JSON.parse(JSON.stringify(this.messageList));
 
-        sendMessageList = sendMessageList.reverse(); // newest message on top level
         this.messageList.push({ role: "assistant", content: '' }); // waiting for ai answer
         this.$nextTick(() => {
           this.scrollToBottom();
