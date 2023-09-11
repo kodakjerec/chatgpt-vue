@@ -60,7 +60,7 @@ onMounted(async () => {
 
   if (token) {
     nowLoading = "Loading cloud data.";
-    await cloundToLocalStorage(false);
+    await cloundToLocalStorage();
     nowLoading = "";
   }
 
