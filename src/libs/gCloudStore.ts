@@ -3,22 +3,26 @@ import { createToaster } from "@meforma/vue-toaster";
 async function solveReadableStream(stream: ReadableStream<Uint8Array>) {
   const reader = stream.getReader();
   const decoder = new TextDecoder("utf-8");
-
+  let streamContent = [];
   while (true) {
     // eslint-disable-next-line no-await-in-loop
     const { done, value } = await reader.read();
     if (done) break;
 
-    const decodedText = JSON.parse(decoder.decode(value, { stream: true }));
-    return decodedText;
+    Array.prototype.push.apply(streamContent, Array.from(value));
   }
+  const decodedText = JSON.parse(decoder.decode(new Uint8Array(streamContent), { stream: true }));
+  return decodedText;
 }
 
 export async function load(sub: string) {
   try {
-    const response = await fetch("https://asia-east1-bodyfatrecorder.cloudfunctions.net/load?id=" + sub, {
-      method: "GET",
-    });
+    const response = await fetch(
+      "https://asia-east1-bodyfatrecorder.cloudfunctions.net/load?dbName=chatGPT&id=" + sub,
+      {
+        method: "GET",
+      }
+    );
     const { body, status, headers } = response;
 
     if (status === 200) {
@@ -37,6 +41,7 @@ export async function load(sub: string) {
 export async function save(sub: string, eMail: string, fileContent: string) {
   try {
     let formData = new FormData();
+    formData.append("dbName", "chatGPT");
     formData.append("id", sub);
     formData.append("eMail", eMail);
     formData.append("data", fileContent);

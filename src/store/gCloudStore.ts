@@ -2,8 +2,8 @@ import { load, save } from "@/libs/gCloudStore";
 import { createToaster } from "@meforma/vue-toaster";
 import Swal from "sweetalert2";
 import { storageGet, storageSet, storeSettings } from ".";
-let saveKeys = ["lastPath", "logData", "settings", "apiKey", "prompts"]
-  
+let saveKeys = ["lastPath", "logData", "settings", "apiKey", "prompts"];
+
 /**
  * 上傳本地資料到雲端
  * @returns
@@ -16,7 +16,7 @@ export async function localStorageToCloud() {
   });
 
   const saveData = JSON.stringify(filterData);
-  
+
   // 開始上傳
   let isOverwrite = true;
   const userInfo: any = await storeSettings().getGDriveToken;
@@ -33,8 +33,7 @@ export async function localStorageToCloud() {
       // TODO 詢問使用者是否覆蓋
       if (lastModifiedTime) {
         const result = await Swal.fire({
-          title:
-            "local->cloud: " + new Date(lastModifiedTime).toISOString().replace("T", " ").replace("Z", " "),
+          title: "local->cloud: " + new Date(lastModifiedTime).toISOString().replace("T", " ").replace("Z", " "),
           showCancelButton: true,
           confirmButtonText: "Yes",
         });
@@ -52,7 +51,7 @@ export async function localStorageToCloud() {
     const eMail = userInfo["email"];
     if (userId && eMail && saveData) {
       const patchResult = await save(userId, eMail, saveData);
-      createToaster().success("load cloud data finish", { position: "top" });
+      createToaster().success("Save to cloud finish", { position: "top" });
       if (patchResult) {
         return patchResult;
       }
@@ -72,7 +71,6 @@ export async function cloundToLocalStorage() {
 
     const cloudData: any = await load(userInfo["sub"]);
     const isSync = storeSettings().isSync;
-    debugger
 
     if (cloudData && cloudData.data && !isSync) {
       // TODO 檢查檔案日期
@@ -81,8 +79,7 @@ export async function cloundToLocalStorage() {
       // TODO 詢問使用者是否覆蓋
       if (lastModifiedTime) {
         const result = await Swal.fire({
-          title:
-            "cloud -> local:" + new Date(lastModifiedTime).toISOString().replace("T", " ").replace("Z", " "),
+          title: "cloud -> local:" + new Date(lastModifiedTime).toISOString().replace("T", " ").replace("Z", " "),
           showCancelButton: true,
           confirmButtonText: "是",
         });
@@ -97,7 +94,7 @@ export async function cloundToLocalStorage() {
     if (isOverwrite && cloudData.data) {
       const fromData = JSON.parse(cloudData.data.data);
       if (fromData) {
-        const notMapAttr = ["gToken"];
+        const notMapAttr = ["googleOAuth2token"];
         Object.entries(cloudData).map(([key, value]) => {
           if (!notMapAttr.includes(key)) {
             storageSet(key, value);

@@ -20,6 +20,6 @@ app
   .use(router)
   .use(pinia)
   .use(vue3GoogleLogin, {
-    clientId: gDriveId,
+    clientId: realId,
   })
   .mount("#app");

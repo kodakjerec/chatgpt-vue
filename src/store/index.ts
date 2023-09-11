@@ -134,8 +134,10 @@ export const storeSettings = defineStore({
             this.apiKey = cryptoJS.AES.decrypt(aesAPIKey, this.getSecretKey).toString(cryptoJS.enc.Utf8);
             break;
           case "googleOAuth2token":
-            let aesToken = storageGet("gToken") ?? "";
-            this.googleOAuth2token = cryptoJS.AES.decrypt(aesToken, this.getSecretKey).toString(cryptoJS.enc.Utf8);
+            let aesToken = storageGet("googleOAuth2token") ?? "";
+            this.googleOAuth2token = JSON.parse(
+              cryptoJS.AES.decrypt(aesToken, this.getSecretKey).toString(cryptoJS.enc.Utf8)
+            );
             break;
           case "lastPath":
             const getObjectString = storageGet(key);
@@ -209,7 +211,7 @@ export const storeSettings = defineStore({
     setGDriveToken(token: object) {
       this.googleOAuth2token = token;
       const aesAPIKey = cryptoJS.AES.encrypt(JSON.stringify(token), this.getSecretKey).toString();
-      storageSet("gToken", aesAPIKey);
+      storageSet("googleOAuth2token", aesAPIKey);
     },
     setPrompts(prompts: Array<promptInterface>) {
       this.prompts = prompts;
