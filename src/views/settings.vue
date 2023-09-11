@@ -8,8 +8,7 @@
                 <div class="w-full text-center">
                     <label class="text-gray-700 font-bold text-xl">Accounts Link</label>
                 </div>
-                <button class="btn" v-if="!googleLogined" @click="showEvents()">Google LogIn</button>
-                <button class="greenBtn" v-else @click="revokeToken()">Google LogOut</button>
+                <GoogleLogin :callback="callback" small />
             </div>
             <div class="flex flex-wrap rounded bg-white m-2 p-2" tabindex="1">
                 <div class="w-full text-center">
@@ -140,10 +139,11 @@
 
 <script lang="ts">
 import { list } from '@/assets/BCP47';
-import { accessToken, revokeToken } from '@/libs/gDrive';
-import { storeGoogleDrive, storeSettings, storeVoice } from '@/store/index';
+import { cloundToLocalStorage } from '@/store/gCloudStore';
+import { storeSettings, storeVoice } from '@/store/index';
 import { gptModelList } from '@/types/gpt';
 import { createToaster } from '@meforma/vue-toaster';
+import { decodeCredential } from 'vue3-google-login';
 
 interface MyObject {
     [key: string]: any;
@@ -395,17 +395,14 @@ export default {
                 this.tooltipTextTw = '';
             }, 10000)
         },
-        showEvents() {
-            if (!storeSettings().getGDriveToken) {
-                accessToken();
-            } else {
-                storeGoogleDrive().cloundToLocalStorage();
-            }
+        // Google Logi
+        async callback(response) {
+            // decodeCredential will retrive the JWT payload from the credential
+            const userData = decodeCredential(response.credential);
+            await storeSettings().setGDriveToken({ sub: userData["sub"], email: userData["email"] });
+
+            cloundToLocalStorage();
         },
-        revokeToken() {
-            revokeToken();
-            createToaster().success(`Log Out!`);
-        }
     }
 }
 </script>

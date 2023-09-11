@@ -1,7 +1,7 @@
-import { gDriveCheck, gDriveLoad, gDrivePatch, gDriveSave } from "@/libs/gDrive";
 import type { ChatMessage } from "@/types/gpt";
 import cryptoJS from "crypto-js";
 import { createPinia, defineStore } from "pinia";
+import { localStorageToCloud } from "./gCloudStore";
 
 // voice settings
 const synth = window.speechSynthesis;
@@ -18,13 +18,13 @@ export function setVoices() {
 }
 
 // unify storage method.
-function storageSet(key, value, cloundSave: boolean = false): void {
+export function storageSet(key, value, cloundSave: boolean = false): void {
   localStorage.setItem(key, value);
   if (cloundSave) {
-    storeGoogleDrive().localStorageToCloud();
+    localStorageToCloud();
   }
 }
-function storageGet(key): any {
+export function storageGet(key): any {
   return localStorage.getItem(key);
 }
 
@@ -72,8 +72,8 @@ export const storeSettings = defineStore({
     lastPath: "", // last view page
     settings: {}, // chatGPT settings
     googleOAuth2token: "", // google OAuth2 token
-    googleDriveFileName: "yourGPT_localStorage.txt",
     prompts: [], // prompts
+    isSync: false as boolean, // 是否有問過同步
   }),
   getters: {
     getSecretKey(state): string {
@@ -206,86 +206,22 @@ export const storeSettings = defineStore({
       }
       return findData;
     },
-    setGDriveToken(token: string) {
+    setGDriveToken(token: object) {
       this.googleOAuth2token = token;
-      const aesAPIKey = cryptoJS.AES.encrypt(token, this.getSecretKey).toString();
+      const aesAPIKey = cryptoJS.AES.encrypt(JSON.stringify(token), this.getSecretKey).toString();
       storageSet("gToken", aesAPIKey);
     },
     setPrompts(prompts: Array<promptInterface>) {
       this.prompts = prompts;
       storageSet("prompts", JSON.stringify(this.prompts));
     },
-  },
-});
-
-export const storeGoogleDrive = defineStore({
-  id: "googleDrive",
-  state: () => ({
-    saveKeys: ["lastPath", "logData", "settings", "apiKey", "prompts"],
-  }),
-  getters: {},
-  actions: {
-    /**
-     * save localstorage to cloud-data
-     * @param data json string
-     */
-    async localStorageToCloud() {
-      const token = storeSettings().getGDriveToken;
-      if (token) {
-        let saveData = {};
-        this.saveKeys.map((key) => {
-          saveData[key] = storageGet(key);
-        });
-        const fileName = storeSettings().googleDriveFileName;
-        // check file exists on google-drive
-        const fileId = await gDriveCheck(fileName);
-
-        if (fileId !== "error") {
-          if (fileId) {
-            const patchResult = await gDrivePatch(JSON.stringify(saveData), fileName, fileId);
-
-            if (patchResult) {
-              return `Patched Filename: ` + fileName;
-            }
-          } else {
-            const upResult = await gDriveSave(JSON.stringify(saveData), fileName);
-
-            if (upResult) {
-              return `Uploaded. Filename: ` + fileName;
-            }
-          }
-        }
-      }
-      return "";
-    },
-    /**
-     * restore localstorage to cloud-data
-     * @param data json string
-     */
-    async cloundToLocalStorage() {
-      const token = storeSettings().getGDriveToken;
-      if (token) {
-        // use google drive
-        const fileName = storeSettings().googleDriveFileName;
-        // check file exists on google-drive
-        const fileId = await gDriveCheck(fileName);
-
-        if (fileId && fileId !== "error") {
-          const fileContent = await gDriveLoad(fileId);
-          if (fileContent) {
-            const cloudData = JSON.parse(fileContent);
-            const notMapAttr = ["gToken"];
-            Object.entries(cloudData).map(([key, value]) => {
-              if (!notMapAttr.includes(key)) {
-                storageSet(key, value);
-              }
-            });
-          }
-        }
-      }
+    setIsSync(status: boolean) {
+      this.isSync = status;
+      storageSet("isSync", this.isSync);
     },
   },
 });
+
 const pinia = createPinia();
 
 export default pinia;

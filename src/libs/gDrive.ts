@@ -1,6 +1,7 @@
-import { storeGoogleDrive, storeSettings } from "@/store/index";
-import { googleSdkLoaded } from "vue3-google-login";
+import { cloundToLocalStorage } from "@/store/gCloudStore";
+import { storeSettings } from "@/store/index";
 import { createToaster } from "@meforma/vue-toaster";
+import { googleSdkLoaded } from "vue3-google-login";
 
 export const gDriveId: string = "929956701294-bvbtd8uh85cnb8gbf1fi5sboa9ue1f5r.apps.googleusercontent.com";
 
@@ -20,7 +21,7 @@ export async function accessToken() {
           // getUserInfo();
 
           // signed.restore or backup
-          await storeGoogleDrive().cloundToLocalStorage();
+          await cloundToLocalStorage();
           createToaster().success("The webpage will be refreshed in 2 seconds.");
           setTimeout(() => {
             window.location.reload();

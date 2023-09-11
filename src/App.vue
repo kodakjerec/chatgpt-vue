@@ -1,16 +1,17 @@
 
 <script lang="ts" setup>
-import { storeSettings, storeGoogleDrive } from '@/store/index';
+import { storeSettings } from '@/store/index';
 // components
-import home from "@/views/home.vue";
 import chat from "@/views/chat.vue";
+import sideBar from "@/views/components/sideBar.vue";
+import createOneImage from "@/views/createOneImage.vue";
+import home from "@/views/home.vue";
+import settings from "@/views/settings.vue";
 import transcription from "@/views/transcription.vue";
 import translation from "@/views/translation.vue";
-import settings from "@/views/settings.vue";
-import createOneImage from "@/views/createOneImage.vue";
-import prompts from './views/prompts.vue';
-import sideBar from "@/views/components/sideBar.vue";
 import { computed, onBeforeUnmount, onMounted } from "vue";
+import { cloundToLocalStorage } from './store/gCloudStore';
+import prompts from './views/prompts.vue';
 
 // set all!
 storeSettings().setFromLocalforge();
@@ -60,7 +61,7 @@ onMounted(async () => {
 
   if (token) {
     nowLoading = "Loading cloud data.";
-    await storeGoogleDrive().cloundToLocalStorage();
+    await cloundToLocalStorage();
     nowLoading = "";
   }
 
