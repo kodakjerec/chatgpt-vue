@@ -13,9 +13,6 @@ import { computed, onBeforeUnmount, onMounted } from "vue";
 import { cloundToLocalStorage } from './store/gCloudStore';
 import prompts from './views/prompts.vue';
 
-// set all!
-storeSettings().setFromLocalforge();
-
 const lastPath = computed(() => storeSettings().getLastPath);
 // dynamic component
 const componentPath: any = computed(() => {
@@ -56,12 +53,14 @@ const handlePageFocus = () => {
 
 onMounted(async () => {
   window.addEventListener('focus', handlePageFocus);
+  // set all!
+  await storeSettings().setFromLocalforge();
 
   const token = storeSettings().getGDriveToken;
 
   if (token) {
     nowLoading = "Loading cloud data.";
-    await cloundToLocalStorage();
+    await cloundToLocalStorage(false);
     nowLoading = "";
   }
 

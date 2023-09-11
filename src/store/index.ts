@@ -135,9 +135,11 @@ export const storeSettings = defineStore({
             break;
           case "googleOAuth2token":
             let aesToken = storageGet("googleOAuth2token") ?? "";
-            this.googleOAuth2token = JSON.parse(
-              cryptoJS.AES.decrypt(aesToken, this.getSecretKey).toString(cryptoJS.enc.Utf8)
-            );
+            if (aesToken) {
+              this.googleOAuth2token = JSON.parse(
+                cryptoJS.AES.decrypt(aesToken, this.getSecretKey).toString(cryptoJS.enc.Utf8)
+              );
+            }
             break;
           case "lastPath":
             const getObjectString = storageGet(key);

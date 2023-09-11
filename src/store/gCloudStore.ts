@@ -51,7 +51,6 @@ export async function localStorageToCloud() {
     const eMail = userInfo["email"];
     if (userId && eMail && saveData) {
       const patchResult = await save(userId, eMail, saveData);
-      createToaster().success("Save to cloud finish", { position: "top" });
       if (patchResult) {
         return patchResult;
       }
@@ -62,16 +61,15 @@ export async function localStorageToCloud() {
 }
 /**
  * 下載雲端資料覆蓋本地
- * @param data json string
  */
 export async function cloundToLocalStorage() {
   const userInfo: any = await storeSettings().getGDriveToken;
+
   if (userInfo) {
     let isOverwrite = true;
 
     const cloudData: any = await load(userInfo["sub"]);
     const isSync = storeSettings().isSync;
-
     if (cloudData && cloudData.data && !isSync) {
       // TODO 檢查檔案日期
       const lastModifiedTime: any = cloudData.data.modifiedTime;
@@ -93,9 +91,10 @@ export async function cloundToLocalStorage() {
     // 下載
     if (isOverwrite && cloudData.data) {
       const fromData = JSON.parse(cloudData.data.data);
+
       if (fromData) {
         const notMapAttr = ["googleOAuth2token"];
-        Object.entries(cloudData).map(([key, value]) => {
+        Object.entries(fromData).map(([key, value]) => {
           if (!notMapAttr.includes(key)) {
             storageSet(key, value);
           }

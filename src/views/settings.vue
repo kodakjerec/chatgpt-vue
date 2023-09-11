@@ -81,7 +81,7 @@
                     <label for="language" class="text-gray-700 mb2 flex items-center">
                         <span class="w-1/4">language</span>
                         <select v-model="trans.language" class="input w-3/4" @change="$event => contentSelectChange($event, 'settings_trans')" @focus="showTooltip('language', 'settings_trans')">
-                                <option v-for="(value, key) of yourVoiceLangList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
+                            <option v-for="(value, key) of yourVoiceLangList" :key="key" :value="key">{{ key + ' ' + value.Description }}</option>
                         </select>
                     </label>
                 </div>
@@ -184,7 +184,7 @@ export default {
         // voices
         await storeVoice().setTotalVoices();
         this.totalVoices = storeVoice().getTotalVoices;
-        if(this.totalVoices) {
+        if (this.totalVoices) {
             this.speechLangList = this.totalVoices.reduce((acc, cur) => {
                 const { lang } = cur;
                 if (!acc[lang]) acc[lang] = { sub: [cur] };
@@ -401,7 +401,11 @@ export default {
             const userData = decodeCredential(response.credential);
             await storeSettings().setGDriveToken({ sub: userData["sub"], email: userData["email"] });
 
-            cloundToLocalStorage();
+            await cloundToLocalStorage();
+            createToaster().success(`This page will reload in 2 seconds`);
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
         },
     }
 }
